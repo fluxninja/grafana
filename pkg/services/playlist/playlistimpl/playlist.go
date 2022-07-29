@@ -17,7 +17,8 @@ func ProvideService(db db.DB, cfg *setting.Cfg) playlist.Service {
 	if cfg.IsFeatureToggleEnabled("NewDBLibrary") {
 		return &Service{
 			store: &sqlxStore{
-				sqlxdb: sqlx.NewDb(db.GetDB().DB, db.GetDialect().DriverName()),
+				sqlxdb:  sqlx.NewDb(db.GetDB().DB, db.GetDialect().DriverName()),
+				dialect: db.GetDialect(),
 			},
 		}
 	}

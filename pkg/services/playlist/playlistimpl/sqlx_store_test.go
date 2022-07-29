@@ -2,7 +2,6 @@ package playlistimpl
 
 import (
 	"context"
-	"fmt"
 	"testing"
 
 	"github.com/grafana/grafana/pkg/services/playlist"
@@ -15,10 +14,12 @@ func TestIntegrationSQLxPlaylistDataAccess(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping integration test")
 	}
-	ss := sqlstore.InitTestDB(t)
-	playlistStore := sqlxStore{sqlxdb: sqlx.NewDb(ss.GetDB().DB, ss.GetDialect().DriverName())}
 
-	fmt.Println("the database drivername is:", ss.GetDialect().DriverName())
+	ss := sqlstore.InitTestDB(t)
+	// fmt.Println("the driver name is: >>>>>>>>", ss.GetDialect().DriverName())
+	playlistStore := sqlxStore{sqlxdb: sqlx.NewDb(ss.GetDB().DB, ss.GetDialect().DriverName()), dialect: ss.GetDialect()}
+
+	// fmt.Println("the driver name is: >>>>>>>>>>>>>>>>>", playlistStore.sqlxdb.DriverName())
 	t.Run("Can create playlist", func(t *testing.T) {
 		items := []playlist.PlaylistItemDTO{
 			{Title: "graphite", Value: "graphite", Type: "dashboard_by_tag"},
@@ -28,6 +29,13 @@ func TestIntegrationSQLxPlaylistDataAccess(t *testing.T) {
 		p, err := playlistStore.Insert(context.Background(), &cmd)
 		require.NoError(t, err)
 		uid := p.UID
+
+		t.Run("Can get playlist", func(t *testing.T) {
+			get := &playlist.GetPlaylistByUidQuery{UID: uid, OrgId: 1}
+			pl, err := playlistStore.Get(context.Background(), get)
+			require.NoError(t, err)
+			require.Equal(t, p.Id, pl.Id)
+		})
 
 		t.Run("Can get playlist items", func(t *testing.T) {
 			get := &playlist.GetPlaylistItemsByUidQuery{PlaylistUID: uid, OrgId: 1}
@@ -58,7 +66,39 @@ func TestIntegrationSQLxPlaylistDataAccess(t *testing.T) {
 		})
 	})
 
-	t.Run("Delete playlist that doesn't exist", func(t *testing.T) {
+	t.Run("Search playlist", func(t *testing.T) {
+		items := []playlist.PlaylistItemDTO{
+			{Title: "graphite", Value: "graphite", Type: "dashboard_by_tag"},
+			{Title: "Backend response times", Value: "3", Type: "dashboard_by_id"},
+		}
+		pl1 := playlist.CreatePlaylistCommand{Name: "NYC office", Interval: "10m", OrgId: 1, Items: items}
+		pl2 := playlist.CreatePlaylistCommand{Name: "NICE office", Interval: "10m", OrgId: 1, Items: items}
+		pl3 := playlist.CreatePlaylistCommand{Name: "NICE office", Interval: "10m", OrgId: 2, Items: items}
+		playlistStore.Insert(context.Background(), &pl1)
+		playlistStore.Insert(context.Background(), &pl2)
+		playlistStore.Insert(context.Background(), &pl3)
+		t.Run("With Org ID", func(t *testing.T) {
+			qr := playlist.GetPlaylistsQuery{Limit: 100, OrgId: 1}
+			res, err := playlistStore.List(context.Background(), &qr)
+
+			require.NoError(t, err)
+			require.Equal(t, 2, len(res))
+		})
+		t.Run("With Limit", func(t *testing.T) {
+			qr := playlist.GetPlaylistsQuery{Limit: 1, Name: "office", OrgId: 1}
+			res, err := playlistStore.List(context.Background(), &qr)
+			require.NoError(t, err)
+			require.Equal(t, 1, len(res))
+		})
+		t.Run("With Org ID and Name", func(t *testing.T) {
+			qr := playlist.GetPlaylistsQuery{Limit: 100, Name: "office", OrgId: 1}
+			res, err := playlistStore.List(context.Background(), &qr)
+			require.NoError(t, err)
+			require.Equal(t, 2, len(res))
+		})
+	})
+
+	t.Run("Delete playlist that doesn't exist, should not return error", func(t *testing.T) {
 		deleteQuery := playlist.DeletePlaylistCommand{UID: "654312", OrgId: 1}
 		err := playlistStore.Delete(context.Background(), &deleteQuery)
 		require.NoError(t, err)

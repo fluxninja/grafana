@@ -3,14 +3,17 @@ package playlistimpl
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/grafana/grafana/pkg/models"
 	"github.com/grafana/grafana/pkg/services/playlist"
+	"github.com/grafana/grafana/pkg/services/sqlstore/migrator"
 	"github.com/jmoiron/sqlx"
 )
 
 type sqlxStore struct {
-	sqlxdb *sqlx.DB
+	sqlxdb  *sqlx.DB
+	dialect migrator.Dialect
 }
 
 func (s *sqlxStore) Insert(ctx context.Context, cmd *playlist.CreatePlaylistCommand) (*playlist.Playlist, error) {
@@ -34,12 +37,13 @@ func (s *sqlxStore) Insert(ctx context.Context, cmd *playlist.CreatePlaylistComm
 	}
 	defer tx.Rollback()
 
-	res, err := tx.NamedExecContext(ctx, s.sqlxdb.Rebind("INSERT INTO playlist (name, interval, org_id, uid) VALUES (:name, :interval, :org_id, :uid)"), &p)
+	query := fmt.Sprintf("INSERT INTO playlist (name, %s, org_id, uid) VALUES (:name, :interval, :org_id, :uid)", s.dialect.Quote("interval"))
+	res, err := tx.NamedExecContext(ctx, s.sqlxdb.Rebind(query), &p)
 	if err != nil {
 		return nil, err
 	}
 
-	lastId, err := res.LastInsertId()
+	p.Id, err = res.LastInsertId()
 	if err != nil {
 		return nil, err
 	}
@@ -48,15 +52,14 @@ func (s *sqlxStore) Insert(ctx context.Context, cmd *playlist.CreatePlaylistComm
 		playlistItems := make([]playlist.PlaylistItem, 0)
 		for _, item := range cmd.Items {
 			playlistItems = append(playlistItems, playlist.PlaylistItem{
-				PlaylistId: lastId,
+				PlaylistId: p.Id,
 				Type:       item.Type,
 				Value:      item.Value,
 				Order:      item.Order,
 				Title:      item.Title,
 			})
 		}
-
-		query := "INSERT INTO playlist_item (`order`, playlist_id, type, value, title) VALUES (:order, :playlist_id, :type, :value, :title)"
+		query := fmt.Sprintf("INSERT INTO playlist_item (playlist_id, type, value, title, %s) VALUES (:playlist_id, :type, :value, :title, :order)", s.dialect.Quote("order"))
 		_, err = tx.NamedExecContext(ctx, query, playlistItems)
 		if err != nil {
 			return nil, err
@@ -94,7 +97,8 @@ func (s *sqlxStore) Update(ctx context.Context, cmd *playlist.UpdatePlaylistComm
 	}
 	defer tx.Rollback()
 
-	_, err = tx.NamedExecContext(ctx, `UPDATE playlist SET uid=:uid, org_id=:org_id, name=:name, interval=:interval WHERE id=:id`, p)
+	query := fmt.Sprintf("UPDATE playlist SET uid=:uid, org_id=:org_id, name=:name, %s=:interval WHERE id=:id", s.dialect.Quote("interval"))
+	_, err = tx.NamedExecContext(ctx, query, p)
 	if err != nil {
 		return nil, err
 	}
@@ -114,8 +118,7 @@ func (s *sqlxStore) Update(ctx context.Context, cmd *playlist.UpdatePlaylistComm
 			Title:      item.Title,
 		})
 	}
-
-	query := "INSERT INTO playlist_item (playlist_id, type, value, title, `order`) VALUES (:playlist_id, :type, :value, :title, :order)"
+	query = fmt.Sprintf("INSERT INTO playlist_item (playlist_id, type, value, title, %s) VALUES (:playlist_id, :type, :value, :title, :order)", s.dialect.Quote("order"))
 	_, err = tx.NamedExecContext(ctx, query, playlistItems)
 	if err != nil {
 		return nil, err
