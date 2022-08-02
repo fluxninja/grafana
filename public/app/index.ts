@@ -1,3 +1,7 @@
+// import 'systemjs';
+import { registerApplication, start } from 'single-spa';
+
+import registerServiceWorker from './registerServiceWorker';
 declare let __webpack_public_path__: string;
 declare let __webpack_nonce__: string;
 
@@ -17,5 +21,11 @@ if (window.nonce) {
 // This is an indication to the window.onLoad failure check that the app bundle has loaded.
 window.__grafana_app_bundle_loaded = true;
 
-import app from './app';
-app.init();
+registerApplication(
+  'fluxNinja-grafana',
+  () => import('./grafana.spa.app'),
+  () => true
+);
+
+start();
+registerServiceWorker();

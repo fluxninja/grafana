@@ -12078,6 +12078,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/systemjs@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "@types/systemjs@npm:6.1.1"
+  checksum: 16f8178b438d5223837995f458927da2d144adcf98c732b8e018e29f1d3364ede8d082edb4de2b31a371c5858485df3496b400fc90868b7ac6d4611e5a7bfa5d
+  languageName: node
+  linkType: hard
+
 "@types/tapable@npm:^1, @types/tapable@npm:^1.0.5":
   version: 1.0.8
   resolution: "@types/tapable@npm:1.0.8"
@@ -14955,6 +14962,13 @@ __metadata:
   dependencies:
     pako: ~1.0.5
   checksum: 5cd9d6a665190fedb4a97dfbad8dabc8698d8a507298a03f42c734e96d58ca35d3c7d4085e283440bbca1cd1938cff85031728079bedb3345310c58ab1ec92d6
+  languageName: node
+  linkType: hard
+
+"browserslist-config-single-spa@npm:^1.0.1":
+  version: 1.0.1
+  resolution: "browserslist-config-single-spa@npm:1.0.1"
+  checksum: 7857db70f4733237caeef2022a3662cf373ee83ab813904aaa0ae40626666b4c5c72488aedb833e92b622c54154c3f452647f5e70499950d05898d81dc0f7109
   languageName: node
   linkType: hard
 
@@ -21412,6 +21426,7 @@ __metadata:
     "@types/semver": 7.3.10
     "@types/slate": 0.47.2
     "@types/slate-plain-serializer": 0.7.2
+    "@types/systemjs": ^6.1.1
     "@types/testing-library__jest-dom": 5.14.5
     "@types/testing-library__react-hooks": ^3.2.0
     "@types/tinycolor2": 1.4.3
@@ -21576,6 +21591,8 @@ __metadata:
     sass-loader: 13.0.2
     selecto: 1.17.0
     semver: 7.3.7
+    single-spa: ^5.9.4
+    single-spa-react: ^4.6.1
     sinon: 14.0.0
     slate: 0.47.8
     slate-plain-serializer: 0.7.10
@@ -21585,6 +21602,7 @@ __metadata:
     stylelint-config-prettier: 9.0.3
     stylelint-config-sass-guidelines: 9.0.1
     symbol-observable: 4.0.0
+    systemjs: ^6.12.1
     terser-webpack-plugin: 5.3.3
     test: "link:./public/test"
     testing-library-selector: 0.2.1
@@ -33892,6 +33910,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"single-spa-react@npm:^4.6.1":
+  version: 4.6.1
+  resolution: "single-spa-react@npm:4.6.1"
+  dependencies:
+    browserslist-config-single-spa: ^1.0.1
+  peerDependencies:
+    "@types/react": "*"
+    "@types/react-dom": "*"
+    react: "*"
+  checksum: 12383d3b1dfc328efb7386f1094cbd255cf7e4785685416cd854ff3e1ba5da7828a2edaada94859593c8bc0405c5982c9655d1f51b5b67a2a94a6c1908983428
+  languageName: node
+  linkType: hard
+
+"single-spa@npm:^5.9.4":
+  version: 5.9.4
+  resolution: "single-spa@npm:5.9.4"
+  checksum: 8547b5db3d1c6788f44833b1bf7a89697a72a4ca4b801c3f9ddbf4e2949a40bc1d9e9a24650460c7a16f5a668d4e332fc237acacb84f329031815c19578a5907
+  languageName: node
+  linkType: hard
+
 "sinon@npm:14.0.0":
   version: 14.0.0
   resolution: "sinon@npm:14.0.0"
@@ -35239,6 +35277,13 @@ __metadata:
   version: 0.20.19
   resolution: "systemjs@npm:0.20.19"
   checksum: 4b5a404be790cd545d6994f617c24ef3a3ae52e029c6498f10206f715c6777c4c0733ab9d626723fdfa359f12707835f302986516e5835be26c202bc13e242df
+  languageName: node
+  linkType: hard
+
+"systemjs@npm:^6.12.1":
+  version: 6.12.1
+  resolution: "systemjs@npm:6.12.1"
+  checksum: 82388eb436013898d364d063478f97ce2a0a01c4a9a46088244da16e48a4aae6b4368a988c24409d3680c0d9bfb0ed68464f45494836218bd1cb4798501be8f9
   languageName: node
   linkType: hard
 
