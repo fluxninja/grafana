@@ -8,6 +8,7 @@ module.exports = {
   target: 'web',
   entry: {
     app: './public/app/index.ts',
+    fn_dashboard: './public/app/fn_dashboard.ts',
   },
   output: {
     clean: true,
@@ -15,6 +16,9 @@ module.exports = {
     filename: '[name].[contenthash].js',
     // Keep publicPath relative for host.com/grafana/ deployments
     publicPath: 'public/build/',
+    library: `${packageName}-[name]`,
+    libraryTarget: 'umd',
+    chunkLoadingGlobal: `webpackJsonp_${packageName}`,
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.es6', '.js', '.json', '.svg'],
