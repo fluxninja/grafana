@@ -20,7 +20,7 @@ module.exports = {
     publicPath: 'public/build/',
     library: `${packageName}-[name]`,
     libraryTarget: 'umd',
-    jsonpFunction: `webpackJsonp_${packageName}`,
+    chunkLoadingGlobal: `webpackJsonp_${packageName}`,
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.es6', '.js', '.json', '.svg'],
