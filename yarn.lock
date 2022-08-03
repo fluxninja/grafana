@@ -3547,7 +3547,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/runtime@npm:7.18.9, @babel/runtime@npm:^7.10.5":
+"@babel/runtime@npm:7.18.9":
   version: 7.18.9
   resolution: "@babel/runtime@npm:7.18.9"
   dependencies:
@@ -21528,7 +21528,6 @@ __metadata:
     prettier: 2.7.1
     prismjs: 1.28.0
     prop-types: 15.8.1
-    qiankun: ^2.7.4
     raw-loader: 4.0.2
     rc-cascader: 3.6.1
     rc-drawer: 4.4.3
@@ -22588,15 +22587,6 @@ __metadata:
     parent-module: ^1.0.0
     resolve-from: ^4.0.0
   checksum: 2cacfad06e652b1edc50be650f7ec3be08c5e5a6f6d12d035c440a42a8cc028e60a5b99ca08a77ab4d6b1346da7d971915828f33cdab730d3d42f08242d09baa
-  languageName: node
-  linkType: hard
-
-"import-html-entry@npm:^1.9.0":
-  version: 1.12.0
-  resolution: "import-html-entry@npm:1.12.0"
-  dependencies:
-    "@babel/runtime": ^7.7.2
-  checksum: 86bead4fa384c165ec56577a2e684251f50b8b98d29a55e4bff3bb95710f5fe5a58014386145322626d39e5fb7d38e69cdd4ff14ac0d1b41c37c34d53dbac122
   languageName: node
   linkType: hard
 
@@ -25947,7 +25937,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash@npm:4.17.21, lodash@npm:^4, lodash@npm:^4.0.0, lodash@npm:^4.1.1, lodash@npm:^4.17.11, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4, lodash@npm:^4.7.0, lodash@npm:~4.17.15":
+"lodash@npm:4.17.21, lodash@npm:^4, lodash@npm:^4.0.0, lodash@npm:^4.1.1, lodash@npm:^4.17.14, lodash@npm:^4.17.15, lodash@npm:^4.17.19, lodash@npm:^4.17.20, lodash@npm:^4.17.21, lodash@npm:^4.17.4, lodash@npm:^4.7.0, lodash@npm:~4.17.15":
   version: 4.17.21
   resolution: "lodash@npm:4.17.21"
   checksum: eb835a2e51d381e561e508ce932ea50a8e5a68f4ebdd771ea240d3048244a8d13658acbd502cd4829768c56f2e16bdd4340b9ea141297d472517b83868e677f7
@@ -30637,19 +30627,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"qiankun@npm:^2.7.4":
-  version: 2.7.4
-  resolution: "qiankun@npm:2.7.4"
-  dependencies:
-    "@babel/runtime": ^7.10.5
-    import-html-entry: ^1.9.0
-    lodash: ^4.17.11
-    single-spa: ^5.9.2
-    tslib: ^1.10.0
-  checksum: 56bda98fc3149a71d047e8640985e66705eaaf6f42a8231dbaf2b5851f48159cd06952f01ad4f510335573785a92048d0e67abe81d7532b5702cc301819be18b
-  languageName: node
-  linkType: hard
-
 "qs@npm:6.7.0":
   version: 6.7.0
   resolution: "qs@npm:6.7.0"
@@ -33912,13 +33889,6 @@ __metadata:
   version: 0.2.0
   resolution: "simple-is@npm:0.2.0"
   checksum: 9ab19289a1da9551f91715f4ae838790c13752ccf7e8b7dce69e4b056f4ab7c2b13486fe987ab00c01294cb33a63bb08fd66a1a4170c70fcc6d3a310bf406e8c
-  languageName: node
-  linkType: hard
-
-"single-spa@npm:^5.9.2":
-  version: 5.9.4
-  resolution: "single-spa@npm:5.9.4"
-  checksum: 8547b5db3d1c6788f44833b1bf7a89697a72a4ca4b801c3f9ddbf4e2949a40bc1d9e9a24650460c7a16f5a668d4e332fc237acacb84f329031815c19578a5907
   languageName: node
   linkType: hard
 
