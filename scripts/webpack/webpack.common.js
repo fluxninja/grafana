@@ -2,6 +2,8 @@ const CopyWebpackPlugin = require('copy-webpack-plugin');
 const path = require('path');
 const webpack = require('webpack');
 
+const packageName = require('../../package.json').name;
+
 const CopyUniconsPlugin = require('./plugins/CopyUniconsPlugin');
 const CorsWorkerPlugin = require('./plugins/CorsWorkerPlugin');
 
@@ -9,6 +11,11 @@ module.exports = {
   target: 'web',
   entry: {
     app: './public/app/index.ts',
+  },
+  output: {
+    library: `${packageName}-[name]`,
+    libraryTarget: 'umd',
+    jsonpFunction: `webpackJsonp_${packageName}`,
   },
   output: {
     clean: true,

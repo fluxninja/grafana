@@ -65,5 +65,3 @@ export class FNAppWrapper extends React.Component<DefaultProps> {
     );
   }
 }
-
-export default new FNAppWrapper({});
