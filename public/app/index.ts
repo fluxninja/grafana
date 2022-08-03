@@ -1,3 +1,11 @@
+import React from 'react';
+import ReactDOM from 'react-dom';
+// Note that SingleSpaContext is a react@16.3 (if available) context that provides the singleSpa props
+import singleSpaReact from 'single-spa-react';
+
+// eslint-disable-next-line import/order
+import { FNAppWrapper } from './FNAppWrapper';
+
 declare let __webpack_public_path__: string;
 declare let __webpack_nonce__: string;
 
@@ -17,5 +25,12 @@ if (window.nonce) {
 // This is an indication to the window.onLoad failure check that the app bundle has loaded.
 window.__grafana_app_bundle_loaded = true;
 
-import app from './app';
-app.init();
+const reactLifecycles = singleSpaReact({
+  React,
+  ReactDOM,
+  rootComponent: FNAppWrapper,
+});
+
+export const bootstrap = reactLifecycles.bootstrap;
+export const mount = reactLifecycles.mount;
+export const unmount = reactLifecycles.unmount;
