@@ -1,5 +1,3 @@
-// eslint-disable-next-line
-
 declare let __webpack_public_path__: string;
 declare let __webpack_nonce__: string;
 
@@ -23,6 +21,11 @@ if (window.nonce) {
 // This is an indication to the window.onLoad failure check that the app bundle has loaded.
 window.__grafana_app_bundle_loaded = true;
 
+import React from 'react';
+import ReactDOM from 'react-dom';
+
+import { FNAppWrapper } from './FNAppWrapper';
+
 /**
  * The bootstrap will only be called once when the child application is initialized.
  * The next time the child application re-enters, the mount hook will be called directly, and bootstrap will not be triggered repeatedly.
@@ -37,24 +40,30 @@ export async function bootstrap() {
  * The mount method is called every time the application enters,
  * usually we trigger the application's rendering method here.
  */
-// export async function mount(props: any) {
-//   ReactDOM.render(React.createElement(FNAppWrapper), props.container ? props.container.querySelector('#root') : document.getElementById('root'));
-// }
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function mount(props: { container: { querySelector: (arg0: string) => ReactDOM.Container | null } }) {
+  ReactDOM.render(
+    React.createElement(FNAppWrapper),
+    props.container ? props.container.querySelector('#root') : document.getElementById('root')
+  );
+}
 
-// /**
-//  * Methods that are called each time the application is switched/unloaded,
-//  * usually in this case we uninstall the application instance of the subapplication.
-//  */
-// export async function unmount(props: any) {
-//   const container = props.container ? props.container.querySelector('#root') : document.getElementById('root')
-//   if (container) {
-//     ReactDOM.unmountComponentAtNode(container);
-//   }
-// }
+/**
+ * Methods that are called each time the application is switched/unloaded,
+ * usually in this case we uninstall the application instance of the subapplication.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function unmount(props: { container: { querySelector: (arg0: string) => any } }) {
+  const container = props.container ? props.container.querySelector('#root') : document.getElementById('root');
+  if (container) {
+    ReactDOM.unmountComponentAtNode(container);
+  }
+}
 
-// /**
-//  * Optional lifecycle，just available with loadMicroApp way
-//  */
-// export async function update(props: any) {
-//   console.log('update props', props);
-// }
+/**
+ * Optional lifecycle，just available with loadMicroApp way
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function update(props: any) {
+  console.log('update props', props);
+}
