@@ -13,16 +13,14 @@ module.exports = {
     app: './public/app/index.ts',
   },
   output: {
-    library: `${packageName}-[name]`,
-    libraryTarget: 'umd',
-    jsonpFunction: `webpackJsonp_${packageName}`,
-  },
-  output: {
     clean: true,
     path: path.resolve(__dirname, '../../public/build'),
     filename: '[name].[contenthash].js',
     // Keep publicPath relative for host.com/grafana/ deployments
     publicPath: 'public/build/',
+    library: `${packageName}-[name]`,
+    libraryTarget: 'umd',
+    jsonpFunction: `webpackJsonp_${packageName}`,
   },
   resolve: {
     extensions: ['.ts', '.tsx', '.es6', '.js', '.json', '.svg'],
