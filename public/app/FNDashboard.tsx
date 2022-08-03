@@ -28,7 +28,7 @@ export function addPageBanner(fn: ComponentType) {
   pageBanners.push(fn);
 }
 
-export class FNAppWrapper extends React.Component<DefaultProps> {
+export class FNDashboard extends React.Component<DefaultProps> {
   app!: GrafanaApp;
   constructor(props: DefaultProps) {
     super(props);

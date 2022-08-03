@@ -24,7 +24,7 @@ window.__grafana_app_bundle_loaded = true;
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import { FNAppWrapper } from './FNAppWrapper';
+import { FNDashboard } from './FNDashboard';
 
 /**
  * The bootstrap will only be called once when the child application is initialized.
@@ -43,7 +43,7 @@ export async function bootstrap() {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export async function mount(props: any) {
   ReactDOM.render(
-    React.createElement(FNAppWrapper),
+    React.createElement(FNDashboard),
     props.container ? props.container.querySelector('reactRoot') : document.getElementById('reactRoot')
   );
 }
