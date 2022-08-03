@@ -41,7 +41,7 @@ export async function bootstrap() {
  * usually we trigger the application's rendering method here.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function mount(props: { container: { querySelector: (arg0: string) => ReactDOM.Container | null } }) {
+export async function mount(props: any) {
   ReactDOM.render(
     React.createElement(FNAppWrapper),
     props.container ? props.container.querySelector('#root') : document.getElementById('root')
@@ -53,7 +53,7 @@ export async function mount(props: { container: { querySelector: (arg0: string) 
  * usually in this case we uninstall the application instance of the subapplication.
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function unmount(props: { container: { querySelector: (arg0: string) => any } }) {
+export async function unmount(props: any) {
   const container = props.container ? props.container.querySelector('#root') : document.getElementById('root');
   if (container) {
     ReactDOM.unmountComponentAtNode(container);
