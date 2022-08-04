@@ -58,6 +58,7 @@ export class BackendSrv implements BackendService {
   private inspectorStream: Subject<FetchResponse | FetchError> = new Subject<FetchResponse | FetchError>();
   private readonly fetchQueue: FetchQueue;
   private readonly responseQueue: ResponseQueue;
+  private grafanaPrefix: boolean;
 
   private dependencies: BackendSrvDependencies = {
     fromFetch: fromFetch,
@@ -77,6 +78,7 @@ export class BackendSrv implements BackendService {
       };
     }
 
+    this.grafanaPrefix = false;
     this.noBackendCache = false;
     this.internalFetch = this.internalFetch.bind(this);
     this.fetchQueue = new FetchQueue();
@@ -86,8 +88,10 @@ export class BackendSrv implements BackendService {
 
   async request<T = any>(options: BackendSrvRequest): Promise<T> {
     // prefix "/grafana" to options.url
-    if (options.url.indexOf('/grafana') !== 0) {
-      options.url = '/grafana' + options.url;
+    if (this.grafanaPrefix) {
+      if (options.url.indexOf('/grafana') !== 0) {
+        options.url = '/grafana' + options.url;
+      }
     }
     return await lastValueFrom(this.fetch<T>(options).pipe(map((response: FetchResponse<T>) => response.data)));
   }
@@ -484,6 +488,10 @@ export class BackendSrv implements BackendService {
     }
 
     return this.get<FolderDTO>(`/api/folders/${uid}?${queryParams.toString()}`);
+  }
+
+  setGrafanaPrefix(prefix: boolean) {
+    this.grafanaPrefix = prefix;
   }
 }
 
