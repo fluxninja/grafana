@@ -115,7 +115,10 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
   componentDidMount() {
     this.initDashboard();
-    this.forceRouteReloadCounter = (this.props.history.location.state as any)?.routeReloadCounter || 0;
+    const { isPublic } = this.props;
+    if (!isPublic) {
+      this.forceRouteReloadCounter = (this.props.history.location.state as any)?.routeReloadCounter || 0;
+    }
   }
 
   componentWillUnmount() {
@@ -151,9 +154,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    const { dashboard, match, templateVarsChangedInUrl } = this.props;
-    const routeReloadCounter = (this.props.history.location.state as any)?.routeReloadCounter;
-
+    const { dashboard, match, templateVarsChangedInUrl, isPublic } = this.props;
     if (!dashboard) {
       return;
     }
