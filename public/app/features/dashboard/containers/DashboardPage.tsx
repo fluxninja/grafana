@@ -77,6 +77,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type OwnProps = {
   isPublic?: boolean;
+  isFNDashboard?: boolean;
 };
 
 export type Props = OwnProps &
@@ -115,8 +116,8 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
   componentDidMount() {
     this.initDashboard();
-    const { isPublic } = this.props;
-    if (!isPublic) {
+    const { isPublic, isFNDashboard } = this.props;
+    if (!isPublic && !isFNDashboard) {
       this.forceRouteReloadCounter = (this.props.history.location.state as any)?.routeReloadCounter || 0;
     }
   }
@@ -131,7 +132,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   initDashboard() {
-    const { dashboard, isPublic, match, queryParams } = this.props;
+    const { dashboard, isPublic, isFNDashboard, match, queryParams } = this.props;
 
     if (dashboard) {
       this.closeDashboard();
@@ -146,7 +147,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       urlFolderId: queryParams.folderId,
       panelType: queryParams.panelType,
       routeName: this.props.route.routeName,
-      fixUrl: !isPublic,
+      fixUrl: !isPublic && !isFNDashboard,
       accessToken: match.params.accessToken,
       keybindingSrv: this.context.keybindings,
     });
@@ -156,7 +157,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    const { dashboard, match, templateVarsChangedInUrl, isPublic } = this.props;
+    const { dashboard, match, templateVarsChangedInUrl, isPublic, isFNDashboard } = this.props;
     if (!dashboard) {
       return;
     }
