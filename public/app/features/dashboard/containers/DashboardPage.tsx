@@ -160,7 +160,13 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    const { dashboard, match, templateVarsChangedInUrl, isPublic, isFNDashboard } = this.props;
+    const { dashboard, match, templateVarsChangedInUrl, isPublic, isFNDashboard, controlsContainer } = this.props;
+    if (controlsContainer && this.toolbar) {
+      const fnToolbar: React.Component = () => {
+        return <FnAppProvider>{this.toolbar}</FnAppProvider>;
+      };
+      ReactDOM.render(React.createElement(fnToolbar), controlsContainer);
+    }
     if (!dashboard) {
       return;
     }
