@@ -1,5 +1,6 @@
 import { cx } from '@emotion/css';
 import React, { PureComponent } from 'react';
+import ReactDOM from 'react-dom';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { NavModel, NavModelItem, TimeRange, PageLayoutType, locationUtil } from '@grafana/data';
@@ -16,6 +17,7 @@ import { getNavModel } from 'app/core/selectors/navModel';
 import { PanelModel } from 'app/features/dashboard/state';
 import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
 import { getPageNavFromSlug, getRootContentNavModel } from 'app/features/storage/StorageFolderPage';
+import { FnAppProvider } from 'app/fn-app/fn-app-provider';
 import { DashboardRoutes, KioskMode, StoreState } from 'app/types';
 import { PanelEditEnteredEvent, PanelEditExitedEvent } from 'app/types/events';
 
@@ -78,6 +80,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type OwnProps = {
   isPublic?: boolean;
   isFNDashboard?: boolean;
+  controlsContainer: HTMLElement;
 };
 
 export type Props = OwnProps &
