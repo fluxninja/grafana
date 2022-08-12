@@ -53,6 +53,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
       iconOnly,
       'aria-label': ariaLabel,
       isHighlighted,
+      isHidden,
       ...rest
     },
     ref
@@ -82,6 +83,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         aria-label={getButtonAriaLabel(ariaLabel, tooltip)}
         aria-expanded={isOpen}
         {...rest}
+        style={{ display: isHidden ? 'none' : '' }}
       >
         {renderIcon(icon)}
         {imgSrc && <img className={styles.img} src={imgSrc} alt={imgAlt ?? ''} />}
