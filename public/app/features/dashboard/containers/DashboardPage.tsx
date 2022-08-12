@@ -141,8 +141,6 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       this.closeDashboard();
     }
 
-    console.log('info', match, dashboard, queryParams, this.props);
-
     this.props.initDashboard({
       urlSlug: match.params.slug,
       urlUid: match.params.uid,
