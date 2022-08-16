@@ -12241,6 +12241,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-datepicker@npm:^4.3.4":
+  version: 4.4.2
+  resolution: "@types/react-datepicker@npm:4.4.2"
+  dependencies:
+    "@popperjs/core": ^2.9.2
+    "@types/react": "*"
+    date-fns: ^2.0.1
+    react-popper: ^2.2.5
+  checksum: 6816335cfcdb587dc5ef7b40abbbf242d31f8dfb443467eb4b5899fdcab059a3e49dd7d6cec4d8469953667dd041237f4b08e3a4a79440efb9280f0c53402667
+  languageName: node
+  linkType: hard
+
 "@types/react-dev-utils@npm:9.0.10":
   version: 9.0.10
   resolution: "@types/react-dev-utils@npm:9.0.10"
@@ -13829,6 +13841,13 @@ __metadata:
     mime-types: ~2.1.24
     negotiator: 0.6.2
   checksum: 27fc8060ffc69481ff6719cd3ee06387d2b88381cb0ce626f087781bbd02201a645a9febc8e7e7333558354b33b1d2f922ad13560be4ec1b7ba9e76fc1c1241d
+  languageName: node
+  linkType: hard
+
+"ace-builds@npm:^1.4.13, ace-builds@npm:^1.4.14":
+  version: 1.9.5
+  resolution: "ace-builds@npm:1.9.5"
+  checksum: bac477c98b5d21e87e8b56db5d897af1b935676331f091c89a019f556f19e3594cd5a64410796e213045819f760005acdd94ff2d12ab6b06be6ea5c464fa22fd
   languageName: node
   linkType: hard
 
@@ -18850,7 +18869,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:2.29.1":
+"date-fns@npm:2.29.1, date-fns@npm:^2.0.1, date-fns@npm:^2.24.0":
   version: 2.29.1
   resolution: "date-fns@npm:2.29.1"
   checksum: 9d07f77dffc1eb8c213391bde39f2963ffe7c0019d9edde14487882d627224f3a39b963e6e99d0cc58afff220a6a1a7e8864d2789958f4eaa77714de94d4d076
@@ -19289,7 +19308,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"diff-match-patch@npm:^1.0.0":
+"diff-match-patch@npm:^1.0.0, diff-match-patch@npm:^1.0.5":
   version: 1.0.5
   resolution: "diff-match-patch@npm:1.0.5"
   checksum: 841522d01b09cccbc4e4402cf61514a81b906349a7d97b67222390f2d35cf5df277cb23959eeed212d5e46afb5629cebab41b87918672c5a05c11c73688630e3
@@ -23283,6 +23302,7 @@ __metadata:
     "@types/rc-tree": ^3.0.0
     "@types/react": 17.0.42
     "@types/react-beautiful-dnd": 13.1.2
+    "@types/react-datepicker": ^4.3.4
     "@types/react-dom": 17.0.14
     "@types/react-grid-layout": 1.3.2
     "@types/react-highlight-words": 0.16.4
@@ -23316,6 +23336,7 @@ __metadata:
     "@visx/tooltip": 2.10.0
     "@welldone-software/why-did-you-render": 7.0.1
     "@wojtekmaj/enzyme-adapter-react-17": 0.6.7
+    ace-builds: ^1.4.14
     angular: 1.8.3
     angular-bindonce: 0.3.1
     angular-route: 1.8.3
@@ -23432,6 +23453,7 @@ __metadata:
     react: 17.0.2
     react-awesome-query-builder: 5.3.1
     react-beautiful-dnd: 13.1.0
+    react-datepicker: ^4.7.0
     react-diff-viewer: ^3.1.1
     react-dom: 17.0.2
     react-draggable: 4.4.5
@@ -34111,6 +34133,23 @@ __metadata:
   languageName: node
   linkType: hard
 
+"react-datepicker@npm:^4.7.0":
+  version: 4.8.0
+  resolution: "react-datepicker@npm:4.8.0"
+  dependencies:
+    "@popperjs/core": ^2.9.2
+    classnames: ^2.2.6
+    date-fns: ^2.24.0
+    prop-types: ^15.7.2
+    react-onclickoutside: ^6.12.0
+    react-popper: ^2.2.5
+  peerDependencies:
+    react: ^16.9.0 || ^17 || ^18
+    react-dom: ^16.9.0 || ^17 || ^18
+  checksum: d31a1002c5c6220fd8a5201f3a71015ac09b003d71f59ebc6fc0f9c452268f924f0244e69c223f64763ebb2131031ce5e792872631bfb364c34b8ea730258e6c
+  languageName: node
+  linkType: hard
+
 "react-dev-utils@npm:^12.0.0":
   version: 12.0.0
   resolution: "react-dev-utils@npm:12.0.0"
@@ -34494,6 +34533,16 @@ __metadata:
     overlap-area: ^1.1.0
     react-css-styled: ^1.0.3
   checksum: 0d96f151a7b1c7ec8fed8e0f46cda8c48ab5553964bf5333ce647d5f14d27efdc6203ad5888b2143448dc33e389f1ec440eb8b515166716fa8423f6f2224a5a4
+  languageName: node
+  linkType: hard
+
+"react-onclickoutside@npm:^6.12.0":
+  version: 6.12.2
+  resolution: "react-onclickoutside@npm:6.12.2"
+  peerDependencies:
+    react: ^15.5.x || ^16.x || ^17.x || ^18.x
+    react-dom: ^15.5.x || ^16.x || ^17.x || ^18.x
+  checksum: a0c7f4fbcf84e00d50b3fc18208e5fdc4e97b17daf910f176659e079038a560d2e299955804d20e6ca2bf375404d03fdb865dc7f5f85cab3e60b493be4375e77
   languageName: node
   linkType: hard
 
