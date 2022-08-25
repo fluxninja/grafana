@@ -243,6 +243,7 @@ require (
 	github.com/Azure/azure-sdk-for-go/sdk/keyvault/azkeys v0.4.0
 	github.com/Azure/go-autorest/autorest/adal v0.9.17
 	github.com/armon/go-radix v1.0.0
+	github.com/bitly/go-simplejson v0.5.0
 	github.com/blugelabs/bluge v0.1.9
 	github.com/blugelabs/bluge_segment_api v0.2.0
 	github.com/dlmiddlecote/sqlstats v1.0.2
@@ -250,6 +251,7 @@ require (
 	github.com/getkin/kin-openapi v0.94.0
 	github.com/golang-migrate/migrate/v4 v4.7.0
 	github.com/google/go-github/v45 v45.2.0
+	github.com/grafadruid/go-druid v0.0.5
 	github.com/grafana/dskit v0.0.0-20211011144203-3a88ec0b675f
 	github.com/jmoiron/sqlx v1.3.5
 	github.com/matryer/is v1.4.0
@@ -272,7 +274,6 @@ require (
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/gosimple/unidecode v1.0.1 // indirect
-	github.com/grafadruid/go-druid v0.0.5 // indirect
 	github.com/hashicorp/go-cleanhttp v0.5.1 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/memberlist v0.4.0 // indirect
