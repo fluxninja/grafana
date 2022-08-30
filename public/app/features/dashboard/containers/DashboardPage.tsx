@@ -85,7 +85,7 @@ type OwnProps = {
 export type Props = OwnProps &
   Themeable2 &
   GrafanaRouteComponentProps<DashboardPageRouteParams, DashboardPageRouteSearchParams> &
-  ConnectedProps<typeof connector>;
+  ConnectedProps<typeof connector> & { hiddenVariables: string[] };
 
 export interface State {
   editPanel: PanelModel | null;
@@ -134,7 +134,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   initDashboard() {
-    const { dashboard, isPublic, isFNDashboard, match, queryParams } = this.props;
+    const { dashboard, isPublic, isFNDashboard, match, queryParams, hiddenVariables } = this.props;
 
     if (dashboard) {
       this.closeDashboard();
