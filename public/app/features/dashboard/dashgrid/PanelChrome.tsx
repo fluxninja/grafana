@@ -532,7 +532,7 @@ class PanelChromeUnconnected extends PureComponent<Props, State> {
               textTransform: 'capitalize',
             }}
           >
-            {slug}
+            {panel.title}
           </div>
         ) : (
           <PanelHeader
