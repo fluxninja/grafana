@@ -9,6 +9,12 @@ import { alertingApi } from '../features/alerting/unified/api/alertingApi';
 
 import { setStore } from './store';
 
+export type ConfiguredStore = EnhancedStore<
+  CombinedState<StoreState>,
+  AnyAction,
+  MiddlewareArray<[ThunkMiddleware<CombinedState<StoreState>, AnyAction>]>
+>;
+
 export function addRootReducer(reducers: any) {
   // this is ok now because we add reducers before configureStore is called
   // in the future if we want to add reducers during runtime

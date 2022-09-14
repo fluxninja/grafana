@@ -1,7 +1,7 @@
 import { cx } from '@emotion/css';
 import React, { PureComponent } from 'react';
 import ReactDOM from 'react-dom';
-import { connect, ConnectedProps } from 'react-redux';
+import { connect, ConnectedProps, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
 import { NavModel, NavModelItem, TimeRange, PageLayoutType, locationUtil } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
@@ -17,7 +17,7 @@ import { getNavModel } from 'app/core/selectors/navModel';
 import { PanelModel } from 'app/features/dashboard/state';
 import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
 import { getPageNavFromSlug, getRootContentNavModel } from 'app/features/storage/StorageFolderPage';
-import { DashboardRoutes, KioskMode, StoreState } from 'app/types';
+import { DashboardRoutes, DashboardState, KioskMode, StoreState } from 'app/types';
 import { PanelEditEnteredEvent, PanelEditExitedEvent } from 'app/types/events';
 
 import { cancelVariables, templateVarsChangedInUrl } from '../../variables/state/actions';
@@ -59,14 +59,30 @@ export type DashboardPageRouteSearchParams = {
   kiosk?: string | true;
 };
 
-export const mapStateToProps = (state: StoreState) => ({
+export type MapStateToDashboardPageProps = MapStateToProps<
+  Pick<DashboardState, 'initPhase' | 'initError'> & { dashboard: ReturnType<DashboardState['getModel']> },
+  OwnProps,
+  StoreState
+>;
+
+export type MapDispatchToDashboardPageProps = MapDispatchToProps<MappedDispatch, OwnProps>;
+
+export type MappedDispatch = {
+  initDashboard: typeof initDashboard;
+  cleanUpDashboardAndVariables: typeof cleanUpDashboardAndVariables;
+  notifyApp: typeof notifyApp;
+  cancelVariables: typeof cancelVariables;
+  templateVarsChangedInUrl: typeof templateVarsChangedInUrl;
+};
+
+export const mapStateToProps: MapStateToDashboardPageProps = (state) => ({
   initPhase: state.dashboard.initPhase,
   initError: state.dashboard.initError,
   dashboard: state.dashboard.getModel(),
   navIndex: state.navIndex,
 });
 
-const mapDispatchToProps = {
+const mapDispatchToProps: MapDispatchToDashboardPageProps = {
   initDashboard,
   cleanUpDashboardAndVariables,
   notifyApp,
@@ -79,13 +95,14 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type OwnProps = {
   isPublic?: boolean;
   isFNDashboard?: boolean;
-  controlsContainer: HTMLElement;
+  controlsContainer?: HTMLElement | null;
+  hiddenVariables?: string[];
 };
 
 export type Props = OwnProps &
   Themeable2 &
   GrafanaRouteComponentProps<DashboardPageRouteParams, DashboardPageRouteSearchParams> &
-  ConnectedProps<typeof connector> & { hiddenVariables: string[] };
+  ConnectedProps<typeof connector>;
 
 export interface State {
   editPanel: PanelModel | null;
@@ -134,7 +151,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   initDashboard() {
-    const { dashboard, isPublic, isFNDashboard, match, queryParams, hiddenVariables } = this.props;
+    const { dashboard, isPublic, isFNDashboard, match, queryParams } = this.props;
 
     if (dashboard) {
       this.closeDashboard();
