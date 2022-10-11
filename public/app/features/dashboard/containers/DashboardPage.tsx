@@ -97,7 +97,11 @@ type OwnProps = {
   isFNDashboard?: boolean;
   controlsContainer?: HTMLElement | null;
   hiddenVariables?: string[];
+  fnLoader?: ReactNode;
 };
+
+export type DashboardPageProps = OwnProps &
+  GrafanaRouteComponentProps<DashboardPageRouteParams, DashboardPageRouteSearchParams>;
 
 export type Props = OwnProps &
   Themeable2 &
