@@ -112,6 +112,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
           icon="clock-nine"
           isOpen={isOpen}
           variant={variant}
+          fnText={fnText}
         >
           <TimePickerButtonLabel {...props} />
         </ToolbarButton>

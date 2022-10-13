@@ -33,7 +33,8 @@ type CommonProps = {
   isHighlighted?: boolean;
 };
 
-export type ToolbarButtonProps = CommonProps & ButtonHTMLAttributes<HTMLButtonElement> & { isHidden?: boolean };
+export type ToolbarButtonProps = CommonProps &
+  ButtonHTMLAttributes<HTMLButtonElement> & { isHidden?: boolean; fnText?: string | JSX.Element };
 
 export type ToolbarButtonVariant = 'default' | 'primary' | 'destructive' | 'active' | 'canvas';
 
@@ -54,6 +55,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
       'aria-label': ariaLabel,
       isHighlighted,
       isHidden,
+      fnText = '',
       ...rest
     },
     ref
@@ -91,6 +93,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         {isOpen === false && <Icon name="angle-down" />}
         {isOpen === true && <Icon name="angle-up" />}
         {isHighlighted && <div className={styles.highlight} />}
+        {fnText !== '' && fnText}
       </button>
     );
 
