@@ -539,35 +539,37 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 			}
 		}
 	case "timeseries":
-		var tsr []map[string]interface{}
-		err := json.Unmarshal(result, &tsr)
-		if err == nil && len(tsr) > 0 {
-			columns := []string{"timestamp"}
-			for c := range tsr[0]["result"].(map[string]interface{}) {
-				columns = append(columns, c)
+		var tsResult TimeseriesResult
+		err := json.Unmarshal(result, &tsResult)
+		if err != nil {
+			return r, err
+		}
+		if len(tsResult) == 0 {
+			return r, nil
+		}
+		columns := tsResult.Columns()
+		for _, result := range tsResult {
+			var row []interface{}
+			t := result.Timestamp
+			if t == "" {
+				// If timestamp not set, use value from previous row.
+				// TODO what if there is no previous result?
+				t = r.Rows[len(r.Rows)-1][0].(string)
 			}
-			for _, result := range tsr {
-				var row []interface{}
-				t := result["timestamp"]
-				if t == nil {
-					// grand total, lets keep it last
-					t = r.Rows[len(r.Rows)-1][0]
-				}
-				row = append(row, t)
-				colResults := result["result"].(map[string]interface{})
-				for _, c := range columns[1:] {
-					row = append(row, colResults[c])
-				}
-				r.Rows = append(r.Rows, row)
+			row = append(row, t)
+			colResults := result.Result
+			for _, c := range columns[1:] {
+				row = append(row, colResults[c])
 			}
-			for i, c := range columns {
-				col := struct {
-					Name string
-					Type string
-				}{Name: c}
-				detectColumnType(&col, i, r.Rows)
-				r.Columns = append(r.Columns, col)
-			}
+			r.Rows = append(r.Rows, row)
+		}
+		for i, c := range columns {
+			col := struct {
+				Name string
+				Type string
+			}{Name: c}
+			detectColumnType(&col, i, r.Rows)
+			r.Columns = append(r.Columns, col)
 		}
 	case "topN":
 		var tn []map[string]interface{}
