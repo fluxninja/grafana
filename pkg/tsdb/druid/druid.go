@@ -881,17 +881,20 @@ func (ds *Service) prepareResponse(resp *druidResponse, settings map[string]inte
 				if r[ic] == nil {
 					r[ic] = ""
 				}
-				ff = append(ff.([]string), r[ic].(string))
+				value, _ := r[ic].(string)
+				ff = append(ff.([]string), value)
 			case "float":
 				if r[ic] == nil {
 					r[ic] = 0.0
 				}
-				ff = append(ff.([]float64), r[ic].(float64))
+				value, _ := r[ic].(float64)
+				ff = append(ff.([]float64), value)
 			case "int":
 				if r[ic] == nil {
 					r[ic] = "0"
 				}
-				i, err := strconv.Atoi(r[ic].(string))
+				value, _ := r[ic].(string)
+				i, err := strconv.Atoi(value)
 				if err != nil {
 					i = 0
 				}
@@ -901,7 +904,8 @@ func (ds *Service) prepareResponse(resp *druidResponse, settings map[string]inte
 				var err error
 				b, ok := r[ic].(bool)
 				if !ok {
-					b, err = strconv.ParseBool(r[ic].(string))
+					value, _ := r[ic].(string)
+					b, err = strconv.ParseBool(value)
 					if err != nil {
 						b = false
 					}
@@ -915,13 +919,15 @@ func (ds *Service) prepareResponse(resp *druidResponse, settings map[string]inte
 				}
 				switch r[ic].(type) {
 				case string:
-					t, err := time.Parse("2006-01-02T15:04:05.000Z", r[ic].(string))
+					value, _ := r[ic].(string)
+					t, err := time.Parse("2006-01-02T15:04:05.000Z", value)
 					if err != nil {
 						t = time.Now()
 					}
 					ff = append(ff.([]time.Time), t)
 				case float64:
-					sec, dec := math.Modf(r[ic].(float64) / 1000)
+					value, _ := r[ic].(float64)
+					sec, dec := math.Modf(value / 1000)
 					ff = append(ff.([]time.Time), time.Unix(int64(sec), int64(dec*(1e9))))
 				}
 			}
