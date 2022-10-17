@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"math"
 	"net/http"
-	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -49,11 +48,23 @@ type druidQuery struct {
 
 type druidResponse struct {
 	Reference string
-	Columns   []struct {
-		Name string
-		Type string
-	}
-	Rows [][]interface{}
+	Columns   []responseColumn
+	Rows      [][]interface{}
+}
+
+type columnType string
+
+const (
+	ColumnString columnType = "string"
+	ColumnTime   columnType = "time"
+	ColumnBool   columnType = "bool"
+	ColumnInt    columnType = "int"
+	ColumnFloat  columnType = "float"
+)
+
+type responseColumn struct {
+	Name string
+	Type columnType
 }
 
 type druidInstanceSettings struct {
@@ -463,64 +474,6 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 	if err != nil {
 		return r, err
 	}
-	detectColumnType := func(c *struct {
-		Name string
-		Type string
-	}, pos int, rr [][]interface{}) {
-		t := map[string]int{"nil": 0}
-		for i := 0; i < len(rr); i += int(math.Ceil(float64(len(rr)) / 5.0)) {
-			r := rr[i]
-			switch r[pos].(type) {
-			case string:
-				v := r[pos].(string)
-				_, err := strconv.Atoi(v)
-				if err != nil {
-					_, err := strconv.ParseBool(v)
-					if err != nil {
-						_, err := time.Parse("2006-01-02T15:04:05.000Z", v)
-						if err != nil {
-							t["string"]++
-							continue
-						}
-						t["time"]++
-						continue
-					}
-					t["bool"]++
-					continue
-				}
-				t["int"]++
-				continue
-			case float64:
-				if c.Name == "__time" || strings.Contains(strings.ToLower(c.Name), "time_") {
-					t["time"]++
-					continue
-				}
-				t["float"]++
-				continue
-			case bool:
-				t["bool"]++
-				continue
-			}
-		}
-		election := func(values map[string]int) string {
-			type kv struct {
-				Key   string
-				Value int
-			}
-			var ss []kv
-			for k, v := range values {
-				ss = append(ss, kv{k, v})
-			}
-			sort.Slice(ss, func(i, j int) bool {
-				return ss[i].Value > ss[j].Value
-			})
-			if len(ss) == 2 {
-				return ss[0].Key
-			}
-			return "string"
-		}
-		c.Type = election(t)
-	}
 	switch qtyp {
 	case "sql":
 		var sqlr []interface{}
@@ -530,10 +483,9 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 				r.Rows = append(r.Rows, row.([]interface{}))
 			}
 			for i, c := range sqlr[0].([]interface{}) {
-				col := struct {
-					Name string
-					Type string
-				}{Name: c.(string)}
+				col := responseColumn{
+					Name: c.(string),
+				}
 				detectColumnType(&col, i, r.Rows)
 				r.Columns = append(r.Columns, col)
 			}
@@ -553,7 +505,7 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 			t := result.Timestamp
 			if t == "" {
 				// If timestamp not set, use value from previous row.
-				// TODO what if there is no previous result?
+				// This can happen when grand total is calculated.
 				t = r.Rows[len(r.Rows)-1][0].(string)
 			}
 			row = append(row, t)
@@ -564,10 +516,9 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 			r.Rows = append(r.Rows, row)
 		}
 		for i, c := range columns {
-			col := struct {
-				Name string
-				Type string
-			}{Name: c}
+			col := responseColumn{
+				Name: c,
+			}
 			detectColumnType(&col, i, r.Rows)
 			r.Columns = append(r.Columns, col)
 		}
@@ -591,10 +542,9 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 				}
 			}
 			for i, c := range columns {
-				col := struct {
-					Name string
-					Type string
-				}{Name: c}
+				col := responseColumn{
+					Name: c,
+				}
 				detectColumnType(&col, i, r.Rows)
 				r.Columns = append(r.Columns, col)
 			}
@@ -617,10 +567,9 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 				r.Rows = append(r.Rows, row)
 			}
 			for i, c := range columns {
-				col := struct {
-					Name string
-					Type string
-				}{Name: c}
+				col := responseColumn{
+					Name: c,
+				}
 				detectColumnType(&col, i, r.Rows)
 				r.Columns = append(r.Columns, col)
 			}
@@ -633,10 +582,9 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 				r.Rows = append(r.Rows, e.([]interface{}))
 			}
 			for i, c := range scanr[0]["columns"].([]interface{}) {
-				col := struct {
-					Name string
-					Type string
-				}{Name: c.(string)}
+				col := responseColumn{
+					Name: c.(string),
+				}
 				detectColumnType(&col, i, r.Rows)
 				r.Columns = append(r.Columns, col)
 			}
@@ -661,10 +609,9 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 				}
 			}
 			for i, c := range columns {
-				col := struct {
-					Name string
-					Type string
-				}{Name: c}
+				col := responseColumn{
+					Name: c,
+				}
 				detectColumnType(&col, i, r.Rows)
 				r.Columns = append(r.Columns, col)
 			}
@@ -687,10 +634,9 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 				r.Rows = append(r.Rows, row)
 			}
 			for i, c := range columns {
-				col := struct {
-					Name string
-					Type string
-				}{Name: c}
+				col := responseColumn{
+					Name: c,
+				}
 				detectColumnType(&col, i, r.Rows)
 				r.Columns = append(r.Columns, col)
 			}
@@ -713,10 +659,9 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 				r.Rows = append(r.Rows, row)
 			}
 			for i, c := range columns {
-				col := struct {
-					Name string
-					Type string
-				}{Name: c}
+				col := responseColumn{
+					Name: c,
+				}
 				detectColumnType(&col, i, r.Rows)
 				r.Columns = append(r.Columns, col)
 			}
@@ -824,10 +769,9 @@ func (ds *Service) executeQuery(queryRef string, q druidquerybuilder.Query, s *d
 				}
 			}
 			for i, c := range columns {
-				col := struct {
-					Name string
-					Type string
-				}{Name: c}
+				col := responseColumn{
+					Name: c,
+				}
 				detectColumnType(&col, i, r.Rows)
 				r.Columns = append(r.Columns, col)
 			}
