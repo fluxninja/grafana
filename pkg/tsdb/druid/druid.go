@@ -20,6 +20,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana/pkg/infra/httpclient"
+	"github.com/grafana/grafana/pkg/tsdb/druid/result"
 )
 
 // Internal interval and range variables
@@ -466,26 +467,26 @@ func (ds *Service) executeQuery(
 	settings map[string]interface{},
 	headers http.Header,
 ) (*data.Frame, error) {
-	var result Framer
+	var resultFramer result.Framer
 	qtyp := q.Type()
 	switch qtyp {
 	case "sql":
 		q.(*druidquery.SQL).SetResultFormat("array").SetHeader(true)
 		return nil, errors.New("not implemented")
 	case "timeseries":
-		var r TimeseriesResult
+		var r result.TimeseriesResult
 		_, err := s.client.Query().Execute(q, &r, headers)
 		if err != nil {
 			return nil, fmt.Errorf("Query error: %w", err)
 		}
-		result = &r
+		resultFramer = &r
 	case "topN":
-		var r TopNResult
+		var r result.TopNResult
 		_, err := s.client.Query().Execute(q, &r, headers)
 		if err != nil {
 			return nil, fmt.Errorf("Query error: %w", err)
 		}
-		result = &r
+		resultFramer = &r
 	case "groupBy":
 		return nil, errors.New("not implemented")
 	case "scan":
@@ -502,7 +503,7 @@ func (ds *Service) executeQuery(
 	default:
 		return nil, errors.New("unknown query type")
 	}
-	f := result.Frame()
+	f := resultFramer.Frame()
 	f.Name = queryRef
 	return f, nil
 }
@@ -517,15 +518,15 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 	case "scan":
 		q.(*druidquery.Scan).SetResultFormat("compactedList")
 	}
-	var result json.RawMessage
-	_, err := s.client.Query().Execute(q, &result, headers)
+	var res json.RawMessage
+	_, err := s.client.Query().Execute(q, &res, headers)
 	if err != nil {
 		return r, err
 	}
 	switch qtyp {
 	case "sql":
 		var sqlr []interface{}
-		err := json.Unmarshal(result, &sqlr)
+		err := json.Unmarshal(res, &sqlr)
 		if err == nil && len(sqlr) > 1 {
 			for _, row := range sqlr[1:] {
 				r.Rows = append(r.Rows, row.([]interface{}))
@@ -539,8 +540,8 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 			}
 		}
 	case "timeseries":
-		var tsResult TimeseriesResult
-		err := json.Unmarshal(result, &tsResult)
+		var tsResult result.TimeseriesResult
+		err := json.Unmarshal(res, &tsResult)
 		if err != nil {
 			return r, err
 		}
@@ -572,7 +573,7 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 		}
 	case "topN":
 		var tn []map[string]interface{}
-		err := json.Unmarshal(result, &tn)
+		err := json.Unmarshal(res, &tn)
 		if err == nil && len(tn) > 0 {
 			columns := []string{"timestamp"}
 			for c := range tn[0]["result"].([]interface{})[0].(map[string]interface{}) {
@@ -599,7 +600,7 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 		}
 	case "groupBy":
 		var gb []map[string]interface{}
-		err := json.Unmarshal(result, &gb)
+		err := json.Unmarshal(res, &gb)
 		if err == nil && len(gb) > 0 {
 			columns := []string{"timestamp"}
 			for c := range gb[0]["event"].(map[string]interface{}) {
@@ -624,7 +625,7 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 		}
 	case "scan":
 		var scanr []map[string]interface{}
-		err := json.Unmarshal(result, &scanr)
+		err := json.Unmarshal(res, &scanr)
 		if err == nil && len(scanr) > 0 {
 			for _, e := range scanr[0]["events"].([]interface{}) {
 				r.Rows = append(r.Rows, e.([]interface{}))
@@ -639,7 +640,7 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 		}
 	case "search":
 		var s []map[string]interface{}
-		err := json.Unmarshal(result, &s)
+		err := json.Unmarshal(res, &s)
 		if err == nil && len(s) > 0 {
 			columns := []string{"timestamp"}
 			for c := range s[0]["result"].([]interface{})[0].(map[string]interface{}) {
@@ -666,7 +667,7 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 		}
 	case "timeBoundary":
 		var tb []map[string]interface{}
-		err := json.Unmarshal(result, &tb)
+		err := json.Unmarshal(res, &tb)
 		if err == nil && len(tb) > 0 {
 			columns := []string{"timestamp"}
 			for c := range tb[0]["result"].(map[string]interface{}) {
@@ -691,7 +692,7 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 		}
 	case "dataSourceMetadata":
 		var dsm []map[string]interface{}
-		err := json.Unmarshal(result, &dsm)
+		err := json.Unmarshal(res, &dsm)
 		if err == nil && len(dsm) > 0 {
 			columns := []string{"timestamp"}
 			for c := range dsm[0]["result"].(map[string]interface{}) {
@@ -716,7 +717,7 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 		}
 	case "segmentMetadata":
 		var sm []map[string]interface{}
-		err := json.Unmarshal(result, &sm)
+		err := json.Unmarshal(res, &sm)
 		if err == nil && len(sm) > 0 {
 			var columns []string
 			switch settings["view"].(string) {
