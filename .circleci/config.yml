@@ -10,6 +10,9 @@ executors:
   base-cimg-executor:
     docker:
       - image: cimg/base:2022.07
+  python-cimg-executor:
+    docker:
+      - image: cimg/python:3.10.4
 
 commands:
   asdf_install:
@@ -223,6 +226,11 @@ jobs:
           fingerprints:
             - "7b:4a:f0:04:90:75:93:7a:63:05:3b:18:a0:80:16:0d"  # argo-manifests R/W
       - checkout
+      - asdf_install:
+          cache_name: release
+          tools: |-
+            python
+            gcloud
       - gcp-gcr/gcr-auth
       - opsninja_install
       - run:
@@ -247,7 +255,7 @@ workflows:
           filters:
             branches:
               only:
-                - main
+                - fluxninja_micro_frontends
           requires:
             - image-build-grafana-alpine
           environment-path: environments/demo/
