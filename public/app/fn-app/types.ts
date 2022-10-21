@@ -1,7 +1,7 @@
+import { Theme } from '@mui/material';
 import { ReactNode } from 'react';
 
 import { GrafanaThemeType } from '@grafana/data';
-import { FnTheme } from 'app/core/reducers/fn-slice';
 
 export type FailedToMountGrafanaErrorName = 'FailedToMountGrafana';
 
@@ -23,7 +23,7 @@ export interface FNDashboardProps<Q extends string = string> {
   uid: string;
   slug: string;
   mode: GrafanaThemeType.Dark | GrafanaThemeType.Light;
-  theme: FnTheme;
+  theme: Theme;
   queryParams: Partial<AnyObject<Q, string>>;
   fnError?: ReactNode;
   fnLoader?: ReactNode;

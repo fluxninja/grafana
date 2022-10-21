@@ -48,25 +48,17 @@ function PickerLabel({ variable }: PropsWithChildren<Props>): ReactElement | nul
       return {};
     }
 
-    /**
-     * TODO:
-     * The below ts-ignores result from the fact that we expect MuiTheme in Grafana
-     * Let's pass GrafanaTheme
-     */
-    // @ts-ignore
-    const color = theme?.palette?.text?.primary;
-    // @ts-ignore
-    const lightBackgroundColor = theme?.palette?.grey;
-    // @ts-ignore
-    const darkBackgroundColor = theme?.palette?.background?.default;
-
     const commonStyles: CSSProperties = {
       ...COMMON_PICKER_LABEL_STYLE,
-      ...(color ? { color } : {}),
+      color: theme.palette.text.primary,
     };
 
-    const backgroundColor = mode === GrafanaThemeType.Light ? lightBackgroundColor : darkBackgroundColor;
-    const createLabelTheme: CSSProperties = backgroundColor ? { backgroundColor } : {};
+    const createLabelTheme =
+      mode === GrafanaThemeType.Light
+        ? {
+            backgroundColor: theme.palette.grey[200],
+          }
+        : { backgroundColor: theme.palette.grey[700] };
 
     return { ...createLabelTheme, ...commonStyles };
   }, [FNDashboard, mode, theme]);
