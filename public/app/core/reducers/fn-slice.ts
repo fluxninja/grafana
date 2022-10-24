@@ -1,9 +1,10 @@
-import { Theme as MuiTheme, createTheme as muiCreateTheme } from '@mui/material';
+import { Theme as MuiTheme } from '@mui/material';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { WritableDraft } from 'immer/dist/internal';
 
-import { GrafanaThemeType } from '@grafana/data';
+import { createTheme, GrafanaThemeType } from '@grafana/data';
 
+import { GrafanaTheme } from '../../../../packages/grafana-data/src/types/theme';
 import { AnyObject } from '../../fn-app/types';
 
 export interface FnGlobalState {
@@ -11,21 +12,45 @@ export interface FnGlobalState {
   uid: string;
   slug: string;
   mode: GrafanaThemeType.Light | GrafanaThemeType.Dark;
-  theme: MuiTheme;
+  theme: FnTheme;
   controlsContainer: HTMLElement | null | undefined;
   pageTitle: string;
   queryParams: AnyObject;
   hiddenVariables: string[];
 }
 
+/**
+ * NOTE:
+ * The initial assumption was that the MuiTheme is used.
+ * Taking into account the below type (GrafanaThemeProps do not map to MuiTheme),
+ * it looks like we may consider to use GrafanaTheme instead of MuiTheme (TODO)
+ */
+export type FnTheme = Omit<MuiTheme, OptionalThemeProp | GrafanaThemeProp> &
+  Partial<Pick<MuiTheme, OptionalThemeProp>> & {
+    palette: GrafanaTheme['palette'];
+    shadows: GrafanaTheme['shadows'];
+    typography: GrafanaTheme['typography'];
+    zIndex: GrafanaTheme['zIndex'];
+    breakpoints: GrafanaTheme['breakpoints'];
+    spacing: GrafanaTheme['spacing'];
+  };
+
+type OptionalThemeProp = Extract<keyof MuiTheme, 'mixins' | 'transitions' | 'shape' | 'direction'>;
+
+type GrafanaThemeProp = Extract<
+  keyof MuiTheme,
+  'palette' | 'shadows' | 'typography' | 'zIndex' | 'breakpoints' | 'spacing'
+>;
+
 const INITIAL_MODE = GrafanaThemeType.Light;
+const INITIAL_THEME = createTheme({ colors: { mode: INITIAL_MODE } });
 
 const initialState: FnGlobalState = {
   FNDashboard: false,
   uid: '',
   slug: '',
   mode: INITIAL_MODE,
-  theme: muiCreateTheme(),
+  theme: INITIAL_THEME.v1,
   controlsContainer: null,
   pageTitle: '',
   queryParams: {},
@@ -37,7 +62,8 @@ const fnSlice = createSlice({
   initialState,
   reducers: {
     setInitialMountState: (state, action: PayloadAction<FnGlobalState>) => {
-      return { ...state, ...action.payload };
+
+      return {...state, ...action.payload};
     },
     updateFnState: (
       state: WritableDraft<FnGlobalState>,
@@ -49,6 +75,7 @@ const fnSlice = createSlice({
         ...state,
         [type]: payload,
       };
+
     },
   },
 });
