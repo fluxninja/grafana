@@ -225,3 +225,16 @@ func AuthHTTPHeaderListFromContext(c context.Context) *AuthHTTPHeaderList {
 	}
 	return nil
 }
+
+func (h *ContextHandler) hasAccessTokenExpired(token *models.UserAuth) bool {
+	if token.OAuthExpiry.IsZero() {
+		return false
+	}
+
+	getTime := h.GetTime
+	if getTime == nil {
+		getTime = time.Now
+	}
+
+	return token.OAuthExpiry.Round(0).Add(-oauthtoken.ExpiryDelta).Before(getTime())
+}
