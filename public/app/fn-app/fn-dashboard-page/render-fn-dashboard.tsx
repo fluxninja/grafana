@@ -5,7 +5,7 @@ import { ThunkDispatch } from 'redux-thunk';
 
 /* eslint-disable-next-line  */
 import { locationService as locationSrv, HistoryWrapper } from '@grafana/runtime';
-import { setInitialMountState, updateFnState } from 'app/core/reducers/fn-slice';
+import { setInitialMountState, updateFnState } from 'app/core/reducers/fn-slice'; // updateFnState
 import DashboardPage, { DashboardPageProps } from 'app/features/dashboard/containers/DashboardPage';
 import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
 import { cancelVariables } from 'app/features/variables/state/actions';
@@ -99,15 +99,17 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
 
     locationService.fnPathnameChange(window.location.pathname, queryParams);
 
+    // console.log(cancelVariables(uid), "cancel variables")
+
     return () => {
-      getTimeSrv().stopAutoRefresh();
+    // getTimeSrv().stopAutoRefresh();
       dispatch(
         updateFnState({
           type: 'FNDashboard',
           payload: false,
         })
       );
-      dispatch(cancelVariables(uid));
+     dispatch(cancelVariables(uid));
     };
   }, [dispatch, uid, slug, controlsContainer, pageTitle, hiddenVariables, queryParams, mode]);
 
