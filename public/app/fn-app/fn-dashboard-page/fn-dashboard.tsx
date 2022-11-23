@@ -1,4 +1,4 @@
-import { get } from 'lodash';
+import { get, snakeCase } from 'lodash';
 import { parse as parseQueryParams } from 'query-string';
 import React, { FC, Suspense, useMemo } from 'react';
 import { lazily } from 'react-lazily';
@@ -26,29 +26,27 @@ export const FNDashboard: FC<FNDashboardProps> = (props) => (
 export const DashboardPortal: FC<FNDashboardProps> = (props) =>{
   const location = useLocation();
 
- console.log(location,  "location");
-
   const portal = useMemo(() =>{
     const { search } = location;
     const queryParams = parseQueryParams(search);
 
-    const { dashboardUID, slug, dashboardType } = queryParams
-    console.log(queryParams, dashboardUID, slug,  "queryParams");
+    const { dashboardUID, slug } = queryParams
     if(!dashboardUID){
       return null;
     }
+
+    console.log({queryParams}, "queryParams in FNDashboard")
 
     const newProps: FNDashboardProps = {
       ...props,
       uid: dashboardUID as string,
       slug: slug as string,
-      queryParams: queryParams,
-      hiddenVariables: get(HIDE_FILTERS_BY_DASHBOARD_TYPE, dashboardType as string)([]) 
+      queryParams,
+      hiddenVariables: get(HIDE_FILTERS_BY_DASHBOARD_TYPE, snakeCase(dashboardUID as string).toUpperCase()) || []
      }
-     console.log(`QueryParams:`, queryParams, `Props:`, newProps, "query Params for location")
     return(
       <RenderPortal ID="grafana-portal" >
-         <RenderFNDashboard {...newProps} />
+        <RenderFNDashboard {...newProps} />
       </RenderPortal>
     )
   },[location, props])

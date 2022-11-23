@@ -98,14 +98,3 @@ export const prometheusDashboardFilters: string[] = [
 
 export const signalDashboardFilters: string[] = ["policy_name", "signal_name"];
 
-export const httpDashboardQueryParams = httpDashboardFilters.map(
-  (filter) => `var-${filter}` as DashboardQueryParam,
-);
-
-export const prometheusDashboardQueryParams = prometheusDashboardFilters.map(
-  (filter) => `var-${filter}` as DashboardQueryParam,
-);
-
-export const signalDashboardQueryParams = signalDashboardFilters.map(
-  (filter) => `var-${filter}` as DashboardQueryParam,
-);
