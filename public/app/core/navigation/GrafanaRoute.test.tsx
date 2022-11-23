@@ -12,6 +12,7 @@ import { GrafanaRoute, Props } from './GrafanaRoute';
 import { GrafanaRouteComponentProps } from './types';
 
 function setup(overrides: Partial<Props>) {
+  const store = configureStore();
   const props: Props = {
     location: { search: '?query=hello&test=asd' } as Location,
     history: {} as History,

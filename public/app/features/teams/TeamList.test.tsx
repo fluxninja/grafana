@@ -17,6 +17,7 @@ jest.mock('app/core/core', () => ({
 }));
 
 const setup = (propOverrides?: object) => {
+  const store = configureStore();
   const props: Props = {
     teams: [] as Team[],
     noTeams: false,

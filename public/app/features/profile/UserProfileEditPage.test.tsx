@@ -8,6 +8,7 @@ import * as useQueryParams from 'app/core/hooks/useQueryParams';
 
 import { TestProvider } from '../../../test/helpers/TestProvider';
 import { backendSrv } from '../../core/services/backend_srv';
+import { configureStore } from '../../store/configureStore';
 import { TeamPermissionLevel } from '../../types';
 import { getMockTeam } from '../teams/__mocks__/teamMocks';
 
@@ -183,9 +184,11 @@ async function getTestContext(overrides: Partial<Props & { extensions: PluginExt
 
   const props = { ...defaultProps, ...overrides };
   const { rerender } = render(
-    <TestProvider>
-      <UserProfileEditPage {...props} />
-    </TestProvider>
+    <Provider store={store}>
+      <TestProvider>
+        <UserProfileEditPage {...props} />
+      </TestProvider>
+    </Provider>
   );
 
   await waitFor(() => expect(props.initUserProfilePage).toHaveBeenCalledTimes(1));

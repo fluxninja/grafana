@@ -44,6 +44,7 @@ jest.mock('app/core/core', () => ({
 }));
 
 const setup = (propOverrides: Partial<Props>) => {
+  const store = configureStore();
   const props: Props = {
     navModel: {
       main: {

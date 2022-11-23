@@ -6,6 +6,7 @@ import { TestProvider } from 'test/helpers/TestProvider';
 import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
 
 import { backendSrv } from '../../core/services/backend_srv';
+import { configureStore } from '../../store/configureStore';
 
 import { SignupInvitedPage, Props } from './SignupInvited';
 
@@ -29,6 +30,7 @@ const defaultGet = {
 
 async function setupTestContext({ get = defaultGet }: { get?: typeof defaultGet | null } = {}) {
   jest.clearAllMocks();
+  const store = configureStore();
 
   const getSpy = jest.spyOn(backendSrv, 'get');
   getSpy.mockResolvedValue(get);
