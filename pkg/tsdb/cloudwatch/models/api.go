@@ -71,3 +71,20 @@ type EC2APIProvider interface {
 	DescribeRegionsWithContext(ctx context.Context, in *ec2.DescribeRegionsInput, opts ...request.Option) (*ec2.DescribeRegionsOutput, error)
 	DescribeInstancesPagesWithContext(ctx context.Context, in *ec2.DescribeInstancesInput, fn func(*ec2.DescribeInstancesOutput, bool) bool, opts ...request.Option) error
 }
+
+type CloudWatchLogsAPIProvider interface {
+	DescribeLogGroups(*cloudwatchlogs.DescribeLogGroupsInput) (*cloudwatchlogs.DescribeLogGroupsOutput, error)
+}
+
+type OAMClientProvider interface {
+	ListSinks(*oam.ListSinksInput) (*oam.ListSinksOutput, error)
+	ListAttachedLinks(*oam.ListAttachedLinksInput) (*oam.ListAttachedLinksOutput, error)
+}
+
+type LogGroupsProvider interface {
+	GetLogGroups(request resources.LogGroupsRequest) ([]resources.ResourceResponse[resources.LogGroup], error)
+}
+
+type AccountsProvider interface {
+	GetAccountsForCurrentUserOrRole() ([]resources.ResourceResponse[resources.Account], error)
+}

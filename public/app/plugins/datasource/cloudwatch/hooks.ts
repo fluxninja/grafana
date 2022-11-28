@@ -4,6 +4,7 @@ import { useAsyncFn, useDeepCompareEffect } from 'react-use';
 import { SelectableValue, toOption } from '@grafana/data';
 import { config } from '@grafana/runtime';
 
+import { CloudWatchAPI } from './api';
 import { CloudWatchDatasource } from './datasource';
 import { ResourcesAPI } from './resources/ResourcesAPI';
 import { GetMetricsRequest, GetDimensionKeysRequest } from './resources/types';
