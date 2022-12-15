@@ -1,12 +1,10 @@
-import { get, snakeCase } from 'lodash';
 import { parse as parseQueryParams } from 'query-string';
 import React, { FC, Suspense, useMemo } from 'react';
 import { lazily } from 'react-lazily';
 import { useLocation } from 'react-router-dom';
 
-import { HIDE_FILTERS_BY_DASHBOARD_TYPE } from '../filter-constants';
 import { FNDashboardProps } from '../types';
-import { RenderPortal } from '../utils';
+import { RenderPortal, useHiddenVariables } from '../utils';
 
 const { RenderFNDashboard } = lazily(() => import('./render-fn-dashboard'));
 const { FnAppProvider } = lazily(() => import('../fn-app-provider'));
@@ -25,21 +23,22 @@ export const FNDashboard: FC<FNDashboardProps> = (props) => (
 
 export const DashboardPortal: FC<FNDashboardProps> = (props) =>{
   const location = useLocation();
+  const { hiddenVariables } = useHiddenVariables();
 
   const portal = useMemo(() =>{
     const { search } = location;
     const queryParams = parseQueryParams(search);
 
     const { dashboardUID, slug } = queryParams
-    console.log({queryParams}, "queryParams in FNDashboard")
 
     const newProps: FNDashboardProps = {
       ...props,
       uid: dashboardUID as string,
       slug: slug as string,
       queryParams,
-      hiddenVariables: get(HIDE_FILTERS_BY_DASHBOARD_TYPE, snakeCase(dashboardUID as string).toUpperCase()) || []
-     }
+      hiddenVariables
+    }
+    
     return dashboardUID &&(
       <RenderPortal ID="grafana-portal" >
         <RenderFNDashboard {...newProps} />

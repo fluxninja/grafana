@@ -1,9 +1,7 @@
 import { merge, isEmpty, isFunction } from 'lodash';
 import React, { useEffect, FC } from 'react';
 import { useDispatch } from 'react-redux';
-import { ThunkDispatch } from 'redux-thunk';
 
-/* eslint-disable-next-line  */
 import { locationService as locationSrv, HistoryWrapper } from '@grafana/runtime';
 import { setInitialMountState } from 'app/core/reducers/fn-slice';
 import DashboardPage, { DashboardPageProps } from 'app/features/dashboard/containers/DashboardPage';
@@ -12,7 +10,6 @@ import { DashboardRoutes, StoreState, useSelector } from 'app/types';
 
 import { FNDashboardProps } from '../types';
 
-/* eslint-disable-next-line  */
 const locationService = locationSrv as HistoryWrapper;
 
 const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'isFNDashboard' | 'history' | 'route'> & {
@@ -24,7 +21,7 @@ const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'isFNDashboard' | '
     path: '/d/:uid/:slug?',
     url: '',
   },
-  /* eslint-disable-next-line  */
+  
   history: {} as DashboardPageProps['history'],
   route: {
     routeName: DashboardRoutes.Normal,
@@ -47,8 +44,7 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
     fnLoader,
   } = props;
 
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  const dispatch = useDispatch<ThunkDispatch<any, any, any>>();
+  const dispatch = useDispatch();
 
   const firstError = useSelector((state: StoreState) => {
     const { appNotifications } = state;
