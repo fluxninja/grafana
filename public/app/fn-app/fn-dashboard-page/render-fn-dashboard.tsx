@@ -1,5 +1,5 @@
 import { merge, isEmpty, isFunction } from 'lodash';
-import React, { useEffect, FC } from 'react';
+import React, { useEffect, FC, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { locationService as locationSrv, HistoryWrapper } from '@grafana/runtime';
@@ -39,7 +39,6 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
     mode,
     controlsContainer,
     pageTitle = '',
-    hiddenVariables,
     setErrors,
     fnLoader,
   } = props;
@@ -51,6 +50,8 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
 
     return Object.values(appNotifications.byId).find(({ severity }) => severity === 'error');
   });
+
+  const hiddenVariables = useSelector(({ fnGlobalState: { hiddenVariables } }: StoreState) => hiddenVariables);
 
   /**
    * NOTE:
@@ -78,7 +79,6 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
         controlsContainer,
         pageTitle,
         queryParams,
-        hiddenVariables,
       })
     );
 
@@ -93,9 +93,9 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
 
     locationService.fnPathnameChange(window.location.pathname, queryParams);
 
-  }, [dispatch, uid, slug, controlsContainer, pageTitle, hiddenVariables, queryParams, mode]);
+  }, [dispatch, uid, slug, controlsContainer, pageTitle, queryParams, mode]);
 
-  const dashboardPageProps: DashboardPageProps = merge({}, DEFAULT_DASHBOARD_PAGE_PROPS, {
+  const dashboardPageProps: DashboardPageProps = useMemo(() => merge({}, DEFAULT_DASHBOARD_PAGE_PROPS, {
     ...DEFAULT_DASHBOARD_PAGE_PROPS,
     match: {
       params: {
@@ -107,7 +107,7 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
     hiddenVariables,
     controlsContainer,
     fnLoader,
-  });
+  }),[controlsContainer, fnLoader, hiddenVariables, props, queryParams]);
 
   return isEmpty(queryParams || {}) ? <>{fnLoader}</> : <DashboardPage {...dashboardPageProps} />;
 };

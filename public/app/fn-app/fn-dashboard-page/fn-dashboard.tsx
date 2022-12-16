@@ -4,7 +4,7 @@ import { lazily } from 'react-lazily';
 import { useLocation } from 'react-router-dom';
 
 import { FNDashboardProps } from '../types';
-import { RenderPortal, useHiddenVariables } from '../utils';
+import { RenderPortal } from '../utils';
 
 const { RenderFNDashboard } = lazily(() => import('./render-fn-dashboard'));
 const { FnAppProvider } = lazily(() => import('../fn-app-provider'));
@@ -23,7 +23,6 @@ export const FNDashboard: FC<FNDashboardProps> = (props) => (
 
 export const DashboardPortal: FC<FNDashboardProps> = (props) =>{
   const location = useLocation();
-  const { hiddenVariables } = useHiddenVariables();
 
   const portal = useMemo(() =>{
     const { search } = location;
@@ -36,7 +35,6 @@ export const DashboardPortal: FC<FNDashboardProps> = (props) =>{
       uid: dashboardUID as string,
       slug: slug as string,
       queryParams,
-      hiddenVariables
     }
     
     return dashboardUID &&(

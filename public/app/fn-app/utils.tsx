@@ -1,4 +1,4 @@
-import { FC, useState } from 'react';
+import { FC } from 'react';
 import ReactDOM from 'react-dom';
 
 export interface RenderPortalProps {
@@ -21,16 +21,4 @@ export const RenderPortal: FC<RenderPortalProps> = ({ ID, children }) => {
   return ReactDOM.createPortal(children, portalDiv);
 };
 
-const HIDDEN_VARIABLES_KEY = 'fn-storage-hidden-filters';
-
-export const useHiddenVariables = () =>{
-  const storage = window.localStorage;
-  const [ hiddenVariables, setHiddenVariables] = useState([]);
-
-  window.addEventListener(HIDDEN_VARIABLES_KEY, () =>{
-    setHiddenVariables(JSON.parse(storage.getItem(HIDDEN_VARIABLES_KEY) || "[]"))
-  });
-
-  return { hiddenVariables }
-}
 
