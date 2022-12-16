@@ -61,6 +61,8 @@ import * as sankeyPanel from 'app/plugins/panel/netsage-sankey-panel/module';
 import * as newsPanel from 'app/plugins/panel/news/module';
 import * as nodeGraph from 'app/plugins/panel/nodeGraph/module';
 import * as pieChartPanel from 'app/plugins/panel/piechart/module';
+//@ts-ignore
+import * as sankey2Panel from 'app/plugins/panel/sankey-panel-0.5.0/module';
 import * as statPanel from 'app/plugins/panel/stat/module';
 import * as stateTimelinePanel from 'app/plugins/panel/state-timeline/module';
 import * as statusHistoryPanel from 'app/plugins/panel/status-history/module';
@@ -150,6 +152,7 @@ const builtInPlugins: any = {
   'app/plugins/panel/histogram/module': histogramPanel,
   'app/plugins/panel/alertGroups/module': alertGroupsPanel,
   'app/plugins/panel/netsage-sankey-panel/module': sankeyPanel,
+  'app/plugins/panel/sankey-panel-0.5.0/module': sankey2Panel,
 };
 
 export default builtInPlugins;
