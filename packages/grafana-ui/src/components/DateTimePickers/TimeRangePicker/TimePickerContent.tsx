@@ -79,6 +79,11 @@ export const TimePickerContentWithScreenSize = (props: PropsWithScreenSize) => {
   return (
     <div id="TimePickerContent" className={cx(styles.container, className)}>
       <div className={styles.body}>
+        {isFullscreen && (
+          <div className={styles.leftSide}>
+            <FullScreenForm {...props} historyOptions={historyOptions} />
+          </div>
+        )}
         {(!isFullscreen || !hideQuickRanges) && (
           <div className={styles.rightSide}>
             <div className={styles.timeRangeFilter}>
@@ -95,11 +100,6 @@ export const TimePickerContentWithScreenSize = (props: PropsWithScreenSize) => {
                 <TimeRangeList options={filteredQuickOptions} onChange={onChangeTimeOption} value={timeOption} />
               )}
             </div>
-          </div>
-        )}
-        {isFullscreen && (
-          <div className={styles.leftSide}>
-            <FullScreenForm {...props} historyOptions={historyOptions} />
           </div>
         )}
       </div>
@@ -189,7 +189,16 @@ const FullScreenForm = (props: FormProps) => {
 
   return (
     <>
-      <div className={styles.container}>
+      <div
+        className={styles.container}
+        style={{
+          height: '100%',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
+      >
         <div className={styles.title} data-testid={selectors.components.TimePicker.absoluteTimeRangeTitle}>
           <TimePickerTitle>
             <Trans i18nKey="time-picker.absolute.title">Absolute time range</Trans>
@@ -212,7 +221,7 @@ const FullScreenForm = (props: FormProps) => {
             title={t('time-picker.absolute.recent-title', 'Recently used absolute ranges')}
             options={historyOptions || []}
             onChange={onChangeTimeOption}
-            placeholderEmpty={<EmptyRecentList />}
+            placeholderEmpty={<></>}
           />
         </div>
       )}

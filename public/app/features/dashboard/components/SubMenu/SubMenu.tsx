@@ -19,6 +19,7 @@ interface OwnProps extends Themeable2 {
   dashboard: DashboardModel;
   links: DashboardLink[];
   annotations: AnnotationQuery[];
+  hiddenVariables?: string[];
 }
 
 interface ConnectedProps {
@@ -55,9 +56,13 @@ class SubMenuUnConnected extends PureComponent<Props> {
     const readOnlyVariables = dashboard.meta.isSnapshot ?? false;
 
     return (
-      <div className={styles.submenu}>
-        <form aria-label="Template variables" className={styles.formStyles} onSubmit={this.disableSubmitOnEnter}>
-          <SubMenuItems variables={variables} readOnly={readOnlyVariables} />
+      <div className="submenu-controls">
+        <form aria-label="Template variables" className={styles}>
+          <SubMenuItems
+            variables={variables}
+            readOnly={readOnlyVariables}
+            hiddenVariables={this.props.hiddenVariables}
+          />
         </form>
         <Annotations
           annotations={annotations}

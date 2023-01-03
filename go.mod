@@ -499,3 +499,7 @@ replace xorm.io/xorm => github.com/grafana/grafana/pkg/util/xorm v0.0.1
 
 // lock for mysql tsdb compat
 replace github.com/go-sql-driver/mysql => github.com/go-sql-driver/mysql v1.7.1
+replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20220421151946-72621c1f0bd3
+// This is for sending custom HTTP headers in druid client.
+// Change in upstream: https://github.com/grafadruid/go-druid/pull/71
+replace github.com/grafadruid/go-druid => github.com/fluxninja/go-druid v0.0.0-20220825112309-14a37dd3317d

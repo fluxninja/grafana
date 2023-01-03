@@ -20,6 +20,7 @@ import (
 	"github.com/grafana/grafana/pkg/tsdb/azuremonitor"
 	cloudmonitoring "github.com/grafana/grafana/pkg/tsdb/cloud-monitoring"
 	"github.com/grafana/grafana/pkg/tsdb/cloudwatch"
+	"github.com/grafana/grafana/pkg/tsdb/druid"
 	"github.com/grafana/grafana/pkg/tsdb/elasticsearch"
 	postgres "github.com/grafana/grafana/pkg/tsdb/grafana-postgresql-datasource"
 	pyroscope "github.com/grafana/grafana/pkg/tsdb/grafana-pyroscope-datasource"
@@ -45,6 +46,7 @@ const (
 	InfluxDB        = "influxdb"
 	Loki            = "loki"
 	OpenTSDB        = "opentsdb"
+	Druid           = "grafadruid-druid-datasource"
 	Prometheus      = "prometheus"
 	Tempo           = "tempo"
 	TestData        = "grafana-testdata-datasource"
@@ -106,6 +108,7 @@ func ProvideCoreRegistry(tracer tracing.Tracer, am *azuremonitor.Service, cw *cl
 		InfluxDB:        asBackendPlugin(idb),
 		Loki:            asBackendPlugin(lk),
 		OpenTSDB:        asBackendPlugin(otsdb),
+		Druid:           asBackendPlugin(dr),
 		Prometheus:      asBackendPlugin(pr),
 		Tempo:           asBackendPlugin(t),
 		TestData:        asBackendPlugin(td),

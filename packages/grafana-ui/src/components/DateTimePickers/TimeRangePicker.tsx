@@ -2,7 +2,7 @@ import { css, cx } from '@emotion/css';
 import { useDialog } from '@react-aria/dialog';
 import { FocusScope } from '@react-aria/focus';
 import { useOverlay } from '@react-aria/overlays';
-import { memo, createRef, useState, useEffect } from 'react';
+import React, { memo, FormEvent, createRef, useState, ReactElement, ReactNode, useEffect } from 'react';
 
 import {
   rangeUtil,
@@ -48,6 +48,7 @@ export interface TimeRangePickerProps {
   onToolbarTimePickerClick?: () => void;
   /** Which day of the week the calendar should start on. Possible values: "saturday", "sunday" or "monday" */
   weekStart?: WeekStart;
+  fnText?: ReactNode;
 }
 
 export interface State {
@@ -75,6 +76,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
     isOnCanvas,
     onToolbarTimePickerClick,
     weekStart,
+    fnText = '',
   } = props;
 
   const onChange = (timeRange: TimeRange) => {
@@ -150,6 +152,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
           icon={timePickerIcon}
           isOpen={isOpen}
           variant={variant}
+          fnText={fnText}
         >
           <TimePickerButtonLabel {...props} />
         </ToolbarButton>

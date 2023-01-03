@@ -37,7 +37,8 @@ type CommonProps = {
   isHighlighted?: boolean;
 };
 
-export type ToolbarButtonProps = CommonProps & ButtonHTMLAttributes<HTMLButtonElement>;
+export type ToolbarButtonProps = CommonProps &
+  ButtonHTMLAttributes<HTMLButtonElement> & { isHidden?: boolean; fnText?: ReactNode };
 
 export type ToolbarButtonVariant = 'default' | 'primary' | 'destructive' | 'active' | 'canvas';
 
@@ -58,6 +59,8 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
       iconOnly,
       'aria-label': ariaLabel,
       isHighlighted,
+      isHidden,
+      fnText = '',
       ...rest
     },
     ref
@@ -87,6 +90,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         aria-label={getButtonAriaLabel(ariaLabel, tooltip)}
         aria-expanded={isOpen}
         {...rest}
+        style={{ display: isHidden ? 'none' : '' }}
       >
         {renderIcon(icon, iconSize)}
         {imgSrc && <img className={styles.img} src={imgSrc} alt={imgAlt ?? ''} />}
@@ -94,6 +98,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         {isOpen === false && <Icon name="angle-down" />}
         {isOpen === true && <Icon name="angle-up" />}
         {isHighlighted && <div className={styles.highlight} />}
+        {fnText !== '' && fnText}
       </button>
     );
 

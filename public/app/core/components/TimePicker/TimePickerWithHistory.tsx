@@ -1,9 +1,13 @@
+import React, { CSSProperties } from 'react';
+import { useSelector } from 'react-redux';
 import { uniqBy } from 'lodash';
 
-import { AppEvents, TimeRange, isDateTime, rangeUtil } from '@grafana/data';
-import { TimeRangePickerProps, TimeRangePicker } from '@grafana/ui';
 import { t } from '@grafana/ui/src/utils/i18n';
 import appEvents from 'app/core/app_events';
+import { TimeRange, isDateTime, rangeUtil, AppEvents } from '@grafana/data';
+import { TimeRangePickerProps, TimeRangePicker, useTheme2 } from '@grafana/ui';
+import { FnGlobalState } from 'app/core/reducers/fn-slice';
+import { StoreState } from 'app/types';
 
 import { LocalStorageValueProvider } from '../LocalStorageValueProvider';
 
@@ -21,6 +25,16 @@ interface TimePickerHistoryItem {
 type LSTimePickerHistoryItem = TimePickerHistoryItem | TimeRange;
 
 export const TimePickerWithHistory = (props: Props) => {
+const FnText: React.FC = () => {
+  const { FNDashboard } = useSelector<StoreState, FnGlobalState>(({ fnGlobalState }) => fnGlobalState);
+  const theme = useTheme2();
+
+  const FN_TEXT_STYLE: CSSProperties = { fontWeight: 700, fontSize: 14, marginLeft: 8 };
+
+  return <>{FNDashboard ? <span style={{ ...FN_TEXT_STYLE, color: theme.colors.warning.main }}>UTC</span> : ''}</>;
+};
+
+export const TimePickerWithHistory: React.FC<Props> = (props) => {
   return (
     <LocalStorageValueProvider<LSTimePickerHistoryItem[]> storageKey={LOCAL_STORAGE_KEY} defaultValue={[]}>
       {(rawValues, onSaveToStore) => {
@@ -41,6 +55,7 @@ export const TimePickerWithHistory = (props: Props) => {
                 t('time-picker.copy-paste.default-error-message', `{{error}} is not a valid time range`, { error }),
               ])
             }
+            fnText={<FnText />}
           />
         );
       }}

@@ -52,9 +52,9 @@ const mapDispatchToProps = {
   updateNavIndex,
 };
 
-const mapStateToProps = (state: StoreState) => ({
-  navIndex: state.navIndex,
-});
+const mapStateToProps = (state: StoreState) => {
+  return { ...state.fnGlobalState, ...state.navIndex };
+};
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
@@ -275,27 +275,37 @@ export const DashNav = memo<Props>((props) => {
   };
 
   const renderRightActions = () => {
-    const { dashboard, isFullscreen, kioskMode, hideTimePicker } = props;
+    const { dashboard, onAddPanel, isFullscreen, kioskMode, FNDashboard, hideTimePicker } = props;
     const { canSave, canEdit, showSettings, canShare } = dashboard.meta;
     const { snapshot } = dashboard;
     const snapshotUrl = snapshot && snapshot.originalUrl;
     const buttons: ReactNode[] = [];
+    const tvButton = config.featureToggles.topnav ? null : (
+      <ToolbarButton
+        tooltip={t('dashboard.toolbar.tv-button', 'Cycle view mode')}
+        icon="monitor"
+        onClick={onToggleTVMode}
+        key="tv-button"
+        isHidden={FNDashboard ? true : false}
+      />
+    );
 
     if (isPlaylistRunning()) {
       return [renderPlaylistControls(), renderTimeControls()];
     }
 
-    if (kioskMode === KioskMode.TV) {
-      return [renderTimeControls()];
+    if (kioskMode === KioskMode.TV || kioskMode === KioskMode.FN) {
+      return [renderTimeControls(), tvButton];
     }
 
     if (snapshotUrl) {
       buttons.push(
         <ToolbarButton
-          tooltip={t('dashboard.toolbar.open-original', 'Open original dashboard')}
-          onClick={onOpenSnapshotOriginal}
-          icon="link"
-          key="button-snapshot"
+          tooltip={t('dashboard.toolbar.add-panel', 'Add panel')}
+          icon="panel-add"
+          onClick={onAddPanel}
+          key="button-panel-add"
+          isHidden={FNDashboard ? true : false}
         />
       );
     }
@@ -313,13 +323,24 @@ export const DashNav = memo<Props>((props) => {
                   onDismiss: hideModal,
                 });
               }}
+              isHidden={FNDashboard ? true : false}
             />
           )}
         </ModalsController>
       );
     }
 
-    addCustomContent(dynamicDashNavActions.right, buttons);
+    if (snapshotUrl) {
+      buttons.push(
+        <ToolbarButton
+          tooltip={t('dashboard.toolbar.open-original', 'Open original dashboard')}
+          onClick={() => gotoSnapshotOrigin(snapshotUrl)}
+          icon="link"
+          key="button-snapshot"
+          isHidden={FNDashboard ? true : false}
+        />
+      );
+    }
 
     if (showSettings) {
       buttons.push(
@@ -328,6 +349,7 @@ export const DashNav = memo<Props>((props) => {
           icon="cog"
           onClick={onOpenSettings}
           key="button-settings"
+          isHidden={FNDashboard ? true : false}
         />
       );
     }
@@ -356,16 +378,51 @@ export const DashNav = memo<Props>((props) => {
     return buttons;
   };
 
+  const gotoSnapshotOrigin = (snapshotUrl: string) => {
+    window.location.href = textUtil.sanitizeUrl(snapshotUrl);
+  };
+
+  const { isFullscreen, title, folderTitle } = props;
+
+  // let titleHref = '';
+  // let parentHref = '';
+
+  // if (kioskMode !== KioskMode.FN && location !== undefined) {
+  //   console.log( location, "inside location" )
+  // this ensures the component rerenders when the location changes
+  //   const location = useLocation()
+  //   titleHref = locationUtil.getUrlForPartial(location, { search: 'open' });
+  //   parentHref = locationUtil.getUrlForPartial(location, { search: 'open', folder: 'current' });
+  // }
+
+  const onGoBack = isFullscreen ? onClose : undefined;
+
+  if (config.featureToggles.topnav) {
+    return (
+      <AppChromeUpdate
+        actions={
+          <>
+            {renderLeftActions()}
+            <NavToolbarSeparator leftActionsSeparator />
+            <ToolbarButtonRow alignment="right">{renderRightActions()}</ToolbarButtonRow>
+          </>
+        }
+      />
+    );
+  }
+
   return (
-    <AppChromeUpdate
-      actions={
-        <>
-          {renderLeftActions()}
-          <NavToolbarSeparator leftActionsSeparator />
-          <ToolbarButtonRow alignment="right">{renderRightActions()}</ToolbarButtonRow>
-        </>
-      }
-    />
+    <PageToolbar
+      //  pageIcon={isFullscreen ? undefined : 'apps'}
+      title={title}
+      parent={folderTitle}
+      // titleHref={titleHref}
+      // parentHref={parentHref}
+      onGoBack={onGoBack}
+      leftItems={renderLeftActions()}
+    >
+      {renderRightActions()}
+    </PageToolbar>
   );
 });
 

@@ -65,6 +65,7 @@ import { parsePromQLStyleMatcherLooseSafe } from './utils/matchers';
 
 let nextDataSourceId = 1;
 
+
 export function mockDataSource<T extends DataSourceJsonData = DataSourceJsonData>(
   partial: Partial<DataSourceInstanceSettings<T>> = {},
   meta: Partial<DataSourcePluginMeta> = {}
@@ -708,8 +709,11 @@ export const grantUserRole = (role: string) => {
   jest.spyOn(contextSrv, 'hasRole').mockReturnValue(true);
 };
 
-export function mockUnifiedAlertingStore(unifiedAlerting?: Partial<StoreState['unifiedAlerting']>) {
-  const defaultState = configureStore().getState();
+export function mockUnifiedAlertingStore(unifiedAlerting?: Partial<UnifiedAlertingState>) {
+  /* eslint-disable-next-line  */
+  const defaultState = configureStore().getState() as any as CombinedState<{
+    unifiedAlerting: Required<UnifiedAlertingState>;
+  }>;
 
   return configureStore({
     ...defaultState,
@@ -720,10 +724,19 @@ export function mockUnifiedAlertingStore(unifiedAlerting?: Partial<StoreState['u
   });
 }
 
-export function mockStore(recipe: (state: StoreState) => void) {
-  const defaultState = configureStore().getState();
+/**
+ * NOTE: I used void just to fix ts errors in tests.
+ */
+export function mockStore(recipe: (state: StoreState) => Promise<StoreState> | void) {
+  /* eslint-disable-next-line  */
+  const defaultState = configureStore().getState() as PreloadedState<StoreState>;
 
-  return configureStore(produce(defaultState, recipe));
+  return configureStore(
+    // @ts-ignore
+    produce(defaultState, recipe as (state: StoreState) => Promise<StoreState>) as Promise<
+      Required<PreloadedState<StoreState>>
+    >
+  );
 }
 
 export function mockAlertQuery(query: Partial<AlertQuery>): AlertQuery {

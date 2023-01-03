@@ -65,6 +65,7 @@ export class BackendSrv implements BackendService {
   private readonly responseQueue: ResponseQueue;
   private _tokenRotationInProgress?: Observable<FetchResponse> | null = null;
   private deviceID?: string | null = null;
+  private grafanaPrefix: boolean;
 
   private dependencies: BackendSrvDependencies = {
     fromFetch: fromFetch,
@@ -83,6 +84,7 @@ export class BackendSrv implements BackendService {
       };
     }
 
+    this.grafanaPrefix = false;
     this.noBackendCache = false;
     this.internalFetch = this.internalFetch.bind(this);
     this.fetchQueue = new FetchQueue();
@@ -108,6 +110,12 @@ export class BackendSrv implements BackendService {
   }
 
   fetch<T>(options: BackendSrvRequest): Observable<FetchResponse<T>> {
+    // prefix "/grafana" to options.url
+    if (this.grafanaPrefix) {
+      if (options.url.indexOf('/grafana') !== 0) {
+        options.url = '/grafana' + options.url;
+      }
+    }
     // We need to match an entry added to the queue stream with the entry that is eventually added to the response stream
     const id = uuidv4();
     const fetchQueue = this.fetchQueue;
@@ -539,6 +547,10 @@ export class BackendSrv implements BackendService {
     return this.get<FolderDTO>(`/api/folders/${uid}?${queryParams.toString()}`, undefined, undefined, {
       showErrorAlert: false,
     });
+  }
+
+  setGrafanaPrefix(prefix: boolean) {
+    this.grafanaPrefix = prefix;
   }
 }
 

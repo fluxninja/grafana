@@ -6,11 +6,7 @@ export declare global {
     __grafana_load_failed: () => void;
     public_cdn_path: string;
     nonce: string | undefined;
-    System: typeof System;
-  }
-
-  // Augment DOMParser to accept TrustedType sanitised content
-  interface DOMParser {
-    parseFromString(string: string | TrustedType, type: DOMParserSupportedType): Document;
+    __POWERED_BY_QIANKUN__: boolean;
+    __INJECTED_PUBLIC_PATH_BY_QIANKUN__: string;
   }
 }

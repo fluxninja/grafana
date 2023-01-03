@@ -1,5 +1,6 @@
-import { debounce } from 'lodash';
-import { PureComponent } from 'react';
+import classNames from 'classnames';
+import React, { PureComponent, CSSProperties } from 'react';
+import { connect } from 'react-redux';
 import { Subscription } from 'rxjs';
 
 import {
@@ -40,7 +41,7 @@ import { getDatasourceSrv } from 'app/features/plugins/datasource_srv';
 import { applyFilterFromTable } from 'app/features/variables/adhoc/actions';
 import { onUpdatePanelSnapshotData } from 'app/plugins/datasource/grafana/utils';
 import { changeSeriesColorConfigFactory } from 'app/plugins/panel/timeseries/overrides/colorSeriesConfigFactory';
-import { dispatch } from 'app/store/store';
+import { StoreState } from 'app/types';
 import { RenderEvent } from 'app/types/events';
 
 import { deleteAnnotation, saveAnnotation, updateAnnotation } from '../../annotations/api';
@@ -71,6 +72,7 @@ export interface Props {
   onInstanceStateChange: (value: unknown) => void;
   timezone?: string;
   hideMenu?: boolean;
+  FNDashboard?: boolean;
 }
 
 export interface State {
@@ -81,6 +83,13 @@ export interface State {
   data: PanelData;
   liveTime?: TimeRange;
 }
+
+const FN_TITLE_STYLE: CSSProperties = {
+  textAlign: 'center',
+  padding: 3,
+  textTransform: 'capitalize',
+};
+
 
 export class PanelStateWrapper extends PureComponent<Props, State> {
   private readonly timeSrv: TimeSrv = getTimeSrv();
@@ -555,7 +564,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
   debouncedSetPanelAttention() {}
 
   render() {
-    const { dashboard, panel, width, height, plugin } = this.props;
+    const { dashboard, panel, isViewing, isEditing, width, height, plugin, FNDashboard } = this.props;
     const { errorMessage, data } = this.state;
     const { transparent } = panel;
     const panelChromeProps = getPanelChromeProps({ ...this.props, data });
@@ -569,45 +578,76 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
       </div>
     );
 
-    return (
-      <PanelChrome
-        width={width}
-        height={height}
-        title={panelChromeProps.title}
-        loadingState={data.state}
-        statusMessage={errorMessage}
-        statusMessageOnClick={panelChromeProps.onOpenErrorInspect}
-        description={panelChromeProps.description}
-        titleItems={panelChromeProps.titleItems}
-        menu={this.props.hideMenu ? undefined : menu}
-        dragClass={panelChromeProps.dragClass}
-        dragClassCancel="grid-drag-cancel"
-        padding={panelChromeProps.padding}
-        hoverHeaderOffset={hoverHeaderOffset}
-        hoverHeader={panelChromeProps.hasOverlayHeader()}
-        displayMode={transparent ? 'transparent' : 'default'}
-        onCancelQuery={panelChromeProps.onCancelQuery}
-        onFocus={() => this.setPanelAttention()}
-        onMouseEnter={() => this.setPanelAttention()}
-        onMouseMove={() => this.debouncedSetPanelAttention()}
-      >
-        {(innerWidth, innerHeight) => (
-          <>
-            <ErrorBoundary
-              dependencies={[data, plugin, panel.getOptions()]}
-              onError={this.onPanelError}
-              onRecover={this.onPanelErrorRecover}
-            >
-              {({ error }) => {
-                if (error) {
-                  return null;
-                }
-                return this.renderPanelContent(innerWidth, innerHeight);
-              }}
-            </ErrorBoundary>
-          </>
-        )}
-      </PanelChrome>
-    );
+    // for new panel header design
+    const onCancelQuery = () => panel.getQueryRunner().cancelQuery();
+    const title = panel.getDisplayTitle();
+    const noPadding: PanelPadding = plugin.noPadding ? 'none' : 'md';
+    const leftItems = [
+      <PanelHeaderLoadingIndicator state={data.state} onClick={onCancelQuery} key="loading-indicator" />,
+    ];
+
+    if (config.featureToggles.newPanelChromeUI) {
+      return (
+        <PanelChrome width={width} height={height} title={title} leftItems={leftItems} padding={noPadding}>
+          {(innerWidth, innerHeight) => (
+            <>
+              <ErrorBoundary
+                dependencies={[data, plugin, panel.getOptions()]}
+                onError={this.onPanelError}
+                onRecover={this.onPanelErrorRecover}
+              >
+                {({ error }) => {
+                  if (error) {
+                    return null;
+                  }
+                  return this.renderPanelContent(innerWidth, innerHeight);
+                }}
+              </ErrorBoundary>
+            </>
+          )}
+        </PanelChrome>
+      );
+    } else {
+      return (
+        <section
+          className={containerClassNames}
+          aria-label={selectors.components.Panels.Panel.containerByTitle(panel.title)}
+        >
+            {FNDashboard ? (
+          // TODO: Avoid divology. Use HTML5, i.e. wrap texts with  p or h element instead of div.
+          <div style={FN_TITLE_STYLE}>{panel.title}</div>
+        ) : <PanelHeader
+            panel={panel}
+            dashboard={dashboard}
+            title={panel.title}
+            description={panel.description}
+            links={panel.links}
+            error={errorMessage}
+            isEditing={isEditing}
+            isViewing={isViewing}
+            alertState={alertState}
+            data={data}
+          />}
+          <ErrorBoundary
+            dependencies={[data, plugin, panel.getOptions()]}
+            onError={this.onPanelError}
+            onRecover={this.onPanelErrorRecover}
+          >
+            {({ error }) => {
+              if (error) {
+                return null;
+              }
+              return this.renderPanel(width, height);
+            }}
+          </ErrorBoundary>
+        </section>
+      );
+    }
   }
 }
+
+const mapStateToProps = (state: StoreState) => {
+  return { ...state.fnGlobalState };
+};
+const connector = connect(mapStateToProps);
+export const PanelChrome = connector(PanelChromeUnconnected);
