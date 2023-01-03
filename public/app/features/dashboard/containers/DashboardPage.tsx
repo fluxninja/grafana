@@ -183,7 +183,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   initDashboard() {
-    const { dashboard, isPublic, isFNDashboard, match, queryParams } = this.props;
+    const { dashboard, isPublic, match, queryParams, isFNDashboard } = this.props;
 
     if (dashboard) {
       this.closeDashboard();
@@ -214,14 +214,15 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
     }
 
     if (!isPublic && !isFNDashboard) {
-    if (
-      prevProps.match.params.uid !== match.params.uid ||
-      (routeReloadCounter !== undefined && this.forceRouteReloadCounter !== routeReloadCounter)
-    ) {
-      this.initDashboard();
-      this.forceRouteReloadCounter = routeReloadCounter;
-      return;
-    }}
+      if (
+        prevProps.match.params.uid !== match.params.uid ||
+        (routeReloadCounter !== undefined && this.forceRouteReloadCounter !== routeReloadCounter)
+      ) {
+        this.initDashboard();
+        this.forceRouteReloadCounter = routeReloadCounter;
+        return;
+      }
+    }
 
     if (prevProps.location.search !== this.props.location.search) {
       const prevUrlParams = prevProps.queryParams;
@@ -389,12 +390,12 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   };
 
   render() {
-    const { dashboard, initError, queryParams, isPublic , isFNDashboard, fnLoader} = this.props;
+    const { dashboard, initError, queryParams, isPublic, isFNDashboard, fnLoader } = this.props;
     const { editPanel, viewPanel, updateScrollTop, pageNav, sectionNav } = this.state;
     const kioskMode = !isPublic ? getKioskMode(this.props.queryParams) : KioskMode.Full;
 
     if (!dashboard || !pageNav || !sectionNav) {
-      return fnLoader ? <>{fnLoader}</> :<DashboardLoading initPhase={this.props.initPhase} />;
+      return fnLoader ? <>{fnLoader}</> : <DashboardLoading initPhase={this.props.initPhase} />;
     }
 
     const inspectPanel = this.getInspectPanel();
@@ -478,22 +479,27 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           navModel={sectionNav}
           pageNav={pageNav}
           layout={PageLayoutType.Canvas}
-             toolbar={
-          this.props.controlsContainer ? (
-            <RenderPortal ID={this.props.controlsContainer}>{toolbar}</RenderPortal>
-          ) : (
-            toolbar
-          )
-        }
+          toolbar={
+            this.props.controlsContainer ? (
+              <RenderPortal ID={this.props.controlsContainer}>{toolbar}</RenderPortal>
+            ) : (
+              toolbar
+            )
+          }
           className={pageClassName}
           onSetScrollRef={this.setScrollRef}
         >
-         {!isFNDashboard &&  <DashboardPrompt dashboard={dashboard} />}
+          {!isFNDashboard && <DashboardPrompt dashboard={dashboard} />}
 
           {initError && <DashboardFailed />}
           {showSubMenu && (
             <section aria-label={selectors.pages.Dashboard.SubMenu.submenu}>
-              <SubMenu dashboard={dashboard} annotations={dashboard.annotations.list} links={dashboard.links} hiddenVariables={this.props.hiddenVariables}/>
+              <SubMenu
+                dashboard={dashboard}
+                annotations={dashboard.annotations.list}
+                links={dashboard.links}
+                hiddenVariables={this.props.hiddenVariables}
+              />
             </section>
           )}
           {config.featureToggles.angularDeprecationUI && dashboard.hasAngularPlugins() && dashboard.uid !== null && (
@@ -541,9 +547,9 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 }
 
 function updateStatePageNavFromProps(props: Props, state: State): State {
-  const { dashboard, navIndex } = props;
+  const { dashboard, isFNDashboard } = props;
 
-  if (!dashboard) {
+  if (!dashboard || isFNDashboard) {
     return state;
   }
 
