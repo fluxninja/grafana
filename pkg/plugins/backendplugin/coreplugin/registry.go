@@ -68,7 +68,7 @@ func NewRegistry(store map[string]backendplugin.PluginFactoryFunc) *Registry {
 func ProvideCoreRegistry(am *azuremonitor.Service, cw *cloudwatch.CloudWatchService, cm *cloudmonitoring.Service,
 	es *elasticsearch.Service, grap *graphite.Service, idb *influxdb.Service, lk *loki.Service, otsdb *opentsdb.Service,
 	pr *prometheus.Service, t *tempo.Service, td *testdatasource.Service, pg *postgres.Service, my *mysql.Service,
-	ms *mssql.Service, graf *grafanads.Service, phlare *phlare.Service, parca *parca.Service) *Registry {
+	ms *mssql.Service, graf *grafanads.Service, phlare *phlare.Service, parca *parca.Service, dr *druid.Service) *Registry {
 	return NewRegistry(map[string]backendplugin.PluginFactoryFunc{
 		CloudWatch:      asBackendPlugin(cw.Executor),
 		CloudMonitoring: asBackendPlugin(cm),
@@ -78,7 +78,6 @@ func ProvideCoreRegistry(am *azuremonitor.Service, cw *cloudwatch.CloudWatchServ
 		InfluxDB:        asBackendPlugin(idb),
 		Loki:            asBackendPlugin(lk),
 		OpenTSDB:        asBackendPlugin(otsdb),
-		Druid:           asBackendPlugin(dr),
 		Prometheus:      asBackendPlugin(pr),
 		Tempo:           asBackendPlugin(t),
 		TestData:        asBackendPlugin(td),
@@ -88,6 +87,7 @@ func ProvideCoreRegistry(am *azuremonitor.Service, cw *cloudwatch.CloudWatchServ
 		Grafana:         asBackendPlugin(graf),
 		Phlare:          asBackendPlugin(phlare),
 		Parca:           asBackendPlugin(parca),
+		Druid:           asBackendPlugin(dr),
 	})
 }
 
