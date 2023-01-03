@@ -108,7 +108,6 @@ func ProvideCoreRegistry(tracer tracing.Tracer, am *azuremonitor.Service, cw *cl
 		InfluxDB:        asBackendPlugin(idb),
 		Loki:            asBackendPlugin(lk),
 		OpenTSDB:        asBackendPlugin(otsdb),
-		Druid:           asBackendPlugin(dr),
 		Prometheus:      asBackendPlugin(pr),
 		Tempo:           asBackendPlugin(t),
 		TestData:        asBackendPlugin(td),
@@ -118,6 +117,7 @@ func ProvideCoreRegistry(tracer tracing.Tracer, am *azuremonitor.Service, cw *cl
 		Grafana:         asBackendPlugin(graf),
 		Pyroscope:       asBackendPlugin(pyroscope),
 		Parca:           asBackendPlugin(parca),
+		Druid:           asBackendPlugin(dr),
 	})
 }
 
