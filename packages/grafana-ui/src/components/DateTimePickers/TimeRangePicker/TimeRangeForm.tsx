@@ -139,7 +139,15 @@ export const TimeRangeForm: React.FC<Props> = (props) => {
         </Field>
         {fyTooltip}
       </div>
-      <Button data-testid={selectors.components.TimePicker.applyTimeRange} onClick={onApply}>
+      <Button
+        data-testid={selectors.components.TimePicker.applyTimeRange}
+        onClick={onApply}
+        style={{
+          width: '100%',
+          textAlign: 'center',
+          paddingLeft: '55px',
+        }}
+      >
         Apply time range
       </Button>
 

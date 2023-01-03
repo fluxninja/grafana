@@ -7,7 +7,7 @@ import { selectors } from '@grafana/e2e-selectors';
 
 import { Field, RadioButtonGroup, Select } from '../..';
 import { stylesFactory, useTheme2 } from '../../../themes';
-import { Button } from '../../Button';
+// import { Button } from '../../Button';
 import { TimeZonePicker } from '../TimeZonePicker';
 import { TimeZoneDescription } from '../TimeZonePicker/TimeZoneDescription';
 import { TimeZoneOffset } from '../TimeZonePicker/TimeZoneOffset';
@@ -59,9 +59,9 @@ export const TimePickerFooter: FC<Props> = (props) => {
   return (
     <div>
       <section aria-label="Time zone selection" className={style.container}>
-        <Button variant="secondary" onClick={onToggleChangeTimeSettings} size="sm">
+        {/* <Button variant="secondary" onClick={onToggleChangeTimeSettings} size="sm">
           Change time settings
-        </Button>
+        </Button> */}
         <div className={style.spacer} />
         <div className={style.timeZoneContainer}>
           <div className={style.timeZone}>
