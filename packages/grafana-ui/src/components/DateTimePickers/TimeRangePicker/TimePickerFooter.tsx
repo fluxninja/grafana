@@ -7,7 +7,7 @@ import { selectors } from '@grafana/e2e-selectors';
 
 import { Field, RadioButtonGroup, Select } from '../..';
 import { stylesFactory, useTheme2 } from '../../../themes';
-// import { Button } from '../../Button';
+import { Button } from '../../Button';
 import { TimeZonePicker } from '../TimeZonePicker';
 import { TimeZoneDescription } from '../TimeZonePicker/TimeZoneDescription';
 import { TimeZoneOffset } from '../TimeZonePicker/TimeZoneOffset';
@@ -59,10 +59,6 @@ export const TimePickerFooter: FC<Props> = (props) => {
   return (
     <div>
       <section aria-label="Time zone selection" className={style.container}>
-        {/* <Button variant="secondary" onClick={onToggleChangeTimeSettings} size="sm">
-          Change time settings
-        </Button> */}
-        <div className={style.spacer} />
         <div className={style.timeZoneContainer}>
           <div className={style.timeZone}>
             <TimeZoneTitle title={info.name} />
@@ -71,6 +67,18 @@ export const TimePickerFooter: FC<Props> = (props) => {
           </div>
           <TimeZoneOffset timeZone={timeZone} timestamp={timestamp} />
         </div>
+        <div className={style.spacer} />
+        <Button
+          onClick={onToggleChangeTimeSettings}
+          size="md"
+          style={{
+            backgroundColor: '#ffffff00',
+            color: '#3A785E',
+            border: '1px solid #3A785E',
+          }}
+        >
+          Change time settings
+        </Button>
       </section>
       {isEditing ? (
         <div className={style.editContainer}>
@@ -135,6 +143,7 @@ const getStyle = stylesFactory((theme: GrafanaTheme2) => {
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
+      height: 60px;
     `,
     editContainer: css`
       border-top: 1px solid ${theme.colors.border.weak};
