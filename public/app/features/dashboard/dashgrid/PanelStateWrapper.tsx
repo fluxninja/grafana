@@ -27,7 +27,7 @@ import { RefreshEvent } from '@grafana/runtime';
 import { VizLegendOptions } from '@grafana/schema';
 import {
   ErrorBoundary,
-  PanelChrome,
+  PanelChrome as Panel,
   PanelContext,
   PanelContextProvider,
   SeriesVisibilityChangeMode,
@@ -89,7 +89,6 @@ const FN_TITLE_STYLE: CSSProperties = {
   padding: 3,
   textTransform: 'capitalize',
 };
-
 
 export class PanelStateWrapper extends PureComponent<Props, State> {
   private readonly timeSrv: TimeSrv = getTimeSrv();
@@ -588,7 +587,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
 
     if (config.featureToggles.newPanelChromeUI) {
       return (
-        <PanelChrome width={width} height={height} title={title} leftItems={leftItems} padding={noPadding}>
+        <Panel width={width} height={height} title={title} leftItems={leftItems} padding={noPadding}>
           {(innerWidth, innerHeight) => (
             <>
               <ErrorBoundary
@@ -605,7 +604,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
               </ErrorBoundary>
             </>
           )}
-        </PanelChrome>
+        </Panel>
       );
     } else {
       return (
@@ -613,21 +612,23 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
           className={containerClassNames}
           aria-label={selectors.components.Panels.Panel.containerByTitle(panel.title)}
         >
-            {FNDashboard ? (
-          // TODO: Avoid divology. Use HTML5, i.e. wrap texts with  p or h element instead of div.
-          <div style={FN_TITLE_STYLE}>{panel.title}</div>
-        ) : <PanelHeader
-            panel={panel}
-            dashboard={dashboard}
-            title={panel.title}
-            description={panel.description}
-            links={panel.links}
-            error={errorMessage}
-            isEditing={isEditing}
-            isViewing={isViewing}
-            alertState={alertState}
-            data={data}
-          />}
+          {FNDashboard ? (
+            // TODO: Avoid divology. Use HTML5, i.e. wrap texts with  p or h element instead of div.
+            <div style={FN_TITLE_STYLE}>{panel.title}</div>
+          ) : (
+            <PanelHeader
+              panel={panel}
+              dashboard={dashboard}
+              title={panel.title}
+              description={panel.description}
+              links={panel.links}
+              error={errorMessage}
+              isEditing={isEditing}
+              isViewing={isViewing}
+              alertState={alertState}
+              data={data}
+            />
+          )}
           <ErrorBoundary
             dependencies={[data, plugin, panel.getOptions()]}
             onError={this.onPanelError}
@@ -650,4 +651,4 @@ const mapStateToProps = (state: StoreState) => {
   return { ...state.fnGlobalState };
 };
 const connector = connect(mapStateToProps);
-export const PanelChrome = connector(PanelChromeUnconnected);
+export const PanelChrome = connector(PanelStateWrapper);
