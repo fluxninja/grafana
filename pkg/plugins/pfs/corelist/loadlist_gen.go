@@ -1,4 +1,4 @@
-// Copyright 2022 Grafana Labs
+// Copyright 2023 Grafana Labs
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -46,6 +46,7 @@ func coreTreeList(rt *thema.Runtime) pfs.TreeList {
 		makeTreeOrPanic("public/app/plugins/datasource/cloudwatch", "cloudwatch", rt),
 		makeTreeOrPanic("public/app/plugins/datasource/dashboard", "dashboard", rt),
 		makeTreeOrPanic("public/app/plugins/datasource/elasticsearch", "elasticsearch", rt),
+		makeTreeOrPanic("public/app/plugins/datasource/grafadruid-druid-datasource", "grafadruid_druid_datasource", rt),
 		makeTreeOrPanic("public/app/plugins/datasource/grafana", "grafana", rt),
 		makeTreeOrPanic("public/app/plugins/datasource/grafana-azure-monitor-datasource", "grafana_azure_monitor_datasource", rt),
 		makeTreeOrPanic("public/app/plugins/datasource/graphite", "graphite", rt),
@@ -79,6 +80,7 @@ func coreTreeList(rt *thema.Runtime) pfs.TreeList {
 		makeTreeOrPanic("public/app/plugins/panel/news", "news", rt),
 		makeTreeOrPanic("public/app/plugins/panel/nodeGraph", "nodeGraph", rt),
 		makeTreeOrPanic("public/app/plugins/panel/piechart", "piechart", rt),
+		makeTreeOrPanic("public/app/plugins/panel/sankey-panel-0.5.0", "ismael_sankey_panel", rt),
 		makeTreeOrPanic("public/app/plugins/panel/stat", "stat", rt),
 		makeTreeOrPanic("public/app/plugins/panel/table-old", "table_old", rt),
 		makeTreeOrPanic("public/app/plugins/panel/text", "text", rt),
