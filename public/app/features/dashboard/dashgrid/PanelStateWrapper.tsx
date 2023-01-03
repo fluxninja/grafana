@@ -1,5 +1,6 @@
 import classNames from 'classnames';
-import React, { PureComponent } from 'react';
+import React, { PureComponent, CSSProperties } from 'react';
+import { connect } from 'react-redux';
 import { Subscription } from 'rxjs';
 
 import {
@@ -35,6 +36,7 @@ import { PANEL_BORDER } from 'app/core/constants';
 import { profiler } from 'app/core/profiler';
 import { applyPanelTimeOverrides } from 'app/features/dashboard/utils/panel';
 import { changeSeriesColorConfigFactory } from 'app/plugins/panel/timeseries/overrides/colorSeriesConfigFactory';
+import { StoreState } from 'app/types';
 import { RenderEvent } from 'app/types/events';
 
 import { isSoloRoute } from '../../../routes/utils';
@@ -62,6 +64,7 @@ export interface Props {
   height: number;
   onInstanceStateChange: (value: any) => void;
   timezone?: string;
+  FNDashboard?: boolean;
 }
 
 export interface State {
@@ -73,6 +76,13 @@ export interface State {
   data: PanelData;
   liveTime?: TimeRange;
 }
+
+const FN_TITLE_STYLE: CSSProperties = {
+  textAlign: 'center',
+  padding: 3,
+  textTransform: 'capitalize',
+};
+
 
 export class PanelStateWrapper extends PureComponent<Props, State> {
   private readonly timeSrv: TimeSrv = getTimeSrv();
@@ -567,7 +577,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
   }
 
   render() {
-    const { dashboard, panel, isViewing, isEditing, width, height, plugin } = this.props;
+    const { dashboard, panel, isViewing, isEditing, width, height, plugin, FNDashboard } = this.props;
     const { errorMessage, data } = this.state;
     const { transparent } = panel;
 
@@ -616,7 +626,10 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
           className={containerClassNames}
           aria-label={selectors.components.Panels.Panel.containerByTitle(panel.title)}
         >
-          <PanelHeader
+            {FNDashboard ? (
+          // TODO: Avoid divology. Use HTML5, i.e. wrap texts with  p or h element instead of div.
+          <div style={FN_TITLE_STYLE}>{panel.title}</div>
+        ) : <PanelHeader
             panel={panel}
             dashboard={dashboard}
             title={panel.title}
@@ -627,7 +640,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
             isViewing={isViewing}
             alertState={alertState}
             data={data}
-          />
+          />}
           <ErrorBoundary
             dependencies={[data, plugin, panel.getOptions()]}
             onError={this.onPanelError}
@@ -645,3 +658,9 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     }
   }
 }
+
+const mapStateToProps = (state: StoreState) => {
+  return { ...state.fnGlobalState };
+};
+const connector = connect(mapStateToProps);
+export const PanelChrome = connector(PanelChromeUnconnected);

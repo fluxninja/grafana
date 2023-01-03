@@ -23,6 +23,8 @@ const mysqlPlugin = async () =>
   await import(/* webpackChunkName: "mysqlPlugin" */ 'app/plugins/datasource/mysql/module');
 const postgresPlugin = async () =>
   await import(/* webpackChunkName: "postgresPlugin" */ 'app/plugins/datasource/postgres/module');
+const grafadruidDruidDatasourcePlugin = async () =>
+  await import(/* webpackChunkName: "druidPlugin" */ 'app/plugins/datasource/grafadruid-druid-datasource/module');
 const prometheusPlugin = async () =>
   await import(/* webpackChunkName: "prometheusPlugin" */ 'app/plugins/datasource/prometheus/module');
 const mssqlPlugin = async () =>
@@ -62,6 +64,8 @@ import * as logsPanel from 'app/plugins/panel/logs/module';
 import * as newsPanel from 'app/plugins/panel/news/module';
 import * as nodeGraph from 'app/plugins/panel/nodeGraph/module';
 import * as pieChartPanel from 'app/plugins/panel/piechart/module';
+//@ts-ignore
+import * as sankeyPanel from 'app/plugins/panel/sankey-panel-0.5.0/module';
 import * as statPanel from 'app/plugins/panel/stat/module';
 import * as stateTimelinePanel from 'app/plugins/panel/state-timeline/module';
 import * as statusHistoryPanel from 'app/plugins/panel/status-history/module';
@@ -111,6 +115,7 @@ const builtInPlugins: any = {
   'app/plugins/datasource/mysql/module': mysqlPlugin,
   'app/plugins/datasource/postgres/module': postgresPlugin,
   'app/plugins/datasource/mssql/module': mssqlPlugin,
+  'app/plugins/datasource/grafadruid-druid-datasource/module': grafadruidDruidDatasourcePlugin,
   'app/plugins/datasource/prometheus/module': prometheusPlugin,
   'app/plugins/datasource/testdata/module': testDataDSPlugin,
   'app/plugins/datasource/cloud-monitoring/module': cloudMonitoringPlugin,
@@ -152,6 +157,7 @@ const builtInPlugins: any = {
   'app/plugins/panel/nodeGraph/module': nodeGraph,
   'app/plugins/panel/histogram/module': histogramPanel,
   'app/plugins/panel/alertGroups/module': alertGroupsPanel,
+  'app/plugins/panel/sankey-panel-0.5.0/module': sankeyPanel,
 };
 
 export default builtInPlugins;

@@ -2,7 +2,7 @@ import { css } from '@emotion/css';
 import { useDialog } from '@react-aria/dialog';
 import { FocusScope } from '@react-aria/focus';
 import { useOverlay } from '@react-aria/overlays';
-import React, { memo, FormEvent, createRef, useState } from 'react';
+import React, { memo, FormEvent, createRef, useState, ReactElement, ReactNode } from 'react';
 
 import {
   isDateTime,
@@ -43,6 +43,7 @@ export interface TimeRangePickerProps {
   hideQuickRanges?: boolean;
   widthOverride?: number;
   isOnCanvas?: boolean;
+  fnText?: ReactNode;
 }
 
 export interface State {
@@ -67,6 +68,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
     hideQuickRanges,
     widthOverride,
     isOnCanvas,
+    fnText = '',
   } = props;
 
   const onChange = (timeRange: TimeRange) => {
@@ -117,6 +119,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
           icon="clock-nine"
           isOpen={isOpen}
           variant={variant}
+          fnText={fnText}
         >
           <TimePickerButtonLabel {...props} />
         </ToolbarButton>

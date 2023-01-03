@@ -11,6 +11,7 @@ import (
 	"github.com/grafana/grafana/pkg/tsdb/azuremonitor"
 	"github.com/grafana/grafana/pkg/tsdb/cloudmonitoring"
 	"github.com/grafana/grafana/pkg/tsdb/cloudwatch"
+	"github.com/grafana/grafana/pkg/tsdb/druid"
 	"github.com/grafana/grafana/pkg/tsdb/elasticsearch"
 	"github.com/grafana/grafana/pkg/tsdb/grafanads"
 	"github.com/grafana/grafana/pkg/tsdb/graphite"
@@ -36,6 +37,7 @@ const (
 	InfluxDB        = "influxdb"
 	Loki            = "loki"
 	OpenTSDB        = "opentsdb"
+	Druid           = "grafadruid-druid-datasource"
 	Prometheus      = "prometheus"
 	Tempo           = "tempo"
 	TestData        = "testdata"
@@ -76,6 +78,7 @@ func ProvideCoreRegistry(am *azuremonitor.Service, cw *cloudwatch.CloudWatchServ
 		InfluxDB:        asBackendPlugin(idb),
 		Loki:            asBackendPlugin(lk),
 		OpenTSDB:        asBackendPlugin(otsdb),
+		Druid:           asBackendPlugin(dr),
 		Prometheus:      asBackendPlugin(pr),
 		Tempo:           asBackendPlugin(t),
 		TestData:        asBackendPlugin(td),

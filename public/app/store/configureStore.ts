@@ -1,4 +1,11 @@
-import { configureStore as reduxConfigureStore } from '@reduxjs/toolkit';
+import {
+  configureStore as reduxConfigureStore,
+  EnhancedStore,
+  MiddlewareArray,
+  PreloadedState,
+} from '@reduxjs/toolkit';
+import { AnyAction, CombinedState } from 'redux';
+import { ThunkMiddleware } from 'redux-thunk';
 
 import { publicDashboardApi } from 'app/features/dashboard/api/publicDashboardApi';
 import { StoreState } from 'app/types/store';
@@ -9,6 +16,12 @@ import { alertingApi } from '../features/alerting/unified/api/alertingApi';
 
 import { setStore } from './store';
 
+export type ConfiguredStore = EnhancedStore<
+  CombinedState<StoreState>,
+  AnyAction,
+  MiddlewareArray<[ThunkMiddleware<CombinedState<StoreState>, AnyAction>]>
+>;
+
 export function addRootReducer(reducers: any) {
   // this is ok now because we add reducers before configureStore is called
   // in the future if we want to add reducers during runtime
@@ -16,7 +29,7 @@ export function addRootReducer(reducers: any) {
   addReducer(reducers);
 }
 
-export function configureStore(initialState?: Partial<StoreState>) {
+export function configureStore<I extends Partial<PreloadedState<StoreState>>>(initialState?: I | Promise<I>) {
   const store = reduxConfigureStore({
     reducer: createRootReducer(),
     middleware: (getDefaultMiddleware) =>

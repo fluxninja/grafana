@@ -1,8 +1,8 @@
 import React, { FC, ReactNode, useContext, useEffect } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import { useLocation } from 'react-router-dom';
 
-import { locationUtil, textUtil } from '@grafana/data';
+import { textUtil } from '@grafana/data';
+// import { textUtil } from '@grafana/data';
 import { selectors as e2eSelectors } from '@grafana/e2e-selectors/src';
 import { locationService } from '@grafana/runtime';
 import {
@@ -26,8 +26,8 @@ import { SaveDashboardDrawer } from 'app/features/dashboard/components/SaveDashb
 import { ShareModal } from 'app/features/dashboard/components/ShareModal';
 import { playlistSrv } from 'app/features/playlist/PlaylistSrv';
 import { updateTimeZoneForSession } from 'app/features/profile/state/reducers';
-import { KioskMode } from 'app/types';
 import { DashboardMetaChangedEvent } from 'app/types/events';
+import { KioskMode, StoreState } from 'app/types';
 
 import { setStarred } from '../../../../core/reducers/navBarTree';
 import { getDashboardSrv } from '../../services/DashboardSrv';
@@ -41,7 +41,11 @@ const mapDispatchToProps = {
   updateTimeZoneForSession,
 };
 
-const connector = connect(null, mapDispatchToProps);
+const mapStateToProps = (state: StoreState) => {
+  return { ...state.fnGlobalState };
+};
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
 
 const selectors = e2eSelectors.pages.Dashboard.DashNav;
 
@@ -260,7 +264,7 @@ export const DashNav = React.memo<Props>((props) => {
   };
 
   const renderRightActions = () => {
-    const { dashboard, onAddPanel, isFullscreen, kioskMode } = props;
+    const { dashboard, onAddPanel, isFullscreen, kioskMode, FNDashboard } = props;
     const { canSave, canEdit, showSettings } = dashboard.meta;
     const { snapshot } = dashboard;
     const snapshotUrl = snapshot && snapshot.originalUrl;
@@ -271,6 +275,7 @@ export const DashNav = React.memo<Props>((props) => {
         icon="monitor"
         onClick={onToggleTVMode}
         key="tv-button"
+        isHidden={FNDashboard ? true : false}
       />
     );
 
@@ -278,7 +283,7 @@ export const DashNav = React.memo<Props>((props) => {
       return [renderPlaylistControls(), renderTimeControls()];
     }
 
-    if (kioskMode === KioskMode.TV) {
+    if (kioskMode === KioskMode.TV || kioskMode === KioskMode.FN) {
       return [renderTimeControls(), tvButton];
     }
 
@@ -289,6 +294,7 @@ export const DashNav = React.memo<Props>((props) => {
           icon="panel-add"
           onClick={onAddPanel}
           key="button-panel-add"
+          isHidden={FNDashboard ? true : false}
         />
       );
     }
@@ -306,6 +312,7 @@ export const DashNav = React.memo<Props>((props) => {
                   onDismiss: hideModal,
                 });
               }}
+              isHidden={FNDashboard ? true : false}
             />
           )}
         </ModalsController>
@@ -319,6 +326,7 @@ export const DashNav = React.memo<Props>((props) => {
           onClick={() => gotoSnapshotOrigin(snapshotUrl)}
           icon="link"
           key="button-snapshot"
+          isHidden={FNDashboard ? true : false}
         />
       );
     }
@@ -330,6 +338,7 @@ export const DashNav = React.memo<Props>((props) => {
           icon="cog"
           onClick={onOpenSettings}
           key="button-settings"
+          isHidden={FNDashboard ? true : false}
         />
       );
     }
@@ -346,10 +355,18 @@ export const DashNav = React.memo<Props>((props) => {
   };
 
   const { isFullscreen, title, folderTitle } = props;
+
+  // let titleHref = '';
+  // let parentHref = '';
+
+  // if (kioskMode !== KioskMode.FN && location !== undefined) {
+  //   console.log( location, "inside location" )
   // this ensures the component rerenders when the location changes
-  const location = useLocation();
-  const titleHref = locationUtil.getUrlForPartial(location, { search: 'open' });
-  const parentHref = locationUtil.getUrlForPartial(location, { search: 'open', query: 'folder:current' });
+  //   const location = useLocation()
+  //   titleHref = locationUtil.getUrlForPartial(location, { search: 'open' });
+  //   parentHref = locationUtil.getUrlForPartial(location, { search: 'open', folder: 'current' });
+  // }
+
   const onGoBack = isFullscreen ? onClose : undefined;
 
   if (config.featureToggles.topnav) {
@@ -368,11 +385,11 @@ export const DashNav = React.memo<Props>((props) => {
 
   return (
     <PageToolbar
-      pageIcon={isFullscreen ? undefined : 'apps'}
+      //  pageIcon={isFullscreen ? undefined : 'apps'}
       title={title}
       parent={folderTitle}
-      titleHref={titleHref}
-      parentHref={parentHref}
+      // titleHref={titleHref}
+      // parentHref={parentHref}
       onGoBack={onGoBack}
       leftItems={renderLeftActions()}
     >
