@@ -56,6 +56,8 @@ export const TimePickerFooter: FC<Props> = (props) => {
     return null;
   }
 
+  const fnColor = theme.isDark ? '#8EC4AD' : '#3A785E';
+
   return (
     <div>
       <section aria-label="Time zone selection" className={style.container}>
@@ -73,8 +75,8 @@ export const TimePickerFooter: FC<Props> = (props) => {
           size="md"
           style={{
             backgroundColor: '#ffffff00',
-            color: '#3A785E',
-            border: '1px solid #3A785E',
+            color: fnColor,
+            border: `1px solid ${fnColor}`,
           }}
         >
           Change time settings
