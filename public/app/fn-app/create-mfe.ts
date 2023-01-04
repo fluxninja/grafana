@@ -195,14 +195,18 @@ class createMfe {
 
     static mountFnApp(Component: ComponentType<FNDashboardProps>) {
         const lifeCycleFn: FrameworkLifeCycles['mount'] = (props: FNDashboardProps) => {
-            return new Promise((res, rej) => {
-                createMfe.logger('Trying to mount grafana...');
+            createMfe.logger('Trying to mount grafana...');
 
+            return new Promise((res, rej) => {
                 try {
                     createMfe.loadFnTheme(props.mode);
                     createMfe.Component = Component;
 
-                    createMfe.renderMfeComponent(props, () => res(true));
+                    createMfe.renderMfeComponent(props, () => {
+                        createMfe.logger('Mounted grafana.');
+
+                        return res(true);
+                    });
                 } catch (err) {
                     const message = `[FN Grafana]: Failed to mount grafana. ${err}`;
 
@@ -286,9 +290,10 @@ class createMfe {
          * Then we should keep the current props that are read them from the state.
          */
         const mergedProps = merge({}, fnGlobalState, props) as FNDashboardProps;
+        const container = createMfe.getContainer(mergedProps)
 
-        ReactDOM.render(React.createElement(createMfe.Component, mergedProps), createMfe.getContainer(mergedProps), () => {
-            createMfe.logger('Successfully rendered mfe component.');
+        ReactDOM.render(React.createElement(createMfe.Component, mergedProps), container, () => {
+            createMfe.logger('Rendered mfe component.', {mergedProps, container});
             onSuccess();
         });
     }
