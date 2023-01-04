@@ -181,13 +181,14 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
   componentDidUpdate(prevProps: Props, prevState: State) {
     const { dashboard, match, templateVarsChangedInUrl, isPublic, isFNDashboard } = this.props;
-    const routeReloadCounter = (this.props.history.location.state as any)?.routeReloadCounter;
 
     if (!dashboard) {
       return;
     }
 
     if (!isPublic && !isFNDashboard) {
+      const routeReloadCounter = (this.props.history.location?.state as any)?.routeReloadCounter;
+
       if (
         prevProps.match.params.uid !== match.params.uid ||
         (routeReloadCounter !== undefined && this.forceRouteReloadCounter !== routeReloadCounter)

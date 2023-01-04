@@ -53,6 +53,7 @@ import { GAEchoBackend } from './core/services/echo/backends/analytics/GABackend
 import { RudderstackBackend } from './core/services/echo/backends/analytics/RudderstackBackend';
 import { GrafanaJavascriptAgentBackend } from './core/services/echo/backends/grafana-javascript-agent/GrafanaJavascriptAgentBackend';
 import { SentryEchoBackend } from './core/services/echo/backends/sentry/SentryBackend';
+import { initializeI18n } from './core/internationalization';
 import { initDevFeatures } from './dev';
 import { getTimeSrv } from './features/dashboard/services/TimeSrv';
 import { PanelDataErrorView } from './features/panel/components/PanelDataErrorView';
@@ -105,6 +106,8 @@ export class GrafanaApp {
       config.panels = settings.panels;
       config.datasources = settings.datasources;
       config.defaultDatasource = settings.defaultDatasource;
+
+      initializeI18n(config.bootData.user.locale);
 
       initEchoSrv();
       addClassIfNoOverlayScrollbar();

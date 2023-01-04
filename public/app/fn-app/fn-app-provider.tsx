@@ -5,7 +5,6 @@ import { BrowserRouter } from 'react-router-dom';
 import { config, navigationLogger } from '@grafana/runtime';
 import { ErrorBoundaryAlert, GlobalStyles } from '@grafana/ui';
 import { loadAndInitAngularIfEnabled } from 'app/angular/loadAndInitAngularIfEnabled';
-import { I18nProvider } from 'app/core/internationalization';
 import { ThemeProvider } from 'app/core/utils/ConfigProvider';
 import { store } from 'app/store/store';
 
@@ -25,7 +24,7 @@ export const FnAppProvider: FC<FnAppProviderProps> = (props) => {
     loadAndInitAngularIfEnabled()
       .then(() => {
         setReady(true);
-        $('.preloader').remove();
+        // $('.preloader').remove();
       })
       .catch((err) => console.error(err));
     return () => {};
@@ -48,16 +47,16 @@ export const FnAppProvider: FC<FnAppProviderProps> = (props) => {
   return (
     <Provider store={store}>
       <BrowserRouter>
-      <I18nProvider>
         <ErrorBoundaryAlert style="page">
           <GrafanaContext.Provider value={app.context}>
-            <ThemeProvider value={config.theme2}>
-              <GlobalStyles />
-              {children}
-            </ThemeProvider>
+            <ThemeProvider value={config.theme2} children={
+              <>
+                <GlobalStyles />
+                {children || null}
+              </>}
+            />
           </GrafanaContext.Provider>
         </ErrorBoundaryAlert>
-      </I18nProvider>
       </BrowserRouter>
     </Provider>
   );
