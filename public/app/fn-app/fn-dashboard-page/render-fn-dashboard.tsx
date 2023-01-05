@@ -21,7 +21,7 @@ const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'isFNDashboard' | '
     path: '/d/:uid/:slug?',
     url: '',
   },
-  
+
   history: {} as DashboardPageProps['history'],
   route: {
     routeName: DashboardRoutes.Normal,
@@ -32,16 +32,7 @@ const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'isFNDashboard' | '
 };
 
 export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
-  const {
-    queryParams,
-    uid,
-    slug,
-    mode,
-    controlsContainer,
-    pageTitle = '',
-    setErrors,
-    fnLoader,
-  } = props;
+  const { queryParams, uid, slug, mode, controlsContainer, pageTitle = '', setErrors, fnLoader } = props;
 
   const dispatch = useDispatch();
 
@@ -95,19 +86,23 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
     locationService.fnPathnameChange(window.location.pathname, queryParams);
   }, [dispatch, uid, slug, controlsContainer, pageTitle, queryParams, mode, hiddenVariables]);
 
-  const dashboardPageProps: DashboardPageProps = useMemo(() => merge({}, DEFAULT_DASHBOARD_PAGE_PROPS, {
-    ...DEFAULT_DASHBOARD_PAGE_PROPS,
-    match: {
-      params: {
-        ...props,
-      },
-    },
-    location: locationService.getLocation(),
-    queryParams,
-    hiddenVariables,
-    controlsContainer,
-    fnLoader,
-  }),[controlsContainer, fnLoader, hiddenVariables, props, queryParams]);
+  const dashboardPageProps: DashboardPageProps = useMemo(
+    () =>
+      merge({}, DEFAULT_DASHBOARD_PAGE_PROPS, {
+        ...DEFAULT_DASHBOARD_PAGE_PROPS,
+        match: {
+          params: {
+            ...props,
+          },
+        },
+        location: locationService.getLocation(),
+        queryParams,
+        hiddenVariables,
+        controlsContainer,
+        fnLoader,
+      }),
+    [controlsContainer, fnLoader, hiddenVariables, props, queryParams]
+  );
 
   return isEmpty(queryParams || {}) ? <>{fnLoader}</> : <DashboardPage {...dashboardPageProps} />;
 };
