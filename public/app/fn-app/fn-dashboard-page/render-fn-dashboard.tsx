@@ -3,7 +3,7 @@ import React, { useEffect, FC, useMemo } from 'react';
 import { useDispatch } from 'react-redux';
 
 import { locationService as locationSrv, HistoryWrapper } from '@grafana/runtime';
-import { setInitialMountState } from 'app/core/reducers/fn-slice';
+import { FnGlobalState, setInitialMountState } from 'app/core/reducers/fn-slice';
 import DashboardPage, { DashboardPageProps } from 'app/features/dashboard/containers/DashboardPage';
 import { FnLoggerService } from 'app/fn_logger';
 import { DashboardRoutes, StoreState, useSelector } from 'app/types';
@@ -68,19 +68,20 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
   }, [firstError, setErrors]);
 
   useEffect(() => {
-    FnLoggerService.log(null, '[FN Grafana] Trying to set initial state...');
+    const initialState: FnGlobalState = {
+      FNDashboard: true,
+      uid,
+      slug,
+      mode,
+      controlsContainer,
+      pageTitle,
+      queryParams,
+      hiddenVariables,
+    };
 
-    dispatch(
-      setInitialMountState({
-        FNDashboard: true,
-        uid,
-        slug,
-        mode,
-        controlsContainer,
-        pageTitle,
-        queryParams,
-      })
-    );
+    FnLoggerService.log(null, '[FN Grafana] Trying to set initial state.', { initialState });
+
+    dispatch(setInitialMountState(initialState));
 
     // TODO: catch success in redux-thunk way
     FnLoggerService.log(
@@ -92,8 +93,7 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
     );
 
     locationService.fnPathnameChange(window.location.pathname, queryParams);
-
-  }, [dispatch, uid, slug, controlsContainer, pageTitle, queryParams, mode]);
+  }, [dispatch, uid, slug, controlsContainer, pageTitle, queryParams, mode, hiddenVariables]);
 
   const dashboardPageProps: DashboardPageProps = useMemo(() => merge({}, DEFAULT_DASHBOARD_PAGE_PROPS, {
     ...DEFAULT_DASHBOARD_PAGE_PROPS,
