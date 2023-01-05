@@ -252,9 +252,7 @@ export function initDashboard(args: InitDashboardArgs): ThunkResult<void> {
         dashboard.autoFitPanels(window.innerHeight, queryParams.kiosk);
       }
 
-      if (!config.publicDashboardAccessToken) {
-        args.keybindingSrv.setupDashboardBindings(dashboard);
-      }
+      args.keybindingSrv?.setupDashboardBindings(dashboard);
     } catch (err) {
       if (err instanceof Error) {
         dispatch(notifyApp(createErrorNotification('Dashboard init failed', err)));
