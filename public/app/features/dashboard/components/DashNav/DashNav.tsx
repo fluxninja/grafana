@@ -286,7 +286,7 @@ export const DashNav = memo<Props>((props) => {
         icon="monitor"
         onClick={onToggleTVMode}
         key="tv-button"
-        isHidden={FNDashboard ? true : false}
+        isHidden={!!FNDashboard}
       />
     );
 
@@ -305,7 +305,7 @@ export const DashNav = memo<Props>((props) => {
           icon="panel-add"
           onClick={onAddPanel}
           key="button-panel-add"
-          isHidden={FNDashboard ? true : false}
+          isHidden={!!FNDashboard}
         />
       );
     }
@@ -323,7 +323,7 @@ export const DashNav = memo<Props>((props) => {
                   onDismiss: hideModal,
                 });
               }}
-              isHidden={FNDashboard ? true : false}
+              isHidden={!!FNDashboard}
             />
           )}
         </ModalsController>
@@ -337,7 +337,7 @@ export const DashNav = memo<Props>((props) => {
           onClick={() => gotoSnapshotOrigin(snapshotUrl)}
           icon="link"
           key="button-snapshot"
-          isHidden={FNDashboard ? true : false}
+          isHidden={!!FNDashboard}
         />
       );
     }
@@ -349,7 +349,7 @@ export const DashNav = memo<Props>((props) => {
           icon="cog"
           onClick={onOpenSettings}
           key="button-settings"
-          isHidden={FNDashboard ? true : false}
+          isHidden={!!FNDashboard}
         />
       );
     }
