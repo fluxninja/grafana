@@ -7,7 +7,7 @@ config.featureToggles = {
   publicDashboards: true,
 };
 
-config.isPublicDashboardView = true;
+config.isPublicDashboardView = false;
 // eslint-disable-next-line
 config.bootData.themePaths = (window as any).fnData?.themePaths;
 
