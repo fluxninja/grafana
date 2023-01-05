@@ -393,14 +393,14 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   render() {
     const { dashboard, initError, queryParams, isPublic, isFNDashboard, fnLoader } = this.props;
     const { editPanel, viewPanel, updateScrollTop, pageNav, sectionNav } = this.state;
-    const kioskMode = !isPublic ? getKioskMode(this.props.queryParams) : KioskMode.Full;
+    const kioskMode = isFNDashboard ? KioskMode.FN : !isPublic  ? getKioskMode(this.props.queryParams) : KioskMode.Full;
 
-    if (!dashboard || !pageNav || !sectionNav) {
+    if (!dashboard ) {
       return fnLoader ? <>{fnLoader}</> : <DashboardLoading initPhase={this.props.initPhase} />;
     }
 
     const inspectPanel = this.getInspectPanel();
-    const showSubMenu = !editPanel && !kioskMode && !this.props.queryParams.editview && dashboard.isSubMenuVisible();
+    const showSubMenu = !editPanel && !this.props.queryParams.editview;
 
     const toolbar = kioskMode !== KioskMode.Full && !queryParams.editview && (
       <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
