@@ -71,7 +71,7 @@ commands:
         description: opsninja branch to install from
       fingerprint:
         type: string
-        default: 8d:43:0f:09:ed:86:44:23:4f:43:88:29:71:bf:92:e7  # fluxninja/cloud R/O
+        default: 10:d1:92:4e:2a:55:81:c9:82:c2:74:ce:6d:0e:e8:a8  # fluxninja/cloud R/O
         description: What SSH identity to use for accessing opsninja repository
     steps:
       - add_ssh_keys:
@@ -224,7 +224,7 @@ jobs:
     steps:
       - add_ssh_keys:
           fingerprints:
-            - "7b:4a:f0:04:90:75:93:7a:63:05:3b:18:a0:80:16:0d"  # argo-manifests R/W
+            - "f9:49:04:10:b1:77:16:b0:0e:c0:ba:21:0e:9d:fd:40"  # argo-manifests R/W
       - checkout
       - asdf_install:
           cache_name: release
