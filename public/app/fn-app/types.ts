@@ -30,6 +30,6 @@ export interface FNDashboardProps {
   controlsContainer: string;
   isLoading: (isLoading: boolean) => void;
   setErrors: (errors?: { [K: number | string]: string }) => void;
-  hiddenVariables: string[];
+  hiddenVariables: readonly string[];
   container?: HTMLElement | null;
 }
