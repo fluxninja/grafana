@@ -78,11 +78,6 @@ export const TimePickerContentWithScreenSize: React.FC<PropsWithScreenSize> = (p
   return (
     <div id="TimePickerContent" className={cx(styles.container, className)}>
       <div className={styles.body}>
-        {isFullscreen && (
-          <div className={styles.leftSide}>
-            <FullScreenForm {...props} historyOptions={historyOptions} />
-          </div>
-        )}
         {(!isFullscreen || !hideQuickRanges) && (
           <div className={styles.rightSide}>
             <div className={styles.timeRangeFilter}>
@@ -100,6 +95,11 @@ export const TimePickerContentWithScreenSize: React.FC<PropsWithScreenSize> = (p
                 <TimeRangeList options={filteredQuickOptions} onChange={onChangeTimeOption} value={timeOption} />
               )}
             </CustomScrollbar>
+          </div>
+        )}
+        {isFullscreen && (
+          <div className={styles.leftSide}>
+            <FullScreenForm {...props} historyOptions={historyOptions} />
           </div>
         )}
       </div>
@@ -189,10 +189,7 @@ const FullScreenForm: React.FC<FormProps> = (props) => {
         className={styles.container}
         style={{
           height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
+          padding: '25px',
         }}
       >
         <div className={styles.title} data-testid={selectors.components.TimePicker.absoluteTimeRangeTitle}>
@@ -287,18 +284,18 @@ const getStyles = stylesFactory((theme: GrafanaTheme2, isReversed, hideQuickRang
     body: css`
       display: flex;
       flex-direction: row-reverse;
-      height: ${isContainerTall ? '381px' : '217px'};
+      height: ${isContainerTall ? '281px' : '217px'};
     `,
     leftSide: css`
       display: flex;
       flex-direction: column;
       border-right: ${isReversed ? 'none' : `1px solid ${theme.colors.border.weak}`};
-      width: ${!hideQuickRanges ? '60%' : '100%'};
+      width: ${!hideQuickRanges ? '50%' : '100%'};
       overflow: hidden;
       order: ${isReversed ? 1 : 0};
     `,
     rightSide: css`
-      width: ${isFullscreen ? '40%' : '100%'}; !important;
+      width: ${isFullscreen ? '50%' : '100%'}; !important;
       border-right: ${isReversed ? `1px solid ${theme.colors.border.weak}` : 'none'};
       display: flex;
       flex-direction: column;

@@ -57,6 +57,8 @@ export const TimePickerFooter: FC<Props> = (props) => {
     return null;
   }
 
+  const fnColor = theme.isDark ? '#8EC4AD' : '#3A785E';
+
   return (
     <div>
       <section
@@ -72,7 +74,15 @@ export const TimePickerFooter: FC<Props> = (props) => {
           <TimeZoneOffset timeZone={timeZone} timestamp={timestamp} />
         </div>
         <div className={style.spacer} />
-        <Button variant="secondary" onClick={onToggleChangeTimeSettings} size="sm">
+        <Button
+          onClick={onToggleChangeTimeSettings}
+          size="md"
+          style={{
+            backgroundColor: '#ffffff00',
+            color: fnColor,
+            border: `1px solid ${fnColor}`,
+          }}
+        >
           <Trans i18nKey="time-picker.footer.change-settings-button">Change time settings</Trans>
         </Button>
       </section>
@@ -142,6 +152,7 @@ const getStyle = stylesFactory((theme: GrafanaTheme2) => {
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
+      height: 60px;
     `,
     editContainer: css`
       border-top: 1px solid ${theme.colors.border.weak};
