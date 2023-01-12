@@ -195,27 +195,17 @@ export const TimeRangeContent = (props: Props) => {
         </Field>
         {fyTooltip}
       </div>
-      <div className={style.buttonsContainer}>
-        <Button
-          data-testid={selectors.components.TimePicker.copyTimeRange}
-          icon="copy"
-          variant="secondary"
-          tooltip={t('time-picker.copy-paste.tooltip-copy', 'Copy time range to clipboard')}
-          type="button"
-          onClick={onCopy}
-        />
-        <Button
-          data-testid={selectors.components.TimePicker.pasteTimeRange}
-          icon="clipboard-alt"
-          variant="secondary"
-          tooltip={t('time-picker.copy-paste.tooltip-paste', 'Paste time range')}
-          type="button"
-          onClick={onPaste}
-        />
-        <Button data-testid={selectors.components.TimePicker.applyTimeRange} type="button" onClick={onApply}>
-          <Trans i18nKey="time-picker.range-content.apply-button">Apply time range</Trans>
-        </Button>
-      </div>
+      <Button
+        data-testid={selectors.components.TimePicker.applyTimeRange}
+        onClick={onApply}
+        style={{
+          width: '100%',
+          textAlign: 'center',
+          paddingLeft: '55px',
+        }}
+      >
+        <Trans i18nKey="time-picker.range-content.apply-button">Apply time range</Trans>
+      </Button>
 
       <TimePickerCalendar
         isFullscreen={isFullscreen}

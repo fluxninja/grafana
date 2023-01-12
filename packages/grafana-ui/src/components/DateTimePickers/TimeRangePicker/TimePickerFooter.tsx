@@ -6,7 +6,7 @@ import * as React from 'react';
 import { getTimeZoneInfo, GrafanaTheme2, TimeZone } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 
-import { useStyles2 } from '../../../themes';
+import { stylesFactory, useStyles2 } from '../../../themes';
 import { t, Trans } from '../../../utils/i18n';
 import { Button } from '../../Button';
 import { Field } from '../../Forms/Field';
@@ -63,6 +63,8 @@ export const TimePickerFooter = (props: Props) => {
     return null;
   }
 
+  const fnColor = theme.isDark ? '#8EC4AD' : '#3A785E';
+
   return (
     <div>
       <section
@@ -79,13 +81,13 @@ export const TimePickerFooter = (props: Props) => {
         </div>
         <div className={style.spacer} />
         <Button
-          data-testid={selectors.components.TimeZonePicker.changeTimeSettingsButton}
-          variant="secondary"
           onClick={onToggleChangeTimeSettings}
-          size="sm"
-          aria-expanded={isEditing}
-          aria-controls={timeSettingsId}
-          icon={isEditing ? 'angle-up' : 'angle-down'}
+          size="md"
+          style={{
+            backgroundColor: '#ffffff00',
+            color: fnColor,
+            border: `1px solid ${fnColor}`,
+          }}
         >
           <Trans i18nKey="time-picker.footer.change-settings-button">Change time settings</Trans>
         </Button>
@@ -162,42 +164,45 @@ export const TimePickerFooter = (props: Props) => {
   );
 };
 
-const getStyle = (theme: GrafanaTheme2) => ({
-  container: css({
-    borderTop: `1px solid ${theme.colors.border.weak}`,
-    padding: theme.spacing(1.5),
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  }),
-  editContainer: css({
-    borderTop: `1px solid ${theme.colors.border.weak}`,
-    padding: theme.spacing(1.5),
-    paddingTop: 0,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  }),
-  spacer: css({
-    marginLeft: '7px',
-  }),
-  timeSettingContainer: css({
-    paddingTop: theme.spacing(1),
-  }),
-  fiscalYearField: css({
-    marginBottom: 0,
-  }),
-  timeZoneContainer: css({
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    flexGrow: 1,
-  }),
-  timeZone: css({
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    flexGrow: 1,
-  }),
+const getStyle = stylesFactory((theme: GrafanaTheme2) => {
+  return {
+    container: css`
+      border-top: 1px solid ${theme.colors.border.weak};
+      padding: 11px;
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      height: 60px;
+    `,
+    editContainer: css`
+      border-top: 1px solid ${theme.colors.border.weak};
+      padding: 11px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 7px;
+    `,
+    spacer: css`
+      margin-left: 7px;
+    `,
+    timeSettingContainer: css`
+      padding-top: ${theme.spacing(1)};
+    `,
+    fiscalYearField: css`
+      margin-bottom: 0px;
+    `,
+    timeZoneContainer: css`
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: center;
+      flex-grow: 1;
+    `,
+    timeZone: css`
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      flex-grow: 1;
+    `,
+  };
 });

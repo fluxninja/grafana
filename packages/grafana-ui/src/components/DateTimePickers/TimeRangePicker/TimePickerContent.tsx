@@ -4,7 +4,7 @@ import { memo, useMemo, useState } from 'react';
 import { GrafanaTheme2, isDateTime, rangeUtil, RawTimeRange, TimeOption, TimeRange, TimeZone } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 
-import { useStyles2, useTheme2 } from '../../../themes';
+import { stylesFactory, useStyles2, useTheme2 } from '../../../themes';
 import { getFocusStyles } from '../../../themes/mixins';
 import { t, Trans } from '../../../utils/i18n';
 import { FilterInput } from '../../FilterInput/FilterInput';
@@ -79,11 +79,6 @@ export const TimePickerContentWithScreenSize = (props: PropsWithScreenSize) => {
   return (
     <div id="TimePickerContent" className={cx(styles.container, className)}>
       <div className={styles.body}>
-        {isFullscreen && (
-          <div className={styles.leftSide}>
-            <FullScreenForm {...props} historyOptions={historyOptions} />
-          </div>
-        )}
         {(!isFullscreen || !hideQuickRanges) && (
           <div className={styles.rightSide}>
             <div className={styles.timeRangeFilter}>
@@ -100,6 +95,11 @@ export const TimePickerContentWithScreenSize = (props: PropsWithScreenSize) => {
                 <TimeRangeList options={filteredQuickOptions} onChange={onChangeTimeOption} value={timeOption} />
               )}
             </div>
+          </div>
+        )}
+        {isFullscreen && (
+          <div className={styles.leftSide}>
+            <FullScreenForm {...props} historyOptions={historyOptions} />
           </div>
         )}
       </div>
@@ -193,10 +193,7 @@ const FullScreenForm = (props: FormProps) => {
         className={styles.container}
         style={{
           height: '100%',
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
+          padding: '25px',
         }}
       >
         <div className={styles.title} data-testid={selectors.components.TimePicker.absoluteTimeRangeTitle}>
@@ -278,54 +275,45 @@ const useTimeOption = (raw: RawTimeRange, quickOptions: TimeOption[]): TimeOptio
   }, [raw, quickOptions]);
 };
 
-const getStyles = (
-  theme: GrafanaTheme2,
-  isReversed?: boolean,
-  hideQuickRanges?: boolean,
-  isContainerTall?: boolean,
-  isFullscreen?: boolean
-) => ({
-  container: css({
-    background: theme.colors.background.primary,
-    boxShadow: theme.shadows.z3,
-    width: `${isFullscreen ? '546px' : '262px'}`,
-    borderRadius: theme.shape.radius.default,
-    border: `1px solid ${theme.colors.border.weak}`,
-    [`${isReversed ? 'left' : 'right'}`]: 0,
-    display: 'flex',
-    flexDirection: 'column',
-  }),
-  body: css({
-    display: 'flex',
-    flexDirection: 'row-reverse',
-    height: `${isContainerTall ? '381px' : '217px'}`,
-    maxHeight: '100vh',
-  }),
-  leftSide: css({
-    display: 'flex',
-    flexDirection: 'column',
-    borderRight: `${isReversed ? 'none' : `1px solid ${theme.colors.border.weak}`}`,
-    width: `${!hideQuickRanges ? '60%' : '100%'}`,
-    overflow: 'auto',
-    scrollbarWidth: 'thin',
-    order: isReversed ? 1 : 0,
-  }),
-  rightSide: css({
-    width: `${isFullscreen ? '40%' : '100%'}; !important`,
-    borderRight: isReversed ? `1px solid ${theme.colors.border.weak}` : 'none',
-    display: 'flex',
-    flexDirection: 'column',
-  }),
-  timeRangeFilter: css({
-    padding: theme.spacing(1),
-  }),
-  spacing: css({
-    marginTop: '16px',
-  }),
-  scrollContent: css({
-    overflowY: 'auto',
-    scrollbarWidth: 'thin',
-  }),
+const getStyles = stylesFactory((theme: GrafanaTheme2, isReversed, hideQuickRanges, isContainerTall, isFullscreen) => {
+  return {
+    container: css`
+      background: ${theme.colors.background.primary};
+      box-shadow: ${theme.shadows.z3};
+      position: absolute;
+      z-index: ${theme.zIndex.dropdown};
+      width: ${isFullscreen ? '546px' : '262px'};
+      top: 116%;
+      border-radius: 2px;
+      border: 1px solid ${theme.colors.border.weak};
+      ${isReversed ? 'left' : 'right'}: 0;
+    `,
+    body: css`
+      display: flex;
+      flex-direction: row-reverse;
+      height: ${isContainerTall ? '281px' : '217px'};
+    `,
+    leftSide: css`
+      display: flex;
+      flex-direction: column;
+      border-right: ${isReversed ? 'none' : `1px solid ${theme.colors.border.weak}`};
+      width: ${!hideQuickRanges ? '50%' : '100%'};
+      overflow: hidden;
+      order: ${isReversed ? 1 : 0};
+    `,
+    rightSide: css`
+      width: ${isFullscreen ? '50%' : '100%'}; !important;
+      border-right: ${isReversed ? `1px solid ${theme.colors.border.weak}` : 'none'};
+      display: flex;
+      flex-direction: column;
+    `,
+    timeRangeFilter: css`
+      padding: ${theme.spacing(1)};
+    `,
+    spacing: css`
+      margin-top: 16px;
+    `,
+  };
 });
 
 const getNarrowScreenStyles = (theme: GrafanaTheme2) => ({
