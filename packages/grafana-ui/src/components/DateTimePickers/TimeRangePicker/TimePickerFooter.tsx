@@ -56,13 +56,11 @@ export const TimePickerFooter: FC<Props> = (props) => {
     return null;
   }
 
+  const fnColor = theme.isDark ? '#8EC4AD' : '#3A785E';
+
   return (
     <div>
       <section aria-label="Time zone selection" className={style.container}>
-        <Button variant="secondary" onClick={onToggleChangeTimeSettings} size="sm">
-          Change time settings
-        </Button>
-        <div className={style.spacer} />
         <div className={style.timeZoneContainer}>
           <div className={style.timeZone}>
             <TimeZoneTitle title={info.name} />
@@ -71,6 +69,18 @@ export const TimePickerFooter: FC<Props> = (props) => {
           </div>
           <TimeZoneOffset timeZone={timeZone} timestamp={timestamp} />
         </div>
+        <div className={style.spacer} />
+        <Button
+          onClick={onToggleChangeTimeSettings}
+          size="md"
+          style={{
+            backgroundColor: '#ffffff00',
+            color: fnColor,
+            border: `1px solid ${fnColor}`,
+          }}
+        >
+          Change time settings
+        </Button>
       </section>
       {isEditing ? (
         <div className={style.editContainer}>
@@ -135,6 +145,7 @@ const getStyle = stylesFactory((theme: GrafanaTheme2) => {
       flex-direction: row;
       justify-content: space-between;
       align-items: center;
+      height: 60px;
     `,
     editContainer: css`
       border-top: 1px solid ${theme.colors.border.weak};
