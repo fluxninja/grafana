@@ -1,6 +1,7 @@
 import React, { FunctionComponent, useEffect, useState } from 'react';
 
 import { selectors } from '@grafana/e2e-selectors';
+import { FnGlobalState } from 'app/core/reducers/fn-slice';
 
 import { PickerRenderer } from '../../../variables/pickers/PickerRenderer';
 import { VariableHide, VariableModel } from '../../../variables/types';
@@ -8,7 +9,7 @@ import { VariableHide, VariableModel } from '../../../variables/types';
 interface Props {
   variables: VariableModel[];
   readOnly?: boolean;
-  hiddenVariables?: string[];
+  hiddenVariables?: FnGlobalState['hiddenVariables'];
 }
 
 export const SubMenuItems: FunctionComponent<Props> = ({ variables, readOnly, hiddenVariables }) => {

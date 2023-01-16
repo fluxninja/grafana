@@ -3,6 +3,7 @@ import React, { PureComponent } from 'react';
 import { connect, MapStateToProps } from 'react-redux';
 
 import { AnnotationQuery, DataQuery } from '@grafana/data';
+import { FnGlobalState } from 'app/core/reducers/fn-slice';
 
 import { StoreState } from '../../../../types';
 import { getSubMenuVariables, getVariablesState } from '../../../variables/state/selectors';
@@ -18,11 +19,11 @@ interface OwnProps {
   dashboard: DashboardModel;
   links: DashboardLink[];
   annotations: AnnotationQuery[];
-  hiddenVariables?: string[];
 }
 
 interface ConnectedProps {
   variables: VariableModel[];
+  hiddenVariables: FnGlobalState['hiddenVariables'];
 }
 
 interface DispatchProps {}
@@ -76,8 +77,10 @@ class SubMenuUnConnected extends PureComponent<Props> {
 const mapStateToProps: MapStateToProps<ConnectedProps, OwnProps, StoreState> = (state, ownProps) => {
   const { uid } = ownProps.dashboard;
   const templatingState = getVariablesState(uid, state);
+
   return {
     variables: getSubMenuVariables(uid, templatingState.variables),
+    hiddenVariables: state.fnGlobalState.hiddenVariables,
   };
 };
 
