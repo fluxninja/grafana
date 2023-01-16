@@ -4,17 +4,19 @@ import { useEffect, useState, FC } from 'react';
 import { GrafanaTheme2, TypedVariableModel, VariableHide } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { useStyles2 } from '@grafana/ui';
+import { FnGlobalState } from 'app/core/reducers/fn-slice';
 
 import { PickerRenderer } from '../../../variables/pickers/PickerRenderer';
 
 interface Props {
   variables: TypedVariableModel[];
   readOnly?: boolean;
-  hiddenVariables?: string[];
+  hiddenVariables?: FnGlobalState['hiddenVariables'];
 }
 
 export const SubMenuItems: FC<Props> = ({ variables, readOnly, hiddenVariables }) => {
   const [visibleVariables, setVisibleVariables] = useState<TypedVariableModel[]>([]);
+  const styles = useStyles2(getStyles);
 
   useEffect(() => {
     setVisibleVariables(variables.filter((state) => state.hide !== VariableHide.hideVariable));
@@ -34,7 +36,7 @@ export const SubMenuItems: FC<Props> = ({ variables, readOnly, hiddenVariables }
         return (
           <div
             key={variable.id}
-            className="submenu-item gf-form-inline"
+             className={styles.submenuItem}
             data-testid={selectors.pages.Dashboard.SubMenu.submenuItem}
           >
             <PickerRenderer variable={variable} readOnly={readOnly} />

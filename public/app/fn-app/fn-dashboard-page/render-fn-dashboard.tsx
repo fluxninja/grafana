@@ -1,27 +1,22 @@
 import { merge, isEmpty, isFunction } from 'lodash';
 import React, { useEffect, FC, useMemo } from 'react';
-import { useDispatch } from 'react-redux';
 
 import { locationService as locationSrv, HistoryWrapper } from '@grafana/runtime';
-import { FnGlobalState, setInitialMountState } from 'app/core/reducers/fn-slice';
 import DashboardPage, { DashboardPageProps } from 'app/features/dashboard/containers/DashboardPage';
-import { FnLoggerService } from 'app/fn_logger';
 import { DashboardRoutes, StoreState, useSelector } from 'app/types';
 
 import { FNDashboardProps } from '../types';
 
 const locationService = locationSrv as HistoryWrapper;
 
-const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'isFNDashboard' | 'history' | 'route'> & {
+const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'history' | 'route'> & {
   match: Pick<DashboardPageProps['match'], 'isExact' | 'path' | 'url'>;
 } = {
-  isFNDashboard: true,
   match: {
     isExact: true,
     path: '/d/:uid/:slug?',
     url: '',
   },
-
   history: {} as DashboardPageProps['history'],
   route: {
     routeName: DashboardRoutes.Normal,
@@ -32,17 +27,13 @@ const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'isFNDashboard' | '
 };
 
 export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
-  const { queryParams, uid, slug, mode, controlsContainer, pageTitle = '', setErrors, fnLoader } = props;
-
-  const dispatch = useDispatch();
+  const { queryParams, controlsContainer, setErrors, fnLoader, hiddenVariables } = props;
 
   const firstError = useSelector((state: StoreState) => {
     const { appNotifications } = state;
 
     return Object.values(appNotifications.byId).find(({ severity }) => severity === 'error');
   });
-
-  const hiddenVariables = useSelector(({ fnGlobalState: { hiddenVariables } }: StoreState) => hiddenVariables);
 
   /**
    * NOTE:
@@ -59,32 +50,8 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
   }, [firstError, setErrors]);
 
   useEffect(() => {
-    const initialState: FnGlobalState = {
-      FNDashboard: true,
-      uid,
-      slug,
-      mode,
-      controlsContainer,
-      pageTitle,
-      queryParams,
-      hiddenVariables,
-    };
-
-    FnLoggerService.log(null, '[FN Grafana] Trying to set initial state.', { initialState });
-
-    dispatch(setInitialMountState(initialState));
-
-    // TODO: catch success in redux-thunk way
-    FnLoggerService.log(
-      null,
-      '[FN Grafana] Successfully set initial state.',
-      locationService.getLocation(),
-      locationService.getHistory,
-      'location params'
-    );
-
     locationService.fnPathnameChange(window.location.pathname, queryParams);
-  }, [dispatch, uid, slug, controlsContainer, pageTitle, queryParams, mode, hiddenVariables]);
+  }, [queryParams]);
 
   const dashboardPageProps: DashboardPageProps = useMemo(
     () =>

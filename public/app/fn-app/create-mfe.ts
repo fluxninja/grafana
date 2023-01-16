@@ -4,24 +4,30 @@ declare let __webpack_public_path__: string;
 window.__grafana_public_path__ =
   __webpack_public_path__.substring(0, __webpack_public_path__.lastIndexOf('build/')) || __webpack_public_path__;
 
-import { isNull, merge, noop } from 'lodash';
+import { isNull, merge, noop, omit, pick } from 'lodash';
 import React, { ComponentType } from 'react';
 import ReactDOM from 'react-dom';
 
 import { createTheme, GrafanaThemeType } from '@grafana/data';
+import { createFnColors } from '@grafana/data/src/themes/fnCreateColors';
+import { GrafanaTheme2 } from '@grafana/data/src/themes/types';
 import { ThemeChangedEvent } from '@grafana/runtime';
+import { GrafanaBootConfig } from '@grafana/runtime/src/config';
 import { getTheme } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
 import config from 'app/core/config';
-import { updateFNGlobalState } from 'app/core/reducers/fn-slice';
+import {
+  FnGlobalState,
+  updatePartialFnStates,
+  updateFnState,
+  INITIAL_FN_STATE,
+  FnPropMappedFromState,
+  fnStateProps,
+} from 'app/core/reducers/fn-slice';
 import { backendSrv } from 'app/core/services/backend_srv';
 import fn_app from 'app/fn_app';
 import { FnLoggerService } from 'app/fn_logger';
-import { store } from 'app/store/store';
-
-import { createFnColors } from '../../../packages/grafana-data/src/themes/fnCreateColors';
-import { GrafanaTheme2 } from '../../../packages/grafana-data/src/themes/types';
-import { GrafanaBootConfig } from '../../../packages/grafana-runtime/src/config';
+import { dispatch } from 'app/store/store';
 
 import { FNDashboardProps, FailedToMountGrafanaErrorName } from './types';
 
@@ -30,22 +36,22 @@ import { FNDashboardProps, FailedToMountGrafanaErrorName } from './types';
  * Qiankun expects Promise. Otherwise warnings are logged and life cycle hooks do not work
  */
 /* eslint-disable-next-line  */
-export declare type LifeCycleFn<T extends { [key: string]: any }> = (app: any, global: typeof window) => Promise<any>;
+export declare type LifeCycleFn = (app: any, global: typeof window) => Promise<any>;
 
 /**
  * NOTE: single-spa and qiankun lifeCycles
  */
 /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-export declare type FrameworkLifeCycles<T = any> = {
-  beforeLoad: LifeCycleFn<T> | Array<LifeCycleFn<T>>;
-  beforeMount: LifeCycleFn<T> | Array<LifeCycleFn<T>>;
-  afterMount: LifeCycleFn<T> | Array<LifeCycleFn<T>>;
-  beforeUnmount: LifeCycleFn<T> | Array<LifeCycleFn<T>>;
-  afterUnmount: LifeCycleFn<T> | Array<LifeCycleFn<T>>;
-  bootstrap: LifeCycleFn<T> | Array<LifeCycleFn<T>>;
-  mount: LifeCycleFn<T> | Array<LifeCycleFn<T>>;
-  unmount: LifeCycleFn<T> | Array<LifeCycleFn<T>>;
-  update: LifeCycleFn<T> | Array<LifeCycleFn<T>>;
+export declare type FrameworkLifeCycles = {
+  beforeLoad: LifeCycleFn | LifeCycleFn[];
+  beforeMount: LifeCycleFn | LifeCycleFn[];
+  afterMount: LifeCycleFn | LifeCycleFn[];
+  beforeUnmount: LifeCycleFn | LifeCycleFn[];
+  afterUnmount: LifeCycleFn | LifeCycleFn[];
+  bootstrap: LifeCycleFn | LifeCycleFn[];
+  mount: LifeCycleFn | LifeCycleFn[];
+  unmount: LifeCycleFn | LifeCycleFn[];
+  update: LifeCycleFn | LifeCycleFn[];
 };
 
 type DeepPartial<T> = {
@@ -58,7 +64,7 @@ class createMfe {
   private static readonly logPrefix = '[FN Grafana]';
 
   mode: FNDashboardProps['mode'];
-  static Component: ComponentType<FNDashboardProps>;
+  static Component: ComponentType<Omit<FNDashboardProps, FnPropMappedFromState>>;
   constructor(readonly props: FNDashboardProps) {
     this.mode = props.mode;
   }
@@ -66,7 +72,7 @@ class createMfe {
   /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
   private static logger = (...args: any[]) => console.log(createMfe.logPrefix, ...args);
 
-  static getLifeCycles(component: ComponentType<FNDashboardProps>) {
+  static getLifeCycles(component: ComponentType<Omit<FNDashboardProps, FnPropMappedFromState>>) {
     const lifeCycles: FrameworkLifeCycles = {
       bootstrap: this.boot(),
       mount: this.mountFnApp(component),
@@ -82,7 +88,7 @@ class createMfe {
     return lifeCycles;
   }
 
-  static create(component: ComponentType<FNDashboardProps>) {
+  static create(component: ComponentType<Omit<FNDashboardProps, FnPropMappedFromState>>) {
     return createMfe.getLifeCycles(component);
   }
 
@@ -193,7 +199,7 @@ class createMfe {
     return parentElement.querySelector(createMfe.containerSelector);
   }
 
-  static mountFnApp(Component: ComponentType<FNDashboardProps>) {
+  static mountFnApp(Component: ComponentType<Omit<FNDashboardProps, FnPropMappedFromState>>) {
     const lifeCycleFn: FrameworkLifeCycles['mount'] = (props: FNDashboardProps) => {
       createMfe.logger('Trying to mount grafana...');
 
@@ -201,6 +207,16 @@ class createMfe {
         try {
           createMfe.loadFnTheme(props.mode);
           createMfe.Component = Component;
+
+          const initialState: FnGlobalState = {
+            ...INITIAL_FN_STATE,
+            FNDashboard: true,
+            ...pick(props, ...fnStateProps),
+          };
+
+          FnLoggerService.log(null, '[FN Grafana] Dispatching initial state.', { initialState });
+
+          dispatch(updateFnState(initialState));
 
           createMfe.renderMfeComponent(props, () => {
             createMfe.logger('Mounted grafana.', { props });
@@ -256,7 +272,11 @@ class createMfe {
          * We do not use the "mode" state right now,
          * but I believe that as long as we store the "mode, we should update it
          */
-        updateFNGlobalState('mode', mode);
+        dispatch(
+          updatePartialFnStates({
+            mode,
+          })
+        );
         /**
          * NOTE:
          * Here happens the theme change.
@@ -271,7 +291,11 @@ class createMfe {
       if (hiddenVariables) {
         createMfe.logger('Trying to update grafana with hidden variables.', { hiddenVariables });
 
-        updateFNGlobalState('hiddenVariables', hiddenVariables);
+        dispatch(
+          updatePartialFnStates({
+            hiddenVariables,
+          })
+        );
       }
 
       // NOTE: The false/true value does not change anything
@@ -281,21 +305,17 @@ class createMfe {
     return lifeCycleFn;
   }
 
-  static renderMfeComponent(props: Partial<FNDashboardProps>, onSuccess = noop) {
-    const { fnGlobalState } = store.getState();
+  static renderMfeComponent(props: FNDashboardProps, onSuccess = noop) {
+    const container = createMfe.getContainer(props);
 
-    /**
-     * NOTE:
-     * It may happen that only partial props are received in arguments.
-     * Then we should keep the current props that are read them from the state.
-     */
-    const mergedProps = merge({}, fnGlobalState, props) as FNDashboardProps;
-    const container = createMfe.getContainer(mergedProps);
-
-    ReactDOM.render(React.createElement(createMfe.Component, mergedProps), container, () => {
-      createMfe.logger('Rendered mfe component.', { mergedProps, container });
-      onSuccess();
-    });
+    ReactDOM.render(
+      React.createElement(createMfe.Component, omit(props, 'hiddenVariables', 'FNDashboard')),
+      container,
+      () => {
+        createMfe.logger('Created mfe component.', { props, container });
+        onSuccess();
+      }
+    );
   }
 }
 

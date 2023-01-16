@@ -15,6 +15,7 @@ import { createErrorNotification } from 'app/core/copy/appNotification';
 import { getKioskMode } from 'app/core/navigation/kiosk';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { ID_PREFIX } from 'app/core/reducers/navBarTree';
+import { FnGlobalState } from 'app/core/reducers/fn-slice';
 import { getNavModel } from 'app/core/selectors/navModel';
 import { PanelModel } from 'app/features/dashboard/state';
 import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
@@ -50,7 +51,10 @@ import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
 
 export type MapStateToDashboardPageProps = MapStateToProps<
-  Pick<DashboardState, 'initPhase' | 'initError'> & { dashboard: ReturnType<DashboardState['getModel']> },
+  Pick<DashboardState, 'initPhase' | 'initError'> & { dashboard: ReturnType<DashboardState['getModel']> } & Pick<
+      FnGlobalState,
+      'FNDashboard'
+    >,
   OwnProps,
   StoreState
 >;
@@ -70,6 +74,7 @@ export const mapStateToProps: MapStateToDashboardPageProps = (state) => ({
   initError: state.dashboard.initError,
   dashboard: state.dashboard.getModel(),
   navIndex: state.navIndex,
+  FNDashboard: state.fnGlobalState.FNDashboard,
 });
 
 const mapDispatchToProps: MapDispatchToDashboardPageProps = {
@@ -84,9 +89,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 type OwnProps = {
   isPublic?: boolean;
-  isFNDashboard?: boolean;
   controlsContainer?: string | null;
-  hiddenVariables?: string[];
   fnLoader?: ReactNode;
 };
 
@@ -167,9 +170,11 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
   componentDidMount() {
     this.initDashboard();
-    const { isPublic, isFNDashboard } = this.props;
-    if (!isPublic && !isFNDashboard) {
-      this.forceRouteReloadCounter = (this.props.history.location.state as any)?.routeReloadCounter || 0;
+
+    const { isPublic, FNDashboard } = this.props;
+
+    if (!isPublic && !FNDashboard) {
+      this.forceRouteReloadCounter = (this.props.history.location?.state as any)?.routeReloadCounter || 0;
     }
   }
 
@@ -183,7 +188,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   initDashboard() {
-    const { dashboard, isPublic, match, queryParams, isFNDashboard } = this.props;
+    const { dashboard, isPublic, match, queryParams, FNDashboard } = this.props;
 
     if (dashboard) {
       this.closeDashboard();
@@ -196,7 +201,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       urlFolderUid: queryParams.folderUid,
       panelType: queryParams.panelType,
       routeName: this.props.route.routeName,
-      fixUrl: !isPublic && !isFNDashboard,
+      fixUrl: !isPublic && !FNDashboard,
       accessToken: match.params.accessToken,
       keybindingSrv: this.context.keybindings,
     });
@@ -206,13 +211,13 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    const { dashboard, match, templateVarsChangedInUrl, isPublic, isFNDashboard } = this.props;
+    const { dashboard, match, templateVarsChangedInUrl, isPublic, FNDashboard } = this.props;
 
     if (!dashboard) {
       return;
     }
 
-    if (!isPublic && !isFNDashboard) {
+    if (!isPublic && !FNDashboard) {
       const routeReloadCounter = (this.props.history.location?.state as any)?.routeReloadCounter;
 
       if (
@@ -391,11 +396,11 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   };
 
   render() {
-    const { dashboard, initError, queryParams, isPublic, isFNDashboard, fnLoader } = this.props;
+    const { dashboard, initError, queryParams, isPublic, FNDashboard, fnLoader } = this.props;
     const { editPanel, viewPanel, updateScrollTop, pageNav, sectionNav } = this.state;
-    const kioskMode = isFNDashboard ? KioskMode.FN : !isPublic  ? getKioskMode(this.props.queryParams) : KioskMode.Full;
+    const kioskMode = FNDashboard ? KioskMode.FN : !isPublic ? getKioskMode(this.props.queryParams) : KioskMode.Full;
 
-    if (!dashboard ) {
+    if (!dashboard) {
       return fnLoader ? <>{fnLoader}</> : <DashboardLoading initPhase={this.props.initPhase} />;
     }
 
@@ -406,7 +411,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
         <DashNav
           dashboard={dashboard}
-          title={!isFNDashboard ? dashboard.title : ''}
+          title={!FNDashboard ? dashboard.title : ''}
           folderTitle={dashboard.meta.folderTitle}
           isFullscreen={!!viewPanel}
           onAddPanel={this.onAddPanel}
@@ -490,17 +495,12 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           className={pageClassName}
           onSetScrollRef={this.setScrollRef}
         >
-          {!isFNDashboard && <DashboardPrompt dashboard={dashboard} />}
+          {!FNDashboard && <DashboardPrompt dashboard={dashboard} />}
 
           {initError && <DashboardFailed />}
           {showSubMenu && (
             <section aria-label={selectors.pages.Dashboard.SubMenu.submenu}>
-              <SubMenu
-                dashboard={dashboard}
-                annotations={dashboard.annotations.list}
-                links={dashboard.links}
-                hiddenVariables={this.props.hiddenVariables}
-              />
+              <SubMenu dashboard={dashboard} annotations={dashboard.annotations.list} links={dashboard.links} />
             </section>
           )}
           {config.featureToggles.angularDeprecationUI && dashboard.hasAngularPlugins() && dashboard.uid !== null && (
@@ -548,9 +548,9 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 }
 
 function updateStatePageNavFromProps(props: Props, state: State): State {
-  const { dashboard, isFNDashboard } = props;
+  const { dashboard, FNDashboard } = props;
 
-  if (!dashboard || isFNDashboard) {
+  if (!dashboard || FNDashboard) {
     return state;
   }
 

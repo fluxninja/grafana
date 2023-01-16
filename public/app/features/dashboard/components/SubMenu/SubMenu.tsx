@@ -4,8 +4,7 @@ import * as React from 'react';
 import { connect, MapStateToProps } from 'react-redux';
 
 import { AnnotationQuery, DataQuery, TypedVariableModel, GrafanaTheme2 } from '@grafana/data';
-import { DashboardLink } from '@grafana/schema';
-import { stylesFactory, Themeable2, withTheme2 } from '@grafana/ui';
+import { FnGlobalState } from 'app/core/reducers/fn-slice';
 
 import { StoreState } from '../../../../types';
 import { getSubMenuVariables, getVariablesState } from '../../../variables/state/selectors';
@@ -14,16 +13,19 @@ import { DashboardModel } from '../../state';
 import { Annotations } from './Annotations';
 import { DashboardLinks } from './DashboardLinks';
 import { SubMenuItems } from './SubMenuItems';
+import { VariableModel } from 'app/features/variables/types';
+import { Themeable2, stylesFactory, withTheme2 } from '@grafana-ui';
+import { DashboardLink } from '@grafana/schema/dist/esm/index';
 
 interface OwnProps extends Themeable2 {
   dashboard: DashboardModel;
   links: DashboardLink[];
   annotations: AnnotationQuery[];
-  hiddenVariables?: string[];
 }
 
 interface ConnectedProps {
   variables: TypedVariableModel[];
+  hiddenVariables: FnGlobalState['hiddenVariables'];
 }
 
 interface DispatchProps {}
@@ -79,8 +81,10 @@ class SubMenuUnConnected extends PureComponent<Props> {
 const mapStateToProps: MapStateToProps<ConnectedProps, OwnProps, StoreState> = (state, ownProps) => {
   const { uid } = ownProps.dashboard;
   const templatingState = getVariablesState(uid, state);
+
   return {
     variables: getSubMenuVariables(uid, templatingState.variables),
+    hiddenVariables: state.fnGlobalState.hiddenVariables,
   };
 };
 

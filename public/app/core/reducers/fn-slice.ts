@@ -1,8 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { WritableDraft } from 'immer/dist/internal';
+import { createSlice, PayloadAction, SliceCaseReducers } from '@reduxjs/toolkit';
 
 import { GrafanaThemeType } from '@grafana/data';
-import { dispatch } from 'app/store/store';
 
 import { AnyObject } from '../../fn-app/types';
 
@@ -14,17 +12,41 @@ export interface FnGlobalState {
   controlsContainer: string | null;
   pageTitle: string;
   queryParams: AnyObject;
-  hiddenVariables: string[];
+  hiddenVariables: readonly string[];
 }
 
-export type UpdateFNGlobalStateAction = PayloadAction<{
-  type: keyof FnGlobalState;
-  payload: FnGlobalState[keyof FnGlobalState];
-}>;
+export type UpdateFNGlobalStateAction = PayloadAction<Partial<FnGlobalState>>;
+
+export type SetFnStateAction = PayloadAction<Omit<FnGlobalState, 'hiddenVariables'>>;
+
+export type FnPropMappedFromState = Extract<keyof FnGlobalState, 'FNDashboard' | 'hiddenVariables' | 'mode'>;
+export type FnStateProp = keyof FnGlobalState;
+
+export type FnPropsMappedFromState = Pick<FnGlobalState, FnPropMappedFromState>;
+
+export const fnStateProps: FnStateProp[] = [
+  'FNDashboard',
+  'controlsContainer',
+  'hiddenVariables',
+  'mode',
+  'pageTitle',
+  'queryParams',
+  'slug',
+  'uid',
+];
+
+export const fnPropsMappedFromState: readonly FnPropMappedFromState[] = [
+  'FNDashboard',
+  'hiddenVariables',
+  'mode',
+] as const;
 
 const INITIAL_MODE = GrafanaThemeType.Light;
 
-const initialState: FnGlobalState = {
+export const FN_STATE_KEY = 'fnGlobalState';
+
+export const INITIAL_FN_STATE: FnGlobalState = {
+  // NOTE: initial value is false
   FNDashboard: false,
   uid: '',
   slug: '',
@@ -33,37 +55,25 @@ const initialState: FnGlobalState = {
   pageTitle: '',
   queryParams: {},
   hiddenVariables: [],
+} as const;
+
+const reducers: SliceCaseReducers<FnGlobalState> = {
+  updateFnState: (state, action: SetFnStateAction) => {
+    return { ...state, ...action.payload };
+  },
+  updatePartialFnStates: (state, action: UpdateFNGlobalStateAction) => {
+    return {
+      ...state,
+      ...action.payload,
+    };
+  },
 };
 
-const fnSlice = createSlice({
-  name: 'fnGlobalState',
-  initialState,
-  reducers: {
-    setInitialMountState: (state, action: PayloadAction<Omit<FnGlobalState, 'hiddenVariables'>>) => {
-      return { ...state, ...action.payload };
-    },
-    updateFnState: (state: WritableDraft<FnGlobalState>, action: UpdateFNGlobalStateAction) => {
-      const { type, payload } = action.payload;
-
-      return {
-        ...state,
-        [type]: payload,
-      };
-    },
-  },
+const fnSlice = createSlice<FnGlobalState, SliceCaseReducers<FnGlobalState>, string>({
+  name: FN_STATE_KEY,
+  initialState: INITIAL_FN_STATE,
+  reducers,
 });
 
-export const { updateFnState, setInitialMountState } = fnSlice.actions;
+export const { updatePartialFnStates, updateFnState } = fnSlice.actions;
 export const fnSliceReducer = fnSlice.reducer;
-
-export const updateFNGlobalState = (
-  type: keyof FnGlobalState,
-  payload: UpdateFNGlobalStateAction['payload']['payload']
-): void => {
-  dispatch(
-    updateFnState({
-      type,
-      payload,
-    })
-  );
-};
