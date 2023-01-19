@@ -10,6 +10,7 @@ var SupportedDatasources = map[string]bool{
 	"elasticsearch":                          true,
 	"frser-sqlite-datasource":                true,
 	"grafadruid-druid-datasource":            true,
+	"fifemon-graphql-datasource":			  true,
 	"grafana-athena-datasource":              true,
 	"grafana-azure-data-explorer-datasource": true,
 	"grafana-azure-monitor-datasource":       true,

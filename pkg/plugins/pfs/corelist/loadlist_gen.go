@@ -46,6 +46,7 @@ func coreTreeList(rt *thema.Runtime) pfs.TreeList {
 		makeTreeOrPanic("public/app/plugins/datasource/cloudwatch", "cloudwatch", rt),
 		makeTreeOrPanic("public/app/plugins/datasource/dashboard", "dashboard", rt),
 		makeTreeOrPanic("public/app/plugins/datasource/elasticsearch", "elasticsearch", rt),
+		makeTreeOrPanic("public/app/plugins/datasource/fifemon-graphql-datasource", "fifemon_graphql_datasource", rt),
 		makeTreeOrPanic("public/app/plugins/datasource/grafadruid-druid-datasource", "grafadruid_druid_datasource", rt),
 		makeTreeOrPanic("public/app/plugins/datasource/grafana", "grafana", rt),
 		makeTreeOrPanic("public/app/plugins/datasource/grafana-azure-monitor-datasource", "grafana_azure_monitor_datasource", rt),
