@@ -3,10 +3,10 @@ import defaults from 'lodash/defaults';
 import React, { PureComponent, ChangeEvent } from 'react';
 import { QueryEditorProps } from '@grafana/data';
 import { LegacyForms, QueryField, Icon } from '@grafana/ui';
-import { DataSource } from './DataSource';
+import { FN_DataSource } from './FN_DataSource';
 import { MyQuery, MyDataSourceOptions, defaultQuery } from './types';
 
-type Props = QueryEditorProps<DataSource, MyQuery, MyDataSourceOptions>;
+type Props = QueryEditorProps<FN_DataSource, MyQuery, MyDataSourceOptions>;
 
 interface State {}
 
