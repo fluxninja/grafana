@@ -47,6 +47,7 @@ const (
 	Loki            = "loki"
 	OpenTSDB        = "opentsdb"
 	Druid           = "grafadruid-druid-datasource"
+	Graphql			= "fifemon-graphql-datasource"
 	Prometheus      = "prometheus"
 	Tempo           = "tempo"
 	TestData        = "grafana-testdata-datasource"
