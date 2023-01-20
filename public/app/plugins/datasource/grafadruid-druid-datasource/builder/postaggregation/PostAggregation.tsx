@@ -1,6 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { QueryBuilderComponentSelector } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import {
   Arithmetic,
   Constant,
@@ -13,6 +15,7 @@ import {
   LongGreatest,
   LongLeast,
   QuantilesDoublesSketchToQuantile,
+  QuantilesDoublesSketchToHistogram,
 } from './';
 
 export const PostAggregation = (props: QueryBuilderProps) => (
@@ -31,6 +34,7 @@ export const PostAggregation = (props: QueryBuilderProps) => (
       LongGreatest: LongGreatest,
       LongLeast: LongLeast,
       QuantilesDoublesSketchToQuantile: QuantilesDoublesSketchToQuantile,
+      QuantilesDoublesSketchToHistogram: QuantilesDoublesSketchToHistogram,
     }}
   />
 );
