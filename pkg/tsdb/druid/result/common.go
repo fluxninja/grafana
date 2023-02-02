@@ -1,6 +1,7 @@
 package result
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend/log"
@@ -75,7 +76,7 @@ func toTypedResults(raw []interface{}) interface{} {
 		return results
 	default:
 		// TODO better error handling
-		log.DefaultLogger.Debug("Unsupported value %T", raw[0])
+		log.DefaultLogger.Debug(fmt.Sprintf("Unsupported type %T", raw[0]))
 		return nil
 	}
 }
