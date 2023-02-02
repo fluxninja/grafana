@@ -1,6 +1,7 @@
 package result
 
 import (
+	"encoding/json"
 	"sort"
 	"time"
 
@@ -39,6 +40,67 @@ func (t *TimeseriesResult) Values(column string) interface{} {
 		results[i] = r.Value(column)
 	}
 	return toTypedResults(results)
+}
+
+// Unmarshal TimeSeriesResult, unnesting records to not contain MultiValue fields.
+func (t *TimeseriesResult) UnmarshalJSON(data []byte) error {
+	var unmarshaled []TimeseriesRecord
+	if err := json.Unmarshal(data, &unmarshaled); err != nil {
+		return err
+	}
+	// Quick checks to avoid copying data if not needed
+	if len(unmarshaled) == 0 {
+		*t = unmarshaled
+		return nil
+	}
+	first_record := unmarshaled[0]
+	need_unnesting := false
+	for _, column := range first_record.Columns() {
+		value := first_record.Value(column)
+		if _, ok := value.([]interface{}); ok {
+			need_unnesting = true
+			break
+		}
+	}
+	if !need_unnesting {
+		*t = unmarshaled
+		return nil
+	}
+	// We need to unnest, by iterating over columns and duplicating current row
+	slice := make([]TimeseriesRecord, 0)
+	for _, record := range unmarshaled {
+		newRecords := make([]TimeseriesRecord, 1)
+		newRecords[0].Timestamp = record.Timestamp
+		newRecords[0].Result = make(map[string]interface{})
+		// Copy over columns, skipping the timestamp column
+		for _, column := range record.Columns()[1:] {
+			value := record.Value(column)
+			if array, ok := value.([]interface{}); ok {
+				// We copy each existing record and add it to the newRecords array
+				// multiple times, setting the current column for one of the values from the array
+				existingRecords := newRecords
+				newRecords = make([]TimeseriesRecord, len(newRecords)*len(array))
+				for exIdx, existing := range existingRecords {
+					for elemIdx, elem := range array {
+						newRecord := TimeseriesRecord{
+							Timestamp: existing.Timestamp,
+							Result:    copyMap(existing.Result),
+						}
+						newRecord.Result[column] = elem
+						newRecords[exIdx*len(array)+elemIdx] = newRecord
+					}
+				}
+			} else {
+				// We got a primitive value, so just add it to all records
+				for _, newRecord := range newRecords {
+					newRecord.Result[column] = value
+				}
+			}
+		}
+		slice = append(slice, newRecords...)
+	}
+	*t = slice
+	return nil
 }
 
 type TimeseriesRecord struct {

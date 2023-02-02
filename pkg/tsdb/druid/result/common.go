@@ -74,9 +74,23 @@ func toTypedResults(raw []interface{}) interface{} {
 			results[i] = vv
 		}
 		return results
+	// case []interface{}:
+	//	if len(raw) == 1 {
+	//		return toTypedResults(raw[0].([]interface{}))
+	//	}
+	//	log.DefaultLogger.Debug(fmt.Sprintf("List containing multiple (%d) lists is not supported %T: %v. Did you forget to set granularity to 'all'?", len(raw), raw[0], raw[0]))
+	//	return nil
 	default:
 		// TODO better error handling
 		log.DefaultLogger.Debug(fmt.Sprintf("Unsupported type %T", raw[0]))
 		return nil
 	}
+}
+
+func copyMap[K comparable, V interface{}](m map[K]V) map[K]V {
+	result := make(map[K]V)
+	for k, v := range m {
+		result[k] = v
+	}
+	return result
 }

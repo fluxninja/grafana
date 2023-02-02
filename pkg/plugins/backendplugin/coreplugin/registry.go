@@ -38,7 +38,7 @@ const (
 	Loki            = "loki"
 	OpenTSDB        = "opentsdb"
 	Druid           = "grafadruid-druid-datasource"
-	Graphql			= "fifemon-graphql-datasource"
+	Graphql         = "fifemon-graphql-datasource"
 	Prometheus      = "prometheus"
 	Tempo           = "tempo"
 	TestData        = "testdata"
@@ -69,7 +69,8 @@ func NewRegistry(store map[string]backendplugin.PluginFactoryFunc) *Registry {
 func ProvideCoreRegistry(am *azuremonitor.Service, cw *cloudwatch.CloudWatchService, cm *cloudmonitoring.Service,
 	es *elasticsearch.Service, grap *graphite.Service, idb *influxdb.Service, lk *loki.Service, otsdb *opentsdb.Service,
 	pr *prometheus.Service, t *tempo.Service, td *testdatasource.Service, pg *postgres.Service, my *mysql.Service,
-	ms *mssql.Service, graf *grafanads.Service, phlare *phlare.Service, parca *parca.Service, dr *druid.Service) *Registry {
+	ms *mssql.Service, graf *grafanads.Service, phlare *phlare.Service, parca *parca.Service, dr *druid.Service,
+) *Registry {
 	return NewRegistry(map[string]backendplugin.PluginFactoryFunc{
 		CloudWatch:      asBackendPlugin(cw.Executor),
 		CloudMonitoring: asBackendPlugin(cm),
@@ -151,4 +152,9 @@ func (l *logWrapper) Error(msg string, args ...interface{}) {
 
 func (l *logWrapper) Level() sdklog.Level {
 	return sdklog.NoLevel
+}
+
+func (l *logWrapper) With(args ...interface{}) sdklog.Logger {
+	l.logger = l.logger.New(args...)
+	return l
 }

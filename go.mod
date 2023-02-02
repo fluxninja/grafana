@@ -60,7 +60,7 @@ require (
 	github.com/grafana/cuetsy v0.1.1
 	github.com/grafana/grafana-aws-sdk v0.11.0
 	github.com/grafana/grafana-azure-sdk-go v1.3.1
-	github.com/grafana/grafana-plugin-sdk-go v0.142.0
+	github.com/grafana/grafana-plugin-sdk-go v0.147.0
 	github.com/grafana/thema v0.0.0-20221113112305-b441ed85a1fd
 	github.com/grpc-ecosystem/go-grpc-middleware v1.3.0
 	github.com/hashicorp/go-hclog v1.0.0
@@ -74,7 +74,7 @@ require (
 	github.com/lib/pq v1.10.4
 	github.com/linkedin/goavro/v2 v2.10.0
 	github.com/m3db/prometheus_remote_client_golang v0.4.4
-	github.com/magefile/mage v1.13.0
+	github.com/magefile/mage v1.14.0
 	github.com/mattn/go-isatty v0.0.14
 	github.com/mattn/go-sqlite3 v1.14.16
 	github.com/matttproud/golang_protobuf_extensions v1.0.2
@@ -90,7 +90,7 @@ require (
 	github.com/prometheus/prometheus v1.8.2-0.20211011171444-354d8d2ecfac
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/russellhaering/goxmldsig v1.1.1
-	github.com/stretchr/testify v1.8.0
+	github.com/stretchr/testify v1.8.1
 	github.com/teris-io/shortid v0.0.0-20171029131806-771a37caa5cf
 	github.com/ua-parser/uap-go v0.0.0-20211112212520-00c877edfe0f
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
@@ -221,7 +221,7 @@ require (
 	github.com/shurcooL/httpfs v0.0.0-20190707220628-8d4bc4ba7749 // indirect
 	github.com/shurcooL/vfsgen v0.0.0-20200824052919-0d455de96546 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
-	github.com/stretchr/objx v0.4.0 // indirect
+	github.com/stretchr/objx v0.5.0 // indirect
 	github.com/uber/jaeger-lib v2.4.1+incompatible // indirect
 	github.com/valyala/bytebufferpool v1.0.0 // indirect
 	github.com/weaveworks/promrus v1.2.0 // indirect
@@ -254,7 +254,7 @@ require (
 	github.com/getkin/kin-openapi v0.103.0
 	github.com/golang-migrate/migrate/v4 v4.7.0
 	github.com/google/go-github/v45 v45.2.0
-	github.com/grafadruid/go-druid v0.0.5
+	github.com/grafadruid/go-druid v0.0.7-0.20230124184506-0825070ee27b
 	github.com/grafana/codejen v0.0.2
 	github.com/grafana/dskit v0.0.0-20211011144203-3a88ec0b675f
 	github.com/jmoiron/sqlx v1.3.5
@@ -298,7 +298,11 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/segmentio/asm v1.1.4 // indirect
+	github.com/unknwon/bra v0.0.0-20200517080246-1e3013ecaff8 // indirect
+	github.com/unknwon/com v1.0.1 // indirect
+	github.com/unknwon/log v0.0.0-20150304194804-e617c87089d3 // indirect
 	go.starlark.net v0.0.0-20221020143700-22309ac47eac // indirect
+	gopkg.in/fsnotify/fsnotify.v1 v1.4.7 // indirect
 )
 
 require (
@@ -390,7 +394,3 @@ replace github.com/prometheus/alertmanager => github.com/grafana/prometheus-aler
 replace google.golang.org/grpc => google.golang.org/grpc v1.45.0
 
 replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20220421151946-72621c1f0bd3
-
-// This is for sending custom HTTP headers in druid client.
-// Change in upstream: https://github.com/grafadruid/go-druid/pull/71
-replace github.com/grafadruid/go-druid => github.com/fluxninja/go-druid v0.0.0-20220825112309-14a37dd3317d

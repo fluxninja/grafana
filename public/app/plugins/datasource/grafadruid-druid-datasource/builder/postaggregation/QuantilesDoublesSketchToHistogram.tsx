@@ -24,15 +24,10 @@ export const QuantilesDoublesSketchToHistogram = (props: QueryBuilderProps) => {
         />
       </Row>
       <Row>
-        <Input
-          {...scopedProps('fraction')}
-          label="Fraction"
-          description="fractional position in the hypothetical sorted stream"
-          type="number"
-        />
+        <Input {...scopedProps('numBins')} label="NumberOfBins" description="number of bins" type="number" />
       </Row>
     </>
   );
 };
 QuantilesDoublesSketchToHistogram.type = 'quantilesDoublesSketchToHistogram';
-QuantilesDoublesSketchToHistogram.fields = ['name', 'field', 'fraction'];
+QuantilesDoublesSketchToHistogram.fields = ['name', 'field', /*'splitPoints',*/ 'numBins'];
