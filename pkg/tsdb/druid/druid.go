@@ -451,11 +451,9 @@ func (ds *Service) prepareQuery(qry []byte, s *druidInstanceSettings) (druidquer
 
 func (ds *Service) prepareQueryContext(parameters []interface{}) map[string]interface{} {
 	ctx := make(map[string]interface{})
-	if parameters != nil {
-		for _, parameter := range parameters {
-			p := parameter.(map[string]interface{})
-			ctx[p["name"].(string)] = p["value"]
-		}
+	for _, parameter := range parameters {
+		p := parameter.(map[string]interface{})
+		ctx[p["name"].(string)] = p["value"]
 	}
 	return ctx
 }

@@ -47,7 +47,7 @@ type TimeseriesRecord struct {
 }
 
 // Columns returns list of columns for given record.
-// The first column will always be "timestamp" followed by other columns sorter
+// The first column will always be "timestamp" followed by other columns sorted
 // alphabetically.
 func (t *TimeseriesRecord) Columns() []string {
 	columns := make([]string, len(t.Result)+1)
