@@ -46,7 +46,7 @@ type TopNRecord struct {
 // Columns returns list of columns for given record.
 // It assumes that every map from Result has the same columns, so it gets
 // the list from first item.
-// The first column will always be "timestamp" followed by other columns sorter
+// The first column will always be "timestamp" followed by other columns sorted
 // alphabetically.
 func (t *TopNRecord) Columns() []string {
 	for _, result := range t.Result {
