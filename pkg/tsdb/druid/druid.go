@@ -486,7 +486,12 @@ func (ds *Service) executeQuery(
 		}
 		resultFramer = &r
 	case "groupBy":
-		return nil, errors.New("not implemented")
+		var r result.GroupByResult
+		_, err := s.client.Query().Execute(q, &r, headers)
+		if err != nil {
+			return nil, fmt.Errorf("Query error: %w", err)
+		}
+		resultFramer = &r
 	case "scan":
 		q.(*druidquery.Scan).SetResultFormat("compactedList")
 		return nil, errors.New("not implemented")
