@@ -7,6 +7,7 @@ import { Icon, useStyles2, ClickOutsideWrapper } from '@grafana/ui';
 import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
 import { PanelModel } from 'app/features/dashboard/state/PanelModel';
 import { getPanelLinksSupplier } from 'app/features/panel/panellinks/linkSuppliers';
+import { StoreState, useSelector } from 'app/types';
 
 import PanelHeaderCorner from './PanelHeaderCorner';
 import { PanelHeaderLoadingIndicator } from './PanelHeaderLoadingIndicator';
@@ -28,6 +29,15 @@ export interface Props {
 }
 
 export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, data, alertState, dashboard }) => {
+
+    const isFnDashboard = useSelector((state: StoreState) => {
+      const {
+        fnGlobalState: { FNDashboard },
+      } = state;
+
+      return FNDashboard;
+    });
+
   const onCancelQuery = () => panel.getQueryRunner().cancelQuery();
   const title = panel.getDisplayTitle();
   const className = cx('panel-header', !(isViewing || isEditing) ? 'grid-drag-handle' : '');
@@ -44,7 +54,7 @@ export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, dat
         links={getPanelLinksSupplier(panel)}
         error={error}
       />
-      <div className={className}>
+      <div className={[className, isFnDashboard ? styles.fnPanelHeader : ""].filter(Boolean).join(" ")}>
         <PanelHeaderMenuTrigger data-testid={selectors.components.Panels.Panel.title(title)}>
           {({ closeMenu, panelMenuOpen }) => {
             return (
@@ -60,14 +70,16 @@ export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, dat
                     />
                   ) : null}
                   <h2 className={styles.titleText}>{title}</h2>
-                  {!dashboard.meta.publicDashboardAccessToken && (
-                    <div data-testid="panel-dropdown">
-                      <Icon name="angle-down" className="panel-menu-toggle" />
-                      {panelMenuOpen ? (
-                        <PanelHeaderMenuWrapper panel={panel} dashboard={dashboard} onClose={closeMenu} />
-                      ) : null}
-                    </div>
-                  )}
+                  {isFnDashboard
+                    ? null
+                    : !dashboard.meta.publicDashboardAccessToken && (
+                        <div data-testid="panel-dropdown">
+                          <Icon name="angle-down" className="panel-menu-toggle" />
+                          {panelMenuOpen ? (
+                            <PanelHeaderMenuWrapper panel={panel} dashboard={dashboard} onClose={closeMenu} />
+                          ) : null}
+                        </div>
+                      )}
                   {data.request && data.request.timeInfo && (
                     <span className="panel-time-info">
                       <Icon name="clock-nine" size="sm" /> {data.request.timeInfo}
@@ -85,6 +97,12 @@ export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, dat
 
 const panelStyles = (theme: GrafanaTheme2) => {
   return {
+    fnPanelHeader: css`
+      &:hover {
+        background-color: initial!important;
+        cursor: default!important;
+      }
+    `,
     titleText: css`
       text-overflow: ellipsis;
       overflow: hidden;
