@@ -178,8 +178,7 @@ export class DruidDataSource extends DataSourceWithBackend<DruidQuery, DruidSett
   }
 
   async getTagKeys() {
-    const columnNamesSql =
-      "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'telemetry-dcde9fb7-6cec-4a4a-b015-114795a65ed0'";
+    const columnNamesSql = "SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'telemetry'";
     const tagKeysQuery = {
       builder: {
         queryType: 'sql',
@@ -193,7 +192,7 @@ export class DruidDataSource extends DataSourceWithBackend<DruidQuery, DruidSett
   }
 
   async getTagValues(options: { key?: string } = {}) {
-    const columnValuesSql = `SELECT ${options.key} FROM \"telemetry-dcde9fb7-6cec-4a4a-b015-114795a65ed0\" GROUP BY 1`;
+    const columnValuesSql = `SELECT \"${options.key}\" FROM \"telemetry\" WHERE __time >= '\${__from:date:iso}' AND __time <= '\${__to:date:iso}' GROUP BY 1`;
     const tagValuesQuery = {
       builder: {
         queryType: 'sql',
