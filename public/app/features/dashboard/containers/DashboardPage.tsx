@@ -1,5 +1,5 @@
 import { cx } from '@emotion/css';
-import React, { PureComponent, ReactNode } from 'react';
+import React, { PureComponent, } from 'react';
 import { connect, ConnectedProps, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
 import { NavModel, NavModelItem, TimeRange, PageLayoutType, locationUtil, GrafanaTheme2 } from '@grafana/data';
@@ -44,6 +44,8 @@ import { getTimeSrv } from '../services/TimeSrv';
 import { explicitlyControlledMigrationPanels, autoMigrateAngular } from '../state/PanelModel';
 import { cleanUpDashboardAndVariables } from '../state/actions';
 import { initDashboard } from '../state/initDashboard';
+import { FNDashboardProps } from 'app/fn-app/types';
+import { isUndefined, isEmpty, noop } from 'lodash';
 
 import { DashboardPageRouteParams, DashboardPageRouteSearchParams } from './types';
 
@@ -90,7 +92,8 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type OwnProps = {
   isPublic?: boolean;
   controlsContainer?: string | null;
-  fnLoader?: ReactNode;
+  fnLoader?: FNDashboardProps['fnLoader'];
+  isLoading?: FNDashboardProps['isLoading']
 };
 
 export type DashboardPageProps = OwnProps &
@@ -396,13 +399,17 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   };
 
   render() {
-    const { dashboard, initError, queryParams, isPublic, FNDashboard, fnLoader } = this.props;
+    const { dashboard, initError, queryParams, isPublic, FNDashboard, fnLoader, isLoading = noop } = this.props;
     const { editPanel, viewPanel, updateScrollTop, pageNav, sectionNav } = this.state;
     const kioskMode = FNDashboard ? KioskMode.FN : !isPublic ? getKioskMode(this.props.queryParams) : KioskMode.Full;
 
-    if (!dashboard) {
-      return fnLoader ? <>{fnLoader}</> : <DashboardLoading initPhase={this.props.initPhase} />;
+    if (!dashboard || isEmpty(queryParams)) {
+      isLoading(true)
+
+      return isUndefined(fnLoader) ? <DashboardLoading initPhase={this.props.initPhase} />: <>{fnLoader}</>;
     }
+
+    isLoading(false)
 
     const inspectPanel = this.getInspectPanel();
     const showSubMenu = !editPanel && !this.props.queryParams.editview;
