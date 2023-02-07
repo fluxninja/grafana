@@ -1,4 +1,4 @@
-import { merge, isEmpty, isFunction } from 'lodash';
+import { merge,  isFunction } from 'lodash';
 import React, { useEffect, FC, useMemo } from 'react';
 
 import { locationService as locationSrv, HistoryWrapper } from '@grafana/runtime';
@@ -27,7 +27,7 @@ const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'history' | 'route'
 };
 
 export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
-  const { queryParams, controlsContainer, setErrors, fnLoader, hiddenVariables } = props;
+  const { queryParams, controlsContainer, setErrors, fnLoader, hiddenVariables, isLoading } = props;
 
   const firstError = useSelector((state: StoreState) => {
     const { appNotifications } = state;
@@ -67,9 +67,10 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
         hiddenVariables,
         controlsContainer,
         fnLoader,
+        isLoading
       }),
     [controlsContainer, fnLoader, hiddenVariables, props, queryParams]
   );
 
-  return isEmpty(queryParams || {}) ? <>{fnLoader}</> : <DashboardPage {...dashboardPageProps} />;
+  return <DashboardPage {...dashboardPageProps} />;
 };
