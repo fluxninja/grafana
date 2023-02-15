@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction, SliceCaseReducers } from '@reduxjs/toolkit';
 
-import { GrafanaThemeType } from '@grafana/data';
+import { GrafanaThemeType, TimeRange } from '@grafana/data';
 
 import { AnyObject } from '../../fn-app/types';
 
@@ -13,6 +13,7 @@ export interface FnGlobalState {
   pageTitle: string;
   queryParams: AnyObject;
   hiddenVariables: readonly string[];
+  fnGlobalTimeRange: TimeRange | null;
 }
 
 export type UpdateFNGlobalStateAction = PayloadAction<Partial<FnGlobalState>>;
@@ -55,6 +56,7 @@ export const INITIAL_FN_STATE: FnGlobalState = {
   pageTitle: '',
   queryParams: {},
   hiddenVariables: [],
+  fnGlobalTimeRange: null,
 } as const;
 
 const reducers: SliceCaseReducers<FnGlobalState> = {
