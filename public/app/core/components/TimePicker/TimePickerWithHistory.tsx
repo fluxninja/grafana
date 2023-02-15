@@ -1,9 +1,11 @@
+import { merge } from 'lodash';
 import React, { CSSProperties } from 'react';
-import { useSelector } from 'react-redux';
+// eslint-disable-next-line no-restricted-imports
+import { useDispatch, useSelector } from 'react-redux';
 
 import { TimeRange, isDateTime, toUtc } from '@grafana/data';
 import { TimeRangePickerProps, TimeRangePicker, useTheme2 } from '@grafana/ui';
-import { FnGlobalState } from 'app/core/reducers/fn-slice';
+import { FnGlobalState, updatePartialFnStates } from 'app/core/reducers/fn-slice';
 import { StoreState } from 'app/types';
 
 import { LocalStorageValueProvider } from '../LocalStorageValueProvider';
@@ -22,14 +24,22 @@ const FnText: React.FC = () => {
 };
 
 export const TimePickerWithHistory: React.FC<Props> = (props) => {
+  const { fnGlobalTimeRange } = useSelector<StoreState, FnGlobalState>(({ fnGlobalState }) => fnGlobalState);
+  const dispatch = useDispatch();
+
   return (
     <LocalStorageValueProvider<TimeRange[]> storageKey={LOCAL_STORAGE_KEY} defaultValue={[]}>
       {(values, onSaveToStore) => {
         return (
           <TimeRangePicker
-            {...props}
+            {...merge({}, props, { value: fnGlobalTimeRange || props.value })}
             history={convertIfJson(values)}
             onChange={(value) => {
+              dispatch(
+                updatePartialFnStates({
+                  fnGlobalTimeRange: value,
+                })
+              );
               onAppendToHistory(value, values, onSaveToStore);
               props.onChange(value);
             }}
