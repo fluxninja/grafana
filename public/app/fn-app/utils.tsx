@@ -5,10 +5,6 @@ export interface RenderPortalProps {
   ID: string;
 }
 
-export declare type PortalEffectReturn = {
-  portalDiv: HTMLElement | null;
-}
-
 export const getPortalContainer = (ID: string): HTMLElement | null => document.getElementById(ID);
 
 export const RenderPortal: FC<RenderPortalProps> = ({ ID, children }) => {

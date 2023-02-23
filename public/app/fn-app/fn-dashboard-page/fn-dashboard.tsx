@@ -1,9 +1,7 @@
 import { pick } from 'lodash';
-import { parse as parseQueryParams } from 'query-string';
 import React, { FC, Suspense, useMemo } from 'react';
 import { lazily } from 'react-lazily';
 import { connect, MapStateToProps } from 'react-redux';
-import { useLocation } from 'react-router-dom';
 
 import {
   FnGlobalState,
@@ -44,7 +42,6 @@ function mapStateToProps(): MapStateToProps<
 }
 
 export const DashboardPortalComponent: FC<FNDashboardComponentProps & FnPropsMappedFromState> = (props) => {
-  const location = useLocation();
 
   const content = useMemo(() => {
     if (!props.FNDashboard) {
@@ -52,10 +49,7 @@ export const DashboardPortalComponent: FC<FNDashboardComponentProps & FnPropsMap
       return null;
     }
 
-    const { search } = location;
-    const queryParams = parseQueryParams(search);
-
-    const { dashboardUID: uid, slug } = queryParams as { dashboardUID?: string; slug?: string };
+    const { uid, slug, queryParams = {} } = props;
 
     if (!uid || !slug) {
       // TODO Use no data
@@ -72,7 +66,7 @@ export const DashboardPortalComponent: FC<FNDashboardComponentProps & FnPropsMap
         }}
       />
     );
-  }, [location, props]);
+  }, [props]);
 
   return <RenderPortal ID="grafana-portal">{content}</RenderPortal>;
 };

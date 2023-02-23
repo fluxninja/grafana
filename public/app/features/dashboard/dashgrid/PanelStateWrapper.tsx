@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import React, { PureComponent, CSSProperties } from 'react';
-import { connect } from 'react-redux';
 import { Subscription } from 'rxjs';
 
 import {
@@ -36,7 +35,6 @@ import { PANEL_BORDER } from 'app/core/constants';
 import { profiler } from 'app/core/profiler';
 import { applyPanelTimeOverrides } from 'app/features/dashboard/utils/panel';
 import { changeSeriesColorConfigFactory } from 'app/plugins/panel/timeseries/overrides/colorSeriesConfigFactory';
-import { StoreState } from 'app/types';
 import { RenderEvent } from 'app/types/events';
 
 import { isSoloRoute } from '../../../routes/utils';
@@ -65,6 +63,7 @@ export interface Props {
   onInstanceStateChange: (value: any) => void;
   timezone?: string;
   FNDashboard?: boolean;
+  mode?: "light" | "dark";
 }
 
 export interface State {
@@ -271,6 +270,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     if (width !== prevProps.width) {
       liveTimer.updateInterval(this);
     }
+    
   }
 
   // Updates the response with information from the stream
@@ -626,8 +626,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
           aria-label={selectors.components.Panels.Panel.containerByTitle(panel.title)}
         >
           {FNDashboard ? (
-            // TODO: Avoid divology. Use HTML5, i.e. wrap texts with  p or h element instead of div.
-            <div style={FN_TITLE_STYLE}>{panel.title}</div>
+            <p style={FN_TITLE_STYLE}>{panel.title}</p>
           ) : (
             <PanelHeader
               panel={panel}
@@ -659,9 +658,3 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     }
   }
 }
-
-const mapStateToProps = (state: StoreState) => {
-  return { ...state.fnGlobalState };
-};
-const connector = connect(mapStateToProps);
-export const PanelChrome = connector(PanelStateWrapper);
