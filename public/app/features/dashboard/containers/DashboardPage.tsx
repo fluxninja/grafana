@@ -1,4 +1,5 @@
 import { cx } from '@emotion/css';
+import { isUndefined, isEmpty, noop } from 'lodash';
 import React, { PureComponent, } from 'react';
 import { connect, ConnectedProps, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
@@ -22,6 +23,7 @@ import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
 import { AngularDeprecationNotice } from 'app/features/plugins/angularDeprecation/AngularDeprecationNotice';
 import { AngularMigrationNotice } from 'app/features/plugins/angularDeprecation/AngularMigrationNotice';
 import { getPageNavFromSlug, getRootContentNavModel } from 'app/features/storage/StorageFolderPage';
+import { FNDashboardProps } from 'app/fn-app/types';
 import { RenderPortal } from 'app/fn-app/utils';
 import { DashboardRoutes, DashboardState, KioskMode, StoreState } from 'app/types';
 import { PanelEditEnteredEvent, PanelEditExitedEvent } from 'app/types/events';
@@ -44,8 +46,6 @@ import { getTimeSrv } from '../services/TimeSrv';
 import { explicitlyControlledMigrationPanels, autoMigrateAngular } from '../state/PanelModel';
 import { cleanUpDashboardAndVariables } from '../state/actions';
 import { initDashboard } from '../state/initDashboard';
-import { FNDashboardProps } from 'app/fn-app/types';
-import { isUndefined, isEmpty, noop } from 'lodash';
 
 import { DashboardPageRouteParams, DashboardPageRouteSearchParams } from './types';
 

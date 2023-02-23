@@ -1,6 +1,5 @@
 import classNames from 'classnames';
 import React, { PureComponent, CSSProperties } from 'react';
-import { connect } from 'react-redux';
 import { Subscription } from 'rxjs';
 
 import {
@@ -41,7 +40,6 @@ import { getDatasourceSrv } from 'app/features/plugins/datasource_srv';
 import { applyFilterFromTable } from 'app/features/variables/adhoc/actions';
 import { onUpdatePanelSnapshotData } from 'app/plugins/datasource/grafana/utils';
 import { changeSeriesColorConfigFactory } from 'app/plugins/panel/timeseries/overrides/colorSeriesConfigFactory';
-import { StoreState } from 'app/types';
 import { RenderEvent } from 'app/types/events';
 
 import { deleteAnnotation, saveAnnotation, updateAnnotation } from '../../annotations/api';
@@ -73,6 +71,7 @@ export interface Props {
   timezone?: string;
   hideMenu?: boolean;
   FNDashboard?: boolean;
+  mode?: "light" | "dark";
 }
 
 export interface State {
@@ -296,6 +295,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     if (width !== prevProps.width) {
       liveTimer.updateInterval(this);
     }
+    
   }
 
   // Updates the response with information from the stream
@@ -613,8 +613,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
           aria-label={selectors.components.Panels.Panel.containerByTitle(panel.title)}
         >
           {FNDashboard ? (
-            // TODO: Avoid divology. Use HTML5, i.e. wrap texts with  p or h element instead of div.
-            <div style={FN_TITLE_STYLE}>{panel.title}</div>
+            <p style={FN_TITLE_STYLE}>{panel.title}</p>
           ) : (
             <PanelHeader
               panel={panel}
@@ -646,9 +645,3 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     }
   }
 }
-
-const mapStateToProps = (state: StoreState) => {
-  return { ...state.fnGlobalState };
-};
-const connector = connect(mapStateToProps);
-export const PanelChrome = connector(PanelStateWrapper);

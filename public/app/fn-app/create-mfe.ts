@@ -264,14 +264,10 @@ class createMfe {
   }
 
   static updateFnApp() {
-    const lifeCycleFn: FrameworkLifeCycles['update'] = ({ mode, hiddenVariables }: FNDashboardProps) => {
+    const lifeCycleFn: FrameworkLifeCycles['update'] = ({ mode, ...other }: FNDashboardProps) => {
       if (mode) {
         createMfe.logger('Trying to update grafana with theme.', { mode });
-        /**
-         * NOTE
-         * We do not use the "mode" state right now,
-         * but I believe that as long as we store the "mode, we should update it
-         */
+
         dispatch(
           updatePartialFnStates({
             mode,
@@ -288,12 +284,15 @@ class createMfe {
         createMfe.loadFnTheme(mode);
       }
 
-      if (hiddenVariables) {
-        createMfe.logger('Trying to update grafana with hidden variables.', { hiddenVariables });
+      if (other.uid) {
+        createMfe.logger('Trying to update grafana with hidden variables.', { updatedProps: other });
 
         dispatch(
           updatePartialFnStates({
-            hiddenVariables,
+            uid: other.uid,
+            hiddenVariables: other.hiddenVariables,
+            slug: other.slug,
+            queryParams: other.queryParams,
           })
         );
       }

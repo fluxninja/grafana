@@ -20,7 +20,7 @@ export type UpdateFNGlobalStateAction = PayloadAction<Partial<FnGlobalState>>;
 
 export type SetFnStateAction = PayloadAction<Omit<FnGlobalState, 'hiddenVariables'>>;
 
-export type FnPropMappedFromState = Extract<keyof FnGlobalState, 'FNDashboard' | 'hiddenVariables' | 'mode'>;
+export type FnPropMappedFromState = Extract<keyof FnGlobalState, 'FNDashboard' | 'hiddenVariables' | 'mode' | 'uid' | 'queryParams' | 'slug'>;
 export type FnStateProp = keyof FnGlobalState;
 
 export type FnPropsMappedFromState = Pick<FnGlobalState, FnPropMappedFromState>;
@@ -40,6 +40,9 @@ export const fnPropsMappedFromState: readonly FnPropMappedFromState[] = [
   'FNDashboard',
   'hiddenVariables',
   'mode',
+  'uid',
+  'queryParams',
+  'slug',
 ] as const;
 
 const INITIAL_MODE = GrafanaThemeType.Light;
