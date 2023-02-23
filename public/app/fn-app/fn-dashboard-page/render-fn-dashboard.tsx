@@ -69,7 +69,7 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
         fnLoader,
         isLoading
       }),
-    [controlsContainer, fnLoader, hiddenVariables, props, queryParams]
+    [controlsContainer, fnLoader, hiddenVariables, isLoading, props, queryParams]
   );
 
   return <DashboardPage {...dashboardPageProps} />;

@@ -1,4 +1,5 @@
 import { cx } from '@emotion/css';
+import { isUndefined, isEmpty, noop } from 'lodash';
 import React, { PureComponent, } from 'react';
 import { connect, ConnectedProps, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
@@ -17,6 +18,7 @@ import { getNavModel } from 'app/core/selectors/navModel';
 import { PanelModel } from 'app/features/dashboard/state';
 import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
 import { getPageNavFromSlug, getRootContentNavModel } from 'app/features/storage/StorageFolderPage';
+import { FNDashboardProps } from 'app/fn-app/types';
 import { RenderPortal } from 'app/fn-app/utils';
 import { DashboardRoutes, DashboardState, KioskMode, StoreState } from 'app/types';
 import { PanelEditEnteredEvent, PanelEditExitedEvent } from 'app/types/events';
@@ -37,8 +39,6 @@ import { liveTimer } from '../dashgrid/liveTimer';
 import { getTimeSrv } from '../services/TimeSrv';
 import { cleanUpDashboardAndVariables } from '../state/actions';
 import { initDashboard } from '../state/initDashboard';
-import { FNDashboardProps } from 'app/fn-app/types';
-import { isUndefined, isEmpty, noop } from 'lodash';
 
 export interface DashboardPageRouteParams {
   uid?: string;

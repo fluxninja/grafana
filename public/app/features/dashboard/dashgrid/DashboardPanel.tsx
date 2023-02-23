@@ -32,6 +32,7 @@ const mapStateToProps = (state: StoreState, props: OwnProps) => {
   return {
     plugin: panelState.plugin,
     instanceState: panelState.instanceState,
+    fnGlobalState: state.fnGlobalState
   };
 };
 
@@ -43,8 +44,8 @@ const mapDispatchToProps = {
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
 export type Props = OwnProps & ConnectedProps<typeof connector>;
-
 export class DashboardPanelUnconnected extends PureComponent<Props> {
+
   static defaultProps: Partial<Props> = {
     lazy: true,
   };
@@ -71,8 +72,10 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
   };
 
   renderPanel = (isInView: boolean) => {
-    const { dashboard, panel, isViewing, isEditing, width, height, plugin, timezone } = this.props;
+    const { dashboard, panel, isViewing, isEditing, width, height, plugin, timezone, fnGlobalState } = this.props;
 
+    // console.log(this.props, "on render panel")
+    
     if (!plugin) {
       return null;
     }
@@ -104,6 +107,8 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
         height={height}
         onInstanceStateChange={this.onInstanceStateChange}
         timezone={timezone}
+        mode={fnGlobalState.mode}
+        FNDashboard={fnGlobalState.FNDashboard}
       />
     );
   };
