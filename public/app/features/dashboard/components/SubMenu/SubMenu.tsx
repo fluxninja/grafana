@@ -1,5 +1,7 @@
 import { css } from '@emotion/css';
-import React, { PureComponent } from 'react';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { Box, styled } from '@mui/material';
+import React, { FC, PureComponent } from 'react';
 import { connect, MapStateToProps } from 'react-redux';
 
 import { AnnotationQuery, DataQuery } from '@grafana/data';
@@ -56,6 +58,7 @@ class SubMenuUnConnected extends PureComponent<Props> {
     return (
       <div className="submenu-controls">
         <form aria-label="Template variables" className={styles}>
+          <FilterWithIcon />
           <SubMenuItems
             variables={variables}
             readOnly={readOnlyVariables}
@@ -93,3 +96,20 @@ const styles = css`
 export const SubMenu = connect(mapStateToProps)(SubMenuUnConnected);
 
 SubMenu.displayName = 'SubMenu';
+
+const FilterWithIcon: FC = () => (
+  <FilterWithIconStyled>
+    <FilterListIcon sx={{ color: '#3A785E' }} />
+    FILTERS
+  </FilterWithIconStyled>
+);
+
+const FilterWithIconStyled = styled(Box)({
+  display: 'flex',
+  gap: 1,
+  alignItems: 'center',
+  color: '#3A785E',
+  fontWeight: 600,
+  lineHeight: '160%',
+  fontSize: 12,
+});
