@@ -1,6 +1,7 @@
 import { css } from '@emotion/css';
-import { PureComponent } from 'react';
-import * as React from 'react';
+import FilterListIcon from '@mui/icons-material/FilterList';
+import { Box, styled } from '@mui/material';
+import React, { FC, PureComponent } from 'react';
 import { connect, MapStateToProps } from 'react-redux';
 
 import { AnnotationQuery, DataQuery, TypedVariableModel, GrafanaTheme2 } from '@grafana/data';
@@ -13,7 +14,7 @@ import { DashboardModel } from '../../state';
 import { Annotations } from './Annotations';
 import { DashboardLinks } from './DashboardLinks';
 import { SubMenuItems } from './SubMenuItems';
-import { VariableModel } from 'app/features/variables/types';
+// import { VariableModel } from 'app/features/variables/types';
 import { Themeable2, stylesFactory, withTheme2 } from '@grafana-ui';
 import { DashboardLink } from '@grafana/schema/dist/esm/index';
 
@@ -60,6 +61,7 @@ class SubMenuUnConnected extends PureComponent<Props> {
     return (
       <div className="submenu-controls">
         <form aria-label="Template variables" className={styles}>
+          <FilterWithIcon />
           <SubMenuItems
             variables={variables}
             readOnly={readOnlyVariables}
@@ -112,3 +114,20 @@ const getStyles = stylesFactory((theme: GrafanaTheme2) => {
 export const SubMenu = withTheme2(connect(mapStateToProps)(SubMenuUnConnected));
 
 SubMenu.displayName = 'SubMenu';
+
+const FilterWithIcon: FC = () => (
+  <FilterWithIconStyled>
+    <FilterListIcon sx={{ color: '#3A785E' }} />
+    FILTERS
+  </FilterWithIconStyled>
+);
+
+const FilterWithIconStyled = styled(Box)({
+  display: 'flex',
+  gap: 1,
+  alignItems: 'center',
+  color: '#3A785E',
+  fontWeight: 600,
+  lineHeight: '160%',
+  fontSize: 12,
+});
