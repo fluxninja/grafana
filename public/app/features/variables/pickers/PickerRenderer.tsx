@@ -1,4 +1,5 @@
 import { css } from '@emotion/css';
+import { isString,  isFunction } from 'lodash';
 import React, { CSSProperties, FunctionComponent, PropsWithChildren, ReactElement, useMemo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
@@ -10,6 +11,7 @@ import type { StoreState } from 'app/types';
 
 import { variableAdapters } from '../adapters';
 import { VariableHide, VariableModel } from '../types';
+import { FnLoggerService } from 'app/fn_logger';
 
 interface Props {
   variable: VariableModel;
@@ -58,8 +60,13 @@ const COMMON_PICKER_LABEL_STYLE: CSSProperties = {
 };
 
 function PickerLabel({ variable }: PropsWithChildren<Props>): ReactElement | null {
-  const labelOrName = useMemo(() => variable.label || variable.name, [variable]);
   const { FNDashboard, mode } = useSelector<StoreState, FnGlobalState>(({ fnGlobalState }) => fnGlobalState);
+
+  const labelOrName = useMemo(() => {
+    const value = variable.label || variable.name;
+
+    return FNDashboard ? transformFnLabel(value) : value;
+  }, [variable, FNDashboard]);
 
   const fnLabelStyle = useMemo(
     () => ({
@@ -77,9 +84,9 @@ function PickerLabel({ variable }: PropsWithChildren<Props>): ReactElement | nul
   if (variable.hide !== VariableHide.dontHide) {
     return null;
   }
-  const fnLabelOrName = FNDashboard ? labelOrName.replace('druid_adhoc_filters', 'ad-hoc') : labelOrName;
 
   const elementId = `var-${variable.id}`;
+
   if (variable.description) {
     return (
       <Tooltip content={variable.description} placement={'bottom'}>
@@ -89,11 +96,12 @@ function PickerLabel({ variable }: PropsWithChildren<Props>): ReactElement | nul
           data-testid={selectors.pages.Dashboard.SubMenu.submenuItemLabels(labelOrName)}
           htmlFor={elementId}
         >
-          {fnLabelOrName}
+          {labelOrName}
         </label>
       </Tooltip>
     );
   }
+
   return (
     <label
       className="gf-form-label gf-form-label--variable"
@@ -101,7 +109,35 @@ function PickerLabel({ variable }: PropsWithChildren<Props>): ReactElement | nul
       data-testid={selectors.pages.Dashboard.SubMenu.submenuItemLabels(labelOrName)}
       htmlFor={elementId}
     >
-      {fnLabelOrName}
+      {labelOrName}
     </label>
   );
+}
+
+
+
+const TRANSFORMERS =  new Map<string | RegExp, string | ((value: string) => string)>([
+  ['druid_adhoc_filters', "ad-hoc filter" ],
+  [/\_/g, " "],
+  ['lowerCase', (value: string) => value.toLowerCase() ],
+])
+
+function transformFnLabel(label: unknown, value = {current: label}) {
+  if (!isString(label)) {
+    FnLoggerService.warn(null, "Label is not a string.", {label})
+    return label
+  }
+
+  if (!label) {
+    return label
+  }
+
+
+ TRANSFORMERS.forEach(( replaceValue: string | ((value: string) => string), searchValue: string|RegExp) => {
+  value.current = isFunction(replaceValue) ? replaceValue(value.current) :`${ value.current}`.replace(searchValue, replaceValue)
+})
+
+return value.current
+
+
 }
