@@ -625,9 +625,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
           className={containerClassNames}
           aria-label={selectors.components.Panels.Panel.containerByTitle(panel.title)}
         >
-          {FNDashboard ? (
-            <p style={FN_TITLE_STYLE}>{panel.title}</p>
-          ) : (
+          <div style={FNDashboard ?  FN_TITLE_STYLE : {}}>
             <PanelHeader
               panel={panel}
               dashboard={dashboard}
@@ -640,7 +638,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
               alertState={alertState}
               data={data}
             />
-          )}
+            </div>
           <ErrorBoundary
             dependencies={[data, plugin, panel.getOptions()]}
             onError={this.onPanelError}
