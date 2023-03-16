@@ -1,34 +1,42 @@
-import { css } from '@emotion/css';
+// import { css } from '@emotion/css';
 import React, { CSSProperties, FunctionComponent, PropsWithChildren, ReactElement, useMemo } from 'react';
-import { Stack } from '@mui/material';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 
-import { TypedVariableModel, VariableHide } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { Tooltip } from '@grafana/ui';
 import { FnGlobalState } from 'app/core/reducers/fn-slice';
 import type { StoreState } from 'app/types';
 
 import { variableAdapters } from '../adapters';
-import { VARIABLE_PREFIX } from '../constants';
+import { VariableHide, VariableModel } from '../types';
 
 interface Props {
-  variable: TypedVariableModel;
+  variable: VariableModel;
   readOnly?: boolean;
 }
 
-const renderWrapperStyle = css`
-  & button,
-  & span,
-  & label,
-  & input {
-    height: 24px;
-    font-size: 12px;
-    line-height: 24px;
-    align-self: center;
-  }
-`;
+// not using this style  for now.
+// const renderWrapperStyle = css`
+//   & button,
+//   & span,
+//   & label,
+//   & input {
+//     height: 35px;
+//     font-size: 14px;
+//   }
+
+//   /* Center align filter picker buttons */
+//   & button {
+//     margin-top: 2px;
+//   }
+
+//   /* Adhoc filter: Disable green border and make input height similar to others */
+//   & div[class*='input-wrapper'] {
+//     min-height: 0 !important;
+//     box-shadow: none !important;
+//   }
+// `;
 
 export const PickerRenderer: FunctionComponent<Props> = (props) => {
   const PickerToRender = useMemo(() => variableAdapters.get(props.variable.type).picker, [props.variable]);
@@ -38,25 +46,25 @@ export const PickerRenderer: FunctionComponent<Props> = (props) => {
   }
 
   return (
-    <Stack gap={0}>
+    <div className="gf-form">
       <PickerLabel variable={props.variable} />
       {props.variable.hide !== VariableHide.hideVariable && PickerToRender && (
-        <div className={renderWrapperStyle}>
+        <div>
           <PickerToRender variable={props.variable} readOnly={props.readOnly ?? false} />
         </div>
       )}
-    </Stack>
+    </div>
   );
 };
 
 const COMMON_PICKER_LABEL_STYLE: CSSProperties = {
-  borderRadius: '2px',
   border: 'none',
-  fontWeight: 400,
-  fontSize: '12px',
+  fontWeight: 500,
+  fontSize: '14px',
   padding: '3px 6px',
   letterSpacing: '0.15px',
   height: '24px',
+  marginTop: '2px',
 };
 
 function PickerLabel({ variable }: PropsWithChildren<Props>): ReactElement | null {
@@ -66,14 +74,9 @@ function PickerLabel({ variable }: PropsWithChildren<Props>): ReactElement | nul
   const fnLabelStyle = useMemo(
     () => ({
       ...COMMON_PICKER_LABEL_STYLE,
-      ...(FNDashboard
-        ? {
-            color: mode === 'light' ? '#2D333E' : '#DBD9D7',
-            backgroundColor: mode === 'light' ? '#E0E0E0' : '#56524D',
-          }
-        : {}),
+      color: mode === 'light' ? '#2D333E' : '#DBD9D7',
     }),
-    [mode, FNDashboard]
+    [mode]
   );
 
   if (variable.hide !== VariableHide.dontHide) {
@@ -81,7 +84,7 @@ function PickerLabel({ variable }: PropsWithChildren<Props>): ReactElement | nul
   }
   const fnLabelOrName = FNDashboard ? labelOrName.replace('druid_adhoc_filters', 'ad-hoc') : labelOrName;
 
-  const elementId = VARIABLE_PREFIX + variable.id;
+  const elementId = `var-${variable.id}`;
   if (variable.description) {
     return (
       <Tooltip content={variable.description} placement={'bottom'}>
