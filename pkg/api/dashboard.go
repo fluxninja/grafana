@@ -745,20 +745,18 @@ func (hs *HTTPServer) GetDashboardVersion(c *models.ReqContext) response.Respons
 		creator = hs.getUserLogin(c.Req.Context(), res.CreatedBy)
 	}
 
-	dashVersionMeta := &dashver.DashboardVersionMeta{
-		ID:            res.ID,
-		DashboardID:   res.DashboardID,
-		DashboardUID:  dashUID,
-		Data:          res.Data,
-		ParentVersion: res.ParentVersion,
-		RestoredFrom:  res.RestoredFrom,
-		Version:       res.Version,
-		Created:       res.Created,
-		Message:       res.Message,
-		CreatedBy:     creator,
+	meta := dtos.DashboardMeta{
+		Type:      models.DashTypeDB,
+		CreatedBy: creator,
+		Version:   res.Version,
 	}
 
-	return response.JSON(http.StatusOK, dashVersionMeta)
+	dto := dtos.DashboardFullWithMeta{
+		Dashboard: res.Data,
+		Meta:      meta,
+	}
+
+	return response.JSON(http.StatusOK, dto)
 }
 
 // swagger:route POST /dashboards/validate dashboards alpha validateDashboard

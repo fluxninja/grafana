@@ -22,6 +22,7 @@ export interface FNDashboardProps {
   name: string;
   uid: string;
   slug: string;
+  version: number;
   mode: GrafanaThemeType.Dark | GrafanaThemeType.Light;
   queryParams: ParsedQuery<string>;
   fnError?: ReactNode;

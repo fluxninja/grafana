@@ -464,6 +464,10 @@ export class BackendSrv implements BackendService {
     return this.get<DashboardDTO>(`/api/dashboards/uid/${uid}`);
   }
 
+  getDashboardByUidVersion(uid: string, version: number): Promise<DashboardDTO> {
+    return this.get<DashboardDTO>(`/api/dashboards/uid/${uid}/versions/${version}`);
+  }
+
   validateDashboard(dashboard: DashboardModel) {
     // We want to send the dashboard as a JSON string (in the JSON body payload) so we can get accurate error line numbers back
     const dashboardJson = JSON.stringify(dashboard, replaceJsonNulls, 2);
