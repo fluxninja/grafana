@@ -1,5 +1,5 @@
 import { merge } from 'lodash';
-import React, { CSSProperties } from 'react';
+import React, { CSSProperties, FC, useEffect } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -23,31 +23,45 @@ const FnText: React.FC = () => {
   return <>{FNDashboard ? <span style={{ ...FN_TEXT_STYLE, color: theme.colors.warning.main }}>UTC</span> : ''}</>;
 };
 
-export const TimePickerWithHistory: React.FC<Props> = (props) => {
+export const TimePickerWithHistory: FC<Props> = (props) => (
+  <LocalStorageValueProvider<TimeRange[]> storageKey={LOCAL_STORAGE_KEY} defaultValue={[]}>
+    {(values, onSaveToStore) => {
+      return <Picker values={values} onSaveToStore={onSaveToStore} pickerProps={props} />;
+    }}
+  </LocalStorageValueProvider>
+);
+
+export interface PickerProps {
+  values: TimeRange[];
+  onSaveToStore: (value: TimeRange[]) => void;
+  pickerProps: Props;
+}
+
+export const Picker: FC<PickerProps> = ({ values, onSaveToStore, pickerProps }) => {
   const { fnGlobalTimeRange } = useSelector<StoreState, FnGlobalState>(({ fnGlobalState }) => fnGlobalState);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    if (!fnGlobalTimeRange) {
+      return;
+    }
+    onAppendToHistory(fnGlobalTimeRange, values, onSaveToStore);
+    pickerProps.onChange(fnGlobalTimeRange);
+  }, [fnGlobalTimeRange, onSaveToStore, pickerProps, values]);
+
   return (
-    <LocalStorageValueProvider<TimeRange[]> storageKey={LOCAL_STORAGE_KEY} defaultValue={[]}>
-      {(values, onSaveToStore) => {
-        return (
-          <TimeRangePicker
-            {...merge({}, props, { value: fnGlobalTimeRange || props.value })}
-            history={convertIfJson(values)}
-            onChange={(value) => {
-              dispatch(
-                updatePartialFnStates({
-                  fnGlobalTimeRange: value,
-                })
-              );
-              onAppendToHistory(value, values, onSaveToStore);
-              props.onChange(value);
-            }}
-            fnText={<FnText />}
-          />
+    <TimeRangePicker
+      {...merge({}, pickerProps, { value: pickerProps.value })}
+      history={convertIfJson(values)}
+      onChange={(value) => {
+        dispatch(
+          updatePartialFnStates({
+            fnGlobalTimeRange: value,
+          })
         );
       }}
-    </LocalStorageValueProvider>
+      fnText={<FnText />}
+    />
   );
 };
 
@@ -69,6 +83,7 @@ function onAppendToHistory(toAppend: TimeRange, values: TimeRange[], onSaveToSto
   if (!isAbsolute(toAppend)) {
     return;
   }
+
   const toStore = limit([toAppend, ...values]);
   onSaveToStore(toStore);
 }
