@@ -47,12 +47,11 @@ export const Picker: FC<PickerProps> = ({ values, onSaveToStore, pickerProps }) 
     }
     onAppendToHistory(fnGlobalTimeRange, values, onSaveToStore);
     pickerProps.onChange(fnGlobalTimeRange);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fnGlobalTimeRange, onSaveToStore, pickerProps, values]);
 
   return (
     <TimeRangePicker
-      {...merge({}, pickerProps, { value: fnGlobalTimeRange || pickerProps.value })}
+      {...merge({}, pickerProps, { value: pickerProps.value })}
       history={convertIfJson(values)}
       onChange={(value) => {
         dispatch(
@@ -60,8 +59,6 @@ export const Picker: FC<PickerProps> = ({ values, onSaveToStore, pickerProps }) 
             fnGlobalTimeRange: value,
           })
         );
-        onAppendToHistory(value, values, onSaveToStore);
-        pickerProps.onChange(value);
       }}
       fnText={<FnText />}
     />
