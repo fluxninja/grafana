@@ -37,7 +37,8 @@ export interface InitDashboardArgs {
   urlUid?: string;
   urlSlug?: string;
   urlType?: string;
-  urlFolderUid?: string;
+  urlFolderId?: string;
+  version?: number;
   panelType?: string;
   accessToken?: string;
   routeName?: string;
@@ -84,10 +85,10 @@ async function fetchDashboard(
         return dashDTO;
       }
       case DashboardRoutes.Public: {
-        return await dashboardLoaderSrv.loadDashboard('public', args.urlSlug, args.accessToken);
+        return await dashboardLoaderSrv.loadDashboard('public', args.urlSlug, args.accessToken, args.version);
       }
       case DashboardRoutes.Normal: {
-        const dashDTO: DashboardDTO = await dashboardLoaderSrv.loadDashboard(args.urlType, args.urlSlug, args.urlUid);
+        const dashDTO: DashboardDTO = await dashboardLoaderSrv.loadDashboard(args.urlType, args.urlSlug, args.urlUid, args.version);
 
         // only the folder API has information about ancestors
         // get parent folder (if it exists) and put it in the store
@@ -127,7 +128,7 @@ async function fetchDashboard(
       }
       case DashboardRoutes.Path: {
         const path = args.urlSlug ?? '';
-        return await dashboardLoaderSrv.loadDashboard(DashboardRoutes.Path, path, path);
+        return await dashboardLoaderSrv.loadDashboard(DashboardRoutes.Path, path, path, args.version);
       }
       default:
         throw { message: 'Unknown route ' + args.routeName };

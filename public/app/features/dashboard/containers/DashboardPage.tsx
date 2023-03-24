@@ -92,6 +92,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type OwnProps = {
   isPublic?: boolean;
   controlsContainer?: string | null;
+  version?: FNDashboardProps['version'];
   fnLoader?: FNDashboardProps['fnLoader'];
   isLoading?: FNDashboardProps['isLoading']
 };
@@ -201,7 +202,8 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       urlSlug: match.params.slug,
       urlUid: match.params.uid,
       urlType: match.params.type,
-      urlFolderUid: queryParams.folderUid,
+      urlFolderId: queryParams.folderId,
+      version: match.params.version,
       panelType: queryParams.panelType,
       routeName: this.props.route.routeName,
       fixUrl: !isPublic && !FNDashboard,
@@ -225,6 +227,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
       if (
         prevProps.match.params.uid !== match.params.uid ||
+        prevProps.match.params.version !== match.params.version ||
         (routeReloadCounter !== undefined && this.forceRouteReloadCounter !== routeReloadCounter)
       ) {
         this.initDashboard();

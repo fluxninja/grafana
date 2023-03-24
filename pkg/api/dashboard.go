@@ -904,7 +904,12 @@ func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.R
 		CreatedBy:     creator,
 	}
 
-	return response.JSON(http.StatusOK, dashVersionMeta)
+	dto := dtos.DashboardFullWithMeta{
+		Dashboard: res.Data,
+		Meta:      meta,
+	}
+
+	return response.JSON(http.StatusOK, dto)
 }
 
 // swagger:route POST /dashboards/calculate-diff dashboards calculateDashboardDiff

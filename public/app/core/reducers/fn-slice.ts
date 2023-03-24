@@ -8,6 +8,7 @@ export interface FnGlobalState {
   FNDashboard: boolean;
   uid: string;
   slug: string;
+  version: number;
   mode: GrafanaThemeType.Light | GrafanaThemeType.Dark;
   controlsContainer: string | null;
   pageTitle: string;
@@ -20,7 +21,7 @@ export type UpdateFNGlobalStateAction = PayloadAction<Partial<FnGlobalState>>;
 
 export type SetFnStateAction = PayloadAction<Omit<FnGlobalState, 'hiddenVariables'>>;
 
-export type FnPropMappedFromState = Extract<keyof FnGlobalState, 'FNDashboard' | 'hiddenVariables' | 'mode' | 'uid' | 'queryParams' | 'slug'>;
+export type FnPropMappedFromState = Extract<keyof FnGlobalState, 'FNDashboard' | 'hiddenVariables' | 'mode' | 'uid' | 'queryParams' | 'slug' | 'version'>;
 export type FnStateProp = keyof FnGlobalState;
 
 export type FnPropsMappedFromState = Pick<FnGlobalState, FnPropMappedFromState>;
@@ -34,6 +35,7 @@ export const fnStateProps: FnStateProp[] = [
   'queryParams',
   'slug',
   'uid',
+  'version',
 ];
 
 export const fnPropsMappedFromState: readonly FnPropMappedFromState[] = [
@@ -43,6 +45,7 @@ export const fnPropsMappedFromState: readonly FnPropMappedFromState[] = [
   'uid',
   'queryParams',
   'slug',
+  'version',
 ] as const;
 
 const INITIAL_MODE = GrafanaThemeType.Light;
@@ -54,6 +57,7 @@ export const INITIAL_FN_STATE: FnGlobalState = {
   FNDashboard: false,
   uid: '',
   slug: '',
+  version: 1,
   mode: INITIAL_MODE,
   controlsContainer: null,
   pageTitle: '',

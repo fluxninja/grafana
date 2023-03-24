@@ -292,6 +292,7 @@ class createMfe {
             uid: other.uid,
             hiddenVariables: other.hiddenVariables,
             slug: other.slug,
+            version: other.version,
             queryParams: other.queryParams,
           })
         );
