@@ -1,7 +1,8 @@
 import { css, cx } from '@emotion/css';
 import { indexOf } from 'lodash';
-import { Component } from 'react';
+import React, { Component } from 'react';
 import { Unsubscribable } from 'rxjs';
+import {connect} from "react-redux"
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
@@ -14,13 +15,15 @@ import { ShowConfirmModalEvent } from '../../../../types/events';
 import { DashboardModel } from '../../state/DashboardModel';
 import { PanelModel } from '../../state/PanelModel';
 import { RowOptionsButton } from '../RowOptions/RowOptionsButton';
+import { StoreState } from 'app/types';
 
 export interface DashboardRowProps extends Themeable2 {
   panel: PanelModel;
   dashboard: DashboardModel;
+  isFnDashboard: boolean
 }
 
-export class UnthemedDashboardRow extends Component<DashboardRowProps> {
+ class Component extends React.Component<DashboardRowProps> {
   sub?: Unsubscribable;
 
   componentDidMount() {
@@ -94,12 +97,18 @@ export class UnthemedDashboardRow extends Component<DashboardRowProps> {
   };
 
   render() {
+    const classes = classNames({
+      'dashboard-row': true,
+      'dashboard-row--collapsed': this.props.panel.collapsed,
+    });
+
+    const {isFnDashboard} = this.props
+
     const title = getTemplateSrv().replace(this.props.panel.title, this.props.panel.scopedVars, 'text');
     const count = this.props.panel.panels ? this.props.panel.panels.length : 0;
     const panels = count === 1 ? 'panel' : 'panels';
-    const canEdit = this.props.dashboard.meta.canEdit === true;
-    const collapsed = this.props.panel.collapsed;
-    const styles = getStyles(this.props.theme);
+    const canEdit = this.props.dashboard.meta.canEdit === true && !isFnDashboard;
+
 
     return (
       <div
@@ -164,88 +173,12 @@ export class UnthemedDashboardRow extends Component<DashboardRowProps> {
   }
 }
 
-export const DashboardRow = withTheme2(UnthemedDashboardRow);
 
-const getStyles = (theme: GrafanaTheme2) => {
-  const actions = css({
-    color: theme.colors.text.secondary,
-    opacity: 0,
-    [theme.transitions.handleMotion('no-preference', 'reduce')]: {
-      transition: '200ms opacity ease-in 200ms',
-    },
-
-    button: {
-      color: theme.colors.text.secondary,
-      paddingLeft: theme.spacing(2),
-      background: 'transparent',
-      border: 'none',
-
-      '&:hover': {
-        color: theme.colors.text.maxContrast,
-      },
-    },
+function mapStateToProps () {
+  return (state: StoreState) =>  ({
+    isFnDashboard: state.fnGlobalState.FNDashboard
   });
+}
 
-  return {
-    dashboardRow: css({
-      display: 'flex',
-      alignItems: 'center',
-      height: '100%',
 
-      '&:hover, &:focus-within': {
-        [`.${actions}`]: {
-          opacity: 1,
-        },
-      },
-    }),
-    dashboardRowCollapsed: css({
-      background: theme.components.panel.background,
-    }),
-    toggleTargetCollapsed: css({
-      flex: 1,
-      cursor: 'pointer',
-      marginRight: '15px',
-    }),
-    title: css({
-      flexGrow: 0,
-      fontSize: theme.typography.h5.fontSize,
-      fontWeight: theme.typography.fontWeightMedium,
-      color: theme.colors.text.primary,
-      background: 'transparent',
-      border: 'none',
-
-      '.fa': {
-        color: theme.colors.text.secondary,
-        fontSize: theme.typography.size.xs,
-        padding: theme.spacing(0, 1),
-      },
-    }),
-    actions,
-    count: css({
-      paddingLeft: theme.spacing(2),
-      color: theme.colors.text.secondary,
-      fontStyle: 'italic',
-      fontSize: theme.typography.size.sm,
-      fontWeight: 'normal',
-      display: 'none',
-    }),
-    countCollapsed: css({
-      display: 'inline-block',
-    }),
-    dragHandle: css({
-      cursor: 'move',
-      width: '16px',
-      height: '100%',
-      background: 'url("public/img/grab_dark.svg") no-repeat 50% 50%',
-      backgroundSize: '8px',
-      visibility: 'hidden',
-      position: 'absolute',
-      top: 0,
-      right: 0,
-    }),
-    dragHandleCollapsed: css({
-      visibility: 'visible',
-      opacity: 1,
-    }),
-  };
-};
+export const DashboardRow = connect(mapStateToProps)(Component);
