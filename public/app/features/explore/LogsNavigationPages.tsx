@@ -51,7 +51,7 @@ export function LogsNavigationPages({
             <button
               type="button"
               data-testid={`page${index + 1}`}
-              className={styles.page}
+              className={cx(clearButtonStyles(theme), styles.page)}
               key={page.queryRange.to}
               onClick={() => {
                 reportInteraction('grafana_explore_logs_pagination_clicked', {

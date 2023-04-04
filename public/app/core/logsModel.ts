@@ -18,6 +18,7 @@ import {
   FieldWithIndex,
   findCommonLabels,
   findUniqueLabels,
+  getTimeField,
   Labels,
   LoadingState,
   LogLevel,
@@ -29,6 +30,7 @@ import {
   MutableDataFrame,
   rangeUtil,
   ScopedVars,
+  sortDataFrame,
   textUtil,
   TimeRange,
   toDataFrame,
@@ -40,6 +42,7 @@ import { ansicolor, colors } from '@grafana/ui';
 import { getThemeColor } from 'app/core/utils/colors';
 
 import { getLogLevel, getLogLevelFromKey, sortInAscendingOrder } from '../features/logs/utils';
+
 export const LIMIT_LABEL = 'Line limit';
 export const COMMON_LABELS = 'Common labels';
 
@@ -198,11 +201,13 @@ function isLogsData(series: DataFrame) {
  * Convert dataFrame into LogsModel which consists of creating separate array of log rows and metrics series. Metrics
  * series can be either already included in the dataFrame or will be computed from the log rows.
  * @param dataFrame
- * @param intervalMs In case there are no metrics series, we use this for computing it from log rows.
+ * @param intervalMs Optional. In case there are no metrics series, we use this for computing it from log rows.
+ * @param absoluteRange Optional. Used to store absolute range of executed queries in logs model. This is used for pagination.
+ * @param queries Optional. Used to store executed queries in logs model. This is used for pagination.
  */
 export function dataFrameToLogsModel(
   dataFrame: DataFrame[],
-  intervalMs: number | undefined,
+  intervalMs?: number,
   absoluteRange?: AbsoluteTimeRange,
   queries?: DataQuery[]
 ): LogsModel {
@@ -730,6 +735,67 @@ export function queryLogsVolume<TQuery extends DataQuery, TOptions extends DataS
           observer.error(error);
         } else {
           rawLogsVolume = rawLogsVolume.concat(dataQueryResponse.data.map(toDataFrame));
+        }
+      },
+      error: (error) => {
+        observer.next({
+          state: LoadingState.Error,
+          error: error,
+          data: [],
+        });
+        observer.error(error);
+      },
+    });
+    return () => {
+      subscription?.unsubscribe();
+    };
+  });
+}
+
+/**
+ * Creates an observable, which makes requests to get logs sample.
+ */
+export function queryLogsSample<TQuery extends DataQuery, TOptions extends DataSourceJsonData>(
+  datasource: DataSourceApi<TQuery, TOptions>,
+  logsSampleRequest: DataQueryRequest<TQuery>
+): Observable<DataQueryResponse> {
+  logsSampleRequest.hideFromInspector = true;
+
+  return new Observable((observer) => {
+    let rawLogsSample: DataFrame[] = [];
+    observer.next({
+      state: LoadingState.Loading,
+      error: undefined,
+      data: [],
+    });
+
+    const queryResponse = datasource.query(logsSampleRequest);
+    const queryObservable = isObservable(queryResponse) ? queryResponse : from(queryResponse);
+
+    const subscription = queryObservable.subscribe({
+      complete: () => {
+        observer.next({
+          state: LoadingState.Done,
+          error: undefined,
+          data: rawLogsSample,
+        });
+        observer.complete();
+      },
+      next: (dataQueryResponse: DataQueryResponse) => {
+        const { error } = dataQueryResponse;
+        if (error !== undefined) {
+          observer.next({
+            state: LoadingState.Error,
+            error,
+            data: [],
+          });
+          observer.error(error);
+        } else {
+          rawLogsSample = dataQueryResponse.data.map((dataFrame) => {
+            const frame = toDataFrame(dataFrame);
+            const { timeIndex } = getTimeField(frame);
+            return sortDataFrame(frame, timeIndex);
+          });
         }
       },
       error: (error) => {

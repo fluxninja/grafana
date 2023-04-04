@@ -2,21 +2,27 @@ package remotecache
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/bradfitz/gomemcache/memcache"
+
 	"github.com/grafana/grafana/pkg/setting"
 )
 
 const memcachedCacheType = "memcached"
 
+var ErrNotImplemented = errors.New("count not implemented")
+
 type memcachedStorage struct {
-	c *memcache.Client
+	c     *memcache.Client
+	codec codec
 }
 
-func newMemcachedStorage(opts *setting.RemoteCacheOptions) *memcachedStorage {
+func newMemcachedStorage(opts *setting.RemoteCacheOptions, codec codec) *memcachedStorage {
 	return &memcachedStorage{
-		c: memcache.New(opts.ConnStr),
+		c:     memcache.New(opts.ConnStr),
+		codec: codec,
 	}
 }
 
@@ -31,7 +37,7 @@ func newItem(sid string, data []byte, expire int32) *memcache.Item {
 // Set sets value to given key in the cache.
 func (s *memcachedStorage) Set(ctx context.Context, key string, val interface{}, expires time.Duration) error {
 	item := &cachedItem{Val: val}
-	bytes, err := encodeGob(item)
+	bytes, err := s.codec.Encode(ctx, item)
 	if err != nil {
 		return err
 	}
@@ -58,12 +64,16 @@ func (s *memcachedStorage) Get(ctx context.Context, key string) (interface{}, er
 
 	item := &cachedItem{}
 
-	err = decodeGob(memcachedItem.Value, item)
+	err = s.codec.Decode(ctx, memcachedItem.Value, item)
 	if err != nil {
 		return nil, err
 	}
 
 	return item.Val, nil
+}
+
+func (s *memcachedStorage) Count(ctx context.Context, prefix string) (int64, error) {
+	return 0, ErrNotImplemented
 }
 
 // Delete delete a key from the cache

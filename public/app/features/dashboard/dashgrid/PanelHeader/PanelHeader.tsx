@@ -1,5 +1,5 @@
 import { css, cx } from '@emotion/css';
-import React, { FC } from 'react';
+import React from 'react';
 
 import { DataLink, GrafanaTheme2, PanelData } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
@@ -28,7 +28,7 @@ export interface Props {
   data: PanelData;
 }
 
-export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, data, alertState, dashboard }) => {
+export function PanelHeader ({ panel, error, isViewing, isEditing, data, alertState, dashboard }: Props) {
 
     const isFnDashboard = useSelector((state: StoreState) => {
       const {
@@ -93,32 +93,6 @@ export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, dat
       </div>
     </>
   );
-};
+}
 
-const panelStyles = (theme: GrafanaTheme2) => {
-  return {
-    fnPanelHeader: css`
-      &:hover {
-        background-color: initial!important;
-        cursor: default!important;
-      }
-    `,
-    titleText: css`
-      text-overflow: ellipsis;
-      overflow: hidden;
-      white-space: nowrap;
-      max-width: calc(100% - 38px);
-      cursor: pointer;
-      font-weight: ${theme.typography.fontWeightMedium};
-      font-size: ${theme.typography.body.fontSize};
-      margin: 0;
 
-      &:hover {
-        color: ${theme.colors.text.primary};
-      }
-      .panel-has-alert & {
-        max-width: calc(100% - 54px);
-      }
-    `,
-  };
-};

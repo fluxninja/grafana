@@ -75,7 +75,7 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
     const { dashboard, panel, isViewing, isEditing, width, height, plugin, timezone, fnGlobalState } = this.props;
 
     // console.log(this.props, "on render panel")
-    
+
     if (!plugin) {
       return null;
     }

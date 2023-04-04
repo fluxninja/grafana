@@ -52,11 +52,11 @@ func (rs *ruleStates) getOrCreate(ctx context.Context, log log.Logger, alertRule
 	ruleLabels, annotations := rs.expandRuleLabelsAndAnnotations(ctx, log, alertRule, result, extraLabels, externalURL)
 
 	values := make(map[string]float64)
-	for _, v := range result.Values {
+	for refID, v := range result.Values {
 		if v.Value != nil {
-			values[v.Var] = *v.Value
+			values[refID] = *v.Value
 		} else {
-			values[v.Var] = math.NaN()
+			values[refID] = math.NaN()
 		}
 	}
 
@@ -209,20 +209,22 @@ func (c *cache) get(orgID int64, alertRuleUID, stateId string) *State {
 	return nil
 }
 
-func (c *cache) getAll(orgID int64) []*State {
+func (c *cache) getAll(orgID int64, skipNormalState bool) []*State {
 	var states []*State
 	c.mtxStates.RLock()
 	defer c.mtxStates.RUnlock()
 	for _, v1 := range c.states[orgID] {
 		for _, v2 := range v1.states {
+			if skipNormalState && IsNormalStateWithNoReason(v2) {
+				continue
+			}
 			states = append(states, v2)
 		}
 	}
 	return states
 }
 
-func (c *cache) getStatesForRuleUID(orgID int64, alertRuleUID string) []*State {
-	var result []*State
+func (c *cache) getStatesForRuleUID(orgID int64, alertRuleUID string, skipNormalState bool) []*State {
 	c.mtxStates.RLock()
 	defer c.mtxStates.RUnlock()
 	orgRules, ok := c.states[orgID]
@@ -233,7 +235,11 @@ func (c *cache) getStatesForRuleUID(orgID int64, alertRuleUID string) []*State {
 	if !ok {
 		return nil
 	}
+	result := make([]*State, 0, len(rs.states))
 	for _, state := range rs.states {
+		if skipNormalState && IsNormalStateWithNoReason(state) {
+			continue
+		}
 		result = append(result, state)
 	}
 	return result

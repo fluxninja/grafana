@@ -10,13 +10,13 @@ import (
 
 	"github.com/benbjohnson/clock"
 	"github.com/go-openapi/strfmt"
-	"github.com/grafana/grafana/pkg/infra/log/logtest"
 	models2 "github.com/prometheus/alertmanager/api/v2/models"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/stretchr/testify/require"
 
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/log"
+	"github.com/grafana/grafana/pkg/infra/log/logtest"
 	"github.com/grafana/grafana/pkg/services/datasources"
 	fake_ds "github.com/grafana/grafana/pkg/services/datasources/fakes"
 	"github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
@@ -31,7 +31,10 @@ import (
 	"github.com/grafana/grafana/pkg/util"
 )
 
-func TestSendingToExternalAlertmanager(t *testing.T) {
+func TestIntegrationSendingToExternalAlertmanager(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
 	ruleKey := models.GenerateRuleKey(1)
 
 	fakeAM := NewFakeExternalAlertmanager(t)
@@ -97,7 +100,10 @@ func TestSendingToExternalAlertmanager(t *testing.T) {
 	assertAlertmanagersStatusForOrg(t, alertsRouter, ruleKey.OrgID, 0, 0)
 }
 
-func TestSendingToExternalAlertmanager_WithMultipleOrgs(t *testing.T) {
+func TestIntegrationSendingToExternalAlertmanager_WithMultipleOrgs(t *testing.T) {
+	if testing.Short() {
+		t.Skip("skipping integration test")
+	}
 	ruleKey1 := models.GenerateRuleKey(1)
 	ruleKey2 := models.GenerateRuleKey(2)
 
@@ -484,6 +490,42 @@ func TestBuildExternalURL(t *testing.T) {
 				Url: "localhost:9000/path/to/am",
 			},
 			expectedURL: "http://localhost:9000/path/to/am",
+		},
+		{
+			name: "adds /alertmanager to path when implementation is mimir",
+			ds: &datasources.DataSource{
+				Url: "https://localhost:9000",
+				JsonData: func() *simplejson.Json {
+					r := simplejson.New()
+					r.Set("implementation", "mimir")
+					return r
+				}(),
+			},
+			expectedURL: "https://localhost:9000/alertmanager",
+		},
+		{
+			name: "adds /alertmanager to path when implementation is cortex",
+			ds: &datasources.DataSource{
+				Url: "https://localhost:9000/path/to/am",
+				JsonData: func() *simplejson.Json {
+					r := simplejson.New()
+					r.Set("implementation", "cortex")
+					return r
+				}(),
+			},
+			expectedURL: "https://localhost:9000/path/to/am/alertmanager",
+		},
+		{
+			name: "do nothing when implementation is prometheus",
+			ds: &datasources.DataSource{
+				Url: "https://localhost:9000/path/to/am",
+				JsonData: func() *simplejson.Json {
+					r := simplejson.New()
+					r.Set("implementation", "prometheus")
+					return r
+				}(),
+			},
+			expectedURL: "https://localhost:9000/path/to/am",
 		},
 	}
 	for _, test := range tests {

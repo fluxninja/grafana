@@ -178,7 +178,7 @@ func (e *AzureResourceGraphDatasource) executeQuery(ctx context.Context, logger 
 	tracer.Inject(ctx, req.Header, span)
 
 	logger.Debug("AzureResourceGraph", "Request ApiURL", req.URL.String())
-	res, err := client.Do(req)
+	res, err := client.Do(req) //nolint:bodyclose // fixed in main
 	if err != nil {
 		return dataResponseErrorWithExecuted(err)
 	}
@@ -191,6 +191,10 @@ func (e *AzureResourceGraphDatasource) executeQuery(ctx context.Context, logger 
 	frame, err := loganalytics.ResponseTableToFrame(&argResponse.Data, query.RefID, query.InterpolatedQuery)
 	if err != nil {
 		return dataResponseErrorWithExecuted(err)
+	}
+	if frame == nil {
+		// empty response
+		return dataResponse
 	}
 
 	azurePortalUrl, err := GetAzurePortalUrl(dsInfo.Cloud)
@@ -273,8 +277,6 @@ func GetAzurePortalUrl(azureCloud string) (string, error) {
 		return "https://portal.azure.cn", nil
 	case azsettings.AzureUSGovernment:
 		return "https://portal.azure.us", nil
-	case azsettings.AzureGermany:
-		return "https://portal.microsoftazure.de", nil
 	default:
 		return "", fmt.Errorf("the cloud is not supported")
 	}

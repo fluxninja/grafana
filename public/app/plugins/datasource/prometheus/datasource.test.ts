@@ -61,6 +61,7 @@ describe('PrometheusDatasource', () => {
   const instanceSettings = {
     url: 'proxied',
     id: 1,
+    uid: 'ABCDEF',
     directUrl: 'direct',
     user: 'test',
     password: 'mupp',
@@ -184,6 +185,7 @@ describe('PrometheusDatasource', () => {
 
   describe('customQueryParams', () => {
     const target = { expr: 'test{job="testjob"}', format: 'time_series', refId: '' };
+
     function makeQuery(target: PromQuery) {
       return {
         range: { from: time({ seconds: 63 }), to: time({ seconds: 183 }) },
@@ -202,7 +204,7 @@ describe('PrometheusDatasource', () => {
       it('added to metadata request', () => {
         promDs.metadataRequest('/foo');
         expect(fetchMock.mock.calls.length).toBe(1);
-        expect(fetchMock.mock.calls[0][0].url).toBe('/api/datasources/1/resources/foo?customQuery=123');
+        expect(fetchMock.mock.calls[0][0].url).toBe('/api/datasources/uid/ABCDEF/resources/foo?customQuery=123');
       });
 
       it('adds params to timeseries query', () => {
@@ -237,13 +239,13 @@ describe('PrometheusDatasource', () => {
       it('added to metadata request with non-POST endpoint', () => {
         promDs.metadataRequest('/foo');
         expect(fetchMock.mock.calls.length).toBe(1);
-        expect(fetchMock.mock.calls[0][0].url).toBe('/api/datasources/1/resources/foo?customQuery=123');
+        expect(fetchMock.mock.calls[0][0].url).toBe('/api/datasources/uid/ABCDEF/resources/foo?customQuery=123');
       });
 
       it('added to metadata request with POST endpoint', () => {
         promDs.metadataRequest('/api/v1/labels');
         expect(fetchMock.mock.calls.length).toBe(1);
-        expect(fetchMock.mock.calls[0][0].url).toBe('/api/datasources/1/resources/api/v1/labels');
+        expect(fetchMock.mock.calls[0][0].url).toBe('/api/datasources/uid/ABCDEF/resources/api/v1/labels');
         expect(fetchMock.mock.calls[0][0].data.customQuery).toBe('123');
       });
 
@@ -752,6 +754,7 @@ describe('PrometheusDatasource2', () => {
   const instanceSettings = {
     url: 'proxied',
     id: 1,
+    uid: 'ABCDEF',
     directUrl: 'direct',
     user: 'test',
     password: 'mupp',
@@ -914,7 +917,7 @@ describe('PrometheusDatasource2', () => {
 
   describe('When querying prometheus with one target and instant = true', () => {
     let results: any;
-    const urlExpected = `/api/datasources/1/resources/api/v1/query?query=${encodeURIComponent(
+    const urlExpected = `/api/datasources/uid/ABCDEF/resources/api/v1/query?query=${encodeURIComponent(
       'test{job="testjob"}'
     )}&time=123`;
     const query = {
@@ -975,6 +978,19 @@ describe('PrometheusDatasource2', () => {
     };
 
     const response = createAnnotationResponse();
+    const emptyResponse = createEmptyAnnotationResponse();
+
+    describe('handle result with empty fields', () => {
+      it('should return empty results', async () => {
+        fetchMock.mockImplementation(() => of(emptyResponse));
+
+        await ds.annotationQuery(options).then((data) => {
+          results = data;
+        });
+
+        expect(results.length).toBe(0);
+      });
+    });
 
     describe('when time series query is cancelled', () => {
       it('should return empty results', async () => {
@@ -2389,6 +2405,31 @@ function createAnnotationResponse() {
               },
               data: {
                 values: [[123], [456]],
+              },
+            },
+          ],
+        },
+      },
+    },
+  };
+
+  return { ...response };
+}
+
+function createEmptyAnnotationResponse() {
+  const response = {
+    data: {
+      results: {
+        X: {
+          frames: [
+            {
+              schema: {
+                name: 'bar',
+                refId: 'X',
+                fields: [],
+              },
+              data: {
+                values: [],
               },
             },
           ],
