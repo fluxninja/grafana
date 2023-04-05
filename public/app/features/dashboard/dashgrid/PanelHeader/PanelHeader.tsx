@@ -28,15 +28,14 @@ export interface Props {
   data: PanelData;
 }
 
-export function PanelHeader ({ panel, error, isViewing, isEditing, data, alertState, dashboard }: Props) {
+export function PanelHeader({ panel, error, isViewing, isEditing, data, alertState, dashboard }: Props) {
+  const isFnDashboard = useSelector((state: StoreState) => {
+    const {
+      fnGlobalState: { FNDashboard },
+    } = state;
 
-    const isFnDashboard = useSelector((state: StoreState) => {
-      const {
-        fnGlobalState: { FNDashboard },
-      } = state;
-
-      return FNDashboard;
-    });
+    return FNDashboard;
+  });
 
   const onCancelQuery = () => panel.getQueryRunner().cancelQuery();
   const title = panel.getDisplayTitle();
@@ -54,7 +53,7 @@ export function PanelHeader ({ panel, error, isViewing, isEditing, data, alertSt
         links={getPanelLinksSupplier(panel)}
         error={error}
       />
-      <div className={[className, isFnDashboard ? styles.fnPanelHeader : ""].filter(Boolean).join(" ")}>
+      <div className={[className, isFnDashboard ? styles.fnPanelHeader : ''].filter(Boolean).join(' ')}>
         <PanelHeaderMenuTrigger data-testid={selectors.components.Panels.Panel.title(title)}>
           {({ closeMenu, panelMenuOpen }) => {
             return (
@@ -95,4 +94,24 @@ export function PanelHeader ({ panel, error, isViewing, isEditing, data, alertSt
   );
 }
 
+const panelStyles = (theme: GrafanaTheme2) => {
+  return {
+    titleText: css`
+      text-overflow: ellipsis;
+      overflow: hidden;
+      white-space: nowrap;
+      max-width: calc(100% - 38px);
+      cursor: pointer;
+      font-weight: ${theme.typography.fontWeightMedium};
+      font-size: ${theme.typography.body.fontSize};
+      margin: 0;
 
+      &:hover {
+        color: ${theme.colors.text.primary};
+      }
+      .panel-has-alert & {
+        max-width: calc(100% - 54px);
+      }
+    `,
+  };
+};

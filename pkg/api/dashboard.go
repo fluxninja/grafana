@@ -94,10 +94,15 @@ func (hs *HTTPServer) TrimDashboard(c *contextmodel.ReqContext) response.Respons
 // 404: notFoundError
 // 500: internalServerError
 func (hs *HTTPServer) GetDashboard(c *contextmodel.ReqContext) response.Response {
+	_, resp := hs.GetDashboardWrapper(c)
+	return resp
+}
+
+func (hs *HTTPServer) GetDashboardWrapper(c *contextmodel.ReqContext) (*dtos.DashboardFullWithMeta, response.Response) {
 	uid := web.Params(c.Req)[":uid"]
 	dash, rsp := hs.getDashboardHelper(c.Req.Context(), c.OrgID, 0, uid)
 	if rsp != nil {
-		return rsp
+		return nil, rsp
 	}
 
 	var (
@@ -110,7 +115,7 @@ func (hs *HTTPServer) GetDashboard(c *contextmodel.ReqContext) response.Response
 	if hs.Features.IsEnabled(featuremgmt.FlagPublicDashboards) {
 		publicDashboard, err := hs.PublicDashboardsApi.PublicDashboardService.FindByDashboardUid(c.Req.Context(), c.OrgID, dash.UID)
 		if err != nil && !errors.Is(err, publicdashboardModels.ErrPublicDashboardNotFound) {
-			return response.Error(500, "Error while retrieving public dashboards", err)
+			return nil, response.Error(500, "Error while retrieving public dashboards", err)
 		}
 
 		if publicDashboard != nil {
@@ -128,16 +133,16 @@ func (hs *HTTPServer) GetDashboard(c *contextmodel.ReqContext) response.Response
 			}
 		}
 		if isEmptyData {
-			return response.Error(500, "Error while loading dashboard, dashboard data is invalid", nil)
+			return nil, response.Error(500, "Error while loading dashboard, dashboard data is invalid", nil)
 		}
 	}
 	guardian, err := guardian.NewByDashboard(c.Req.Context(), dash, c.OrgID, c.SignedInUser)
 	if err != nil {
-		return response.Err(err)
+		return nil, response.Err(err)
 	}
 
 	if canView, err := guardian.CanView(); err != nil || !canView {
-		return dashboardGuardianResponse(err)
+		return nil, dashboardGuardianResponse(err)
 	}
 	canEdit, _ := guardian.CanEdit()
 	canSave, _ := guardian.CanSave()
@@ -146,7 +151,7 @@ func (hs *HTTPServer) GetDashboard(c *contextmodel.ReqContext) response.Response
 
 	isStarred, err := hs.isDashboardStarredByUser(c, dash.ID)
 	if err != nil {
-		return response.Error(500, "Error while checking if dashboard was starred by user", err)
+		return nil, response.Error(500, "Error while checking if dashboard was starred by user", err)
 	}
 	// Finding creator and last updater of the dashboard
 	updater, creator := anonString, anonString
@@ -193,9 +198,9 @@ func (hs *HTTPServer) GetDashboard(c *contextmodel.ReqContext) response.Response
 		queryResult, err := hs.DashboardService.GetDashboard(c.Req.Context(), &query)
 		if err != nil {
 			if errors.Is(err, dashboards.ErrFolderNotFound) {
-				return response.Error(404, "Folder not found", err)
+				return nil, response.Error(404, "Folder not found", err)
 			}
-			return response.Error(500, "Dashboard folder could not be read", err)
+			return nil, response.Error(500, "Dashboard folder could not be read", err)
 		}
 		meta.FolderUid = queryResult.UID
 		meta.FolderTitle = queryResult.Title
@@ -204,7 +209,7 @@ func (hs *HTTPServer) GetDashboard(c *contextmodel.ReqContext) response.Response
 
 	provisioningData, err := hs.dashboardProvisioningService.GetProvisionedDashboardDataByDashboardID(c.Req.Context(), dash.ID)
 	if err != nil {
-		return response.Error(500, "Error while checking if dashboard is provisioned", err)
+		return nil, response.Error(500, "Error while checking if dashboard is provisioned", err)
 	}
 
 	if provisioningData != nil {
@@ -229,7 +234,7 @@ func (hs *HTTPServer) GetDashboard(c *contextmodel.ReqContext) response.Response
 
 	if hs.QueryLibraryService != nil && !hs.QueryLibraryService.IsDisabled() {
 		if err := hs.QueryLibraryService.UpdateDashboardQueries(c.Req.Context(), c.SignedInUser, dash); err != nil {
-			return response.Error(500, "Error while loading saved queries", err)
+			return nil, response.Error(500, "Error while loading saved queries", err)
 		}
 	}
 
@@ -239,7 +244,7 @@ func (hs *HTTPServer) GetDashboard(c *contextmodel.ReqContext) response.Response
 	}
 
 	c.TimeRequest(metrics.MApiDashboardGet)
-	return response.JSON(http.StatusOK, dto)
+	return &dto, response.JSON(http.StatusOK, dto)
 }
 
 func (hs *HTTPServer) getAnnotationPermissionsByScope(c *contextmodel.ReqContext, actions *dtos.AnnotationActions, scope string) {
@@ -710,31 +715,15 @@ func (hs *HTTPServer) GetDashboardVersions(c *contextmodel.ReqContext) response.
 // 404: notFoundError
 // 500: internalServerError
 func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.Response {
-	var dashID int64
-
-	var err error
-	dashUID := web.Params(c.Req)[":uid"]
-
-	var dash *dashboards.Dashboard
-	if dashUID == "" {
-		dashID, err = strconv.ParseInt(web.Params(c.Req)[":dashboardId"], 10, 64)
-		if err != nil {
-			return response.Error(http.StatusBadRequest, "dashboardId is invalid", err)
-		}
+	dashboardFull, resp := hs.GetDashboardWrapper(c)
+	if dashboardFull == nil {
+		return resp
 	}
 
-	dash, rsp := hs.getDashboardHelper(c.Req.Context(), c.OrgID, dashID, dashUID)
+	uid := web.Params(c.Req)[":uid"]
+	dash, rsp := hs.getDashboardHelper(c.Req.Context(), c.OrgID, 0, uid)
 	if rsp != nil {
 		return rsp
-	}
-
-	guardian, err := guardian.NewByDashboard(c.Req.Context(), dash, c.OrgID, c.SignedInUser)
-	if err != nil {
-		return response.Err(err)
-	}
-
-	if canSave, err := guardian.CanSave(); err != nil || !canSave {
-		return dashboardGuardianResponse(err)
 	}
 
 	version, _ := strconv.ParseInt(web.Params(c.Req)[":id"], 10, 32)
@@ -749,26 +738,14 @@ func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.R
 	if err != nil {
 		return response.Error(500, fmt.Sprintf("Dashboard version %d not found for dashboardId %d", query.Version, dash.ID), err)
 	}
+	dashboardFull.Meta.Version = res.Version
 
-	creator := anonString
-	if res.CreatedBy > 0 {
-		creator = hs.getUserLogin(c.Req.Context(), res.CreatedBy)
+	dto := dtos.DashboardFullWithMeta{
+		Dashboard: res.Data,
+		Meta:      dashboardFull.Meta,
 	}
 
-	dashVersionMeta := &dashver.DashboardVersionMeta{
-		ID:            res.ID,
-		DashboardID:   res.DashboardID,
-		DashboardUID:  dash.UID,
-		Data:          res.Data,
-		ParentVersion: res.ParentVersion,
-		RestoredFrom:  res.RestoredFrom,
-		Version:       res.Version,
-		Created:       res.Created,
-		Message:       res.Message,
-		CreatedBy:     creator,
-	}
-
-	return response.JSON(http.StatusOK, dashVersionMeta)
+	return response.JSON(http.StatusOK, dto)
 }
 
 // swagger:route POST /dashboards/validate dashboards alpha validateDashboard
