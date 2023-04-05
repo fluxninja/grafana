@@ -61,8 +61,6 @@ export const Table = memo((props: Props) => {
   const theme = useTheme2();
   const headerHeight = noHeader ? 0 : tableStyles.rowHeight;
   const [footerItems, setFooterItems] = useState<FooterItem[] | undefined>(footerValues);
-  const [expandedIndexes, setExpandedIndexes] = useState<Set<number>>(new Set());
-  const prevExpandedIndexes = usePrevious(expandedIndexes);
 
   const footerHeight = useMemo(() => {
     const EXTENDED_ROW_HEIGHT = headerHeight;
@@ -244,40 +242,6 @@ export const Table = memo((props: Props) => {
       return null;
     },
     [state.expanded, subData, tableStyles.rowHeight, theme.colors, width]
-  );
-
-  useEffect(() => {
-    setExpandedIndexes(new Set());
-  }, [data, subData]);
-
-  const renderSubTable = React.useCallback(
-    (rowIndex: number) => {
-      if (expandedIndexes.has(rowIndex)) {
-        const rowSubData = subData?.find((frame) => frame.meta?.custom?.parentRowIndex === rowIndex);
-        if (rowSubData) {
-          const noHeader = !!rowSubData.meta?.custom?.noHeader;
-          const subTableStyle: CSSProperties = {
-            height: tableStyles.rowHeight * (rowSubData.length + (noHeader ? 0 : 1)), // account for the header with + 1
-            background: theme.colors.emphasize(theme.colors.background.primary, 0.015),
-            paddingLeft: EXPANDER_WIDTH,
-            position: 'absolute',
-            bottom: 0,
-          };
-          return (
-            <div style={subTableStyle}>
-              <Table
-                data={rowSubData}
-                width={width - EXPANDER_WIDTH}
-                height={tableStyles.rowHeight * (rowSubData.length + 1)}
-                noHeader={noHeader}
-              />
-            </div>
-          );
-        }
-      }
-      return null;
-    },
-    [expandedIndexes, subData, tableStyles.rowHeight, theme.colors, width]
   );
 
   const RenderRow = React.useCallback(

@@ -408,6 +408,50 @@
       "pluralName": "DebugPanelCfgs",
       "schemaInterface": "PanelCfg"
     },
+    "druiddataquery": {
+      "category": "composable",
+      "codeowners": [],
+      "currentVersion": [
+        0,
+        0
+      ],
+      "grafanaMaturityCount": 0,
+      "lineageIsGroup": false,
+      "links": {
+        "docs": "n/a",
+        "go": "n/a",
+        "schema": "n/a",
+        "ts": "n/a"
+      },
+      "machineName": "druiddataquery",
+      "maturity": "planned",
+      "name": "DruidDataQuery",
+      "pluralMachineName": "druiddataquerys",
+      "pluralName": "DruidDataQuerys",
+      "schemaInterface": "DataQuery"
+    },
+    "druiddatasourcecfg": {
+      "category": "composable",
+      "codeowners": [],
+      "currentVersion": [
+        0,
+        0
+      ],
+      "grafanaMaturityCount": 0,
+      "lineageIsGroup": true,
+      "links": {
+        "docs": "n/a",
+        "go": "n/a",
+        "schema": "n/a",
+        "ts": "n/a"
+      },
+      "machineName": "druiddatasourcecfg",
+      "maturity": "planned",
+      "name": "DruidDataSourceCfg",
+      "pluralMachineName": "druiddatasourcecfgs",
+      "pluralName": "DruidDataSourceCfgs",
+      "schemaInterface": "DataSourceCfg"
+    },
     "elasticsearchdataquery": {
       "category": "composable",
       "codeowners": [],
@@ -716,6 +760,50 @@
       "pluralMachineName": "grapholdpanelcfgs",
       "pluralName": "GraphOldPanelCfgs",
       "schemaInterface": "PanelCfg"
+    },
+    "graphqldatasourcedataquery": {
+      "category": "composable",
+      "codeowners": [],
+      "currentVersion": [
+        0,
+        0
+      ],
+      "grafanaMaturityCount": 0,
+      "lineageIsGroup": false,
+      "links": {
+        "docs": "n/a",
+        "go": "n/a",
+        "schema": "n/a",
+        "ts": "n/a"
+      },
+      "machineName": "graphqldatasourcedataquery",
+      "maturity": "planned",
+      "name": "GraphQLDataSourceDataQuery",
+      "pluralMachineName": "graphqldatasourcedataquerys",
+      "pluralName": "GraphQLDataSourceDataQuerys",
+      "schemaInterface": "DataQuery"
+    },
+    "graphqldatasourcedatasourcecfg": {
+      "category": "composable",
+      "codeowners": [],
+      "currentVersion": [
+        0,
+        0
+      ],
+      "grafanaMaturityCount": 0,
+      "lineageIsGroup": true,
+      "links": {
+        "docs": "n/a",
+        "go": "n/a",
+        "schema": "n/a",
+        "ts": "n/a"
+      },
+      "machineName": "graphqldatasourcedatasourcecfg",
+      "maturity": "planned",
+      "name": "GraphQLDataSourceDataSourceCfg",
+      "pluralMachineName": "graphqldatasourcedatasourcecfgs",
+      "pluralName": "GraphQLDataSourceDataSourceCfgs",
+      "schemaInterface": "DataSourceCfg"
     },
     "histogrampanelcfg": {
       "category": "composable",
@@ -1377,6 +1465,28 @@
       "pluralMachineName": "queryhistorys",
       "pluralName": "QueryHistorys"
     },
+    "sankeypanelpanelcfg": {
+      "category": "composable",
+      "codeowners": [],
+      "currentVersion": [
+        0,
+        0
+      ],
+      "grafanaMaturityCount": 0,
+      "lineageIsGroup": true,
+      "links": {
+        "docs": "n/a",
+        "go": "n/a",
+        "schema": "n/a",
+        "ts": "n/a"
+      },
+      "machineName": "sankeypanelpanelcfg",
+      "maturity": "planned",
+      "name": "SankeyPanelPanelCfg",
+      "pluralMachineName": "sankeypanelpanelcfgs",
+      "pluralName": "SankeyPanelPanelCfgs",
+      "schemaInterface": "PanelCfg"
+    },
     "serviceaccount": {
       "category": "core",
       "codeowners": [
@@ -1812,6 +1922,8 @@
           "dashboarddatasourcecfg",
           "dashboardlistpanelcfg",
           "debugpanelcfg",
+          "druiddataquery",
+          "druiddatasourcecfg",
           "elasticsearchdataquery",
           "elasticsearchdatasourcecfg",
           "flamegraphpanelcfg",
@@ -1825,6 +1937,8 @@
           "graphitedataquery",
           "graphitedatasourcecfg",
           "grapholdpanelcfg",
+          "graphqldatasourcedataquery",
+          "graphqldatasourcedatasourcecfg",
           "histogrampanelcfg",
           "iconpanelcfg",
           "jaegerdataquery",
@@ -1848,6 +1962,7 @@
           "postgresqldatasourcecfg",
           "prometheusdataquery",
           "prometheusdatasourcecfg",
+          "sankeypanelpanelcfg",
           "statetimelinepanelcfg",
           "statpanelcfg",
           "statushistorypanelcfg",
@@ -1863,7 +1978,7 @@
           "zipkindataquery",
           "zipkindatasourcecfg"
         ],
-        "count": 65
+        "count": 70
       },
       "core": {
         "name": "core",
@@ -1942,6 +2057,8 @@
           "dashboarddatasourcecfg",
           "datasource",
           "debugpanelcfg",
+          "druiddataquery",
+          "druiddatasourcecfg",
           "elasticsearchdataquery",
           "elasticsearchdatasourcecfg",
           "flamegraphpanelcfg",
@@ -1955,6 +2072,8 @@
           "graphitedataquery",
           "graphitedatasourcecfg",
           "grapholdpanelcfg",
+          "graphqldatasourcedataquery",
+          "graphqldatasourcedatasourcecfg",
           "iconpanelcfg",
           "jaegerdataquery",
           "jaegerdatasourcecfg",
@@ -1976,6 +2095,7 @@
           "prometheusdatasourcecfg",
           "query",
           "queryhistory",
+          "sankeypanelpanelcfg",
           "tableoldpanelcfg",
           "tempodataquery",
           "tempodatasourcecfg",
@@ -1987,7 +2107,7 @@
           "zipkindataquery",
           "zipkindatasourcecfg"
         ],
-        "count": 56
+        "count": 61
       },
       "stable": {
         "name": "stable",

@@ -714,7 +714,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
       const hoverHeaderOffset = (panel.gridPos?.y ?? 0) === 0 ? -16 : undefined;
 
       return (
-        <PanelChrome
+        <Panel
           width={width}
           height={height}
           title={title}

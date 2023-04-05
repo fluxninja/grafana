@@ -98,7 +98,7 @@ require (
 	github.com/uber/jaeger-client-go v2.29.1+incompatible
 	github.com/urfave/cli/v2 v2.3.0
 	github.com/vectordotdev/go-datemath v0.1.1-0.20220323213446-f3954d0b18ae
-	github.com/weaveworks/common v0.0.0-20210913144402-035033b78a78 // indirect
+	github.com/weaveworks/common v0.0.0-20210913144402-035033b78a78
 	github.com/xorcare/pointer v1.1.0
 	github.com/yalue/merged_fs v1.2.2
 	github.com/yudai/gojsondiff v1.0.0
@@ -124,9 +124,9 @@ require (
 	gopkg.in/ldap.v3 v3.1.0
 	gopkg.in/mail.v2 v2.3.1
 	gopkg.in/square/go-jose.v2 v2.5.1
-	gopkg.in/yaml.v2 v2.4.0 // indirect
+	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
-	xorm.io/builder v0.3.6
+	xorm.io/builder v0.3.6 // indirect
 	xorm.io/core v0.7.3
 	xorm.io/xorm v0.8.2
 )
@@ -255,6 +255,7 @@ require (
 	github.com/getkin/kin-openapi v0.107.0
 	github.com/golang-migrate/migrate/v4 v4.7.0
 	github.com/google/go-github/v45 v45.2.0
+	github.com/grafadruid/go-druid v0.0.5
 	github.com/grafana/codejen v0.0.3
 	github.com/grafana/dskit v0.0.0-20211011144203-3a88ec0b675f
 	github.com/grafana/phlare/api v0.1.2
@@ -275,6 +276,7 @@ require (
 	buf.build/gen/go/parca-dev/parca/bufbuild/connect-go v1.4.1-20221222094228-8b1d3d0f62e6.1
 	buf.build/gen/go/parca-dev/parca/protocolbuffers/go v1.28.1-20221222094228-8b1d3d0f62e6.4
 	github.com/Masterminds/semver/v3 v3.1.1
+	github.com/bitly/go-simplejson v0.5.0
 	github.com/dave/dst v0.27.2
 	github.com/grafana/thema v0.0.0-20230122235053-b4b6714dd1c9
 	github.com/hmarr/codeowners v1.1.1
@@ -312,7 +314,9 @@ require (
 	github.com/googleapis/enterprise-certificate-proxy v0.2.0 // indirect
 	github.com/gophercloud/gophercloud v0.24.0 // indirect
 	github.com/grafana/sqlds/v2 v2.3.10 // indirect
+	github.com/hashicorp/go-cleanhttp v0.5.2 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
+	github.com/hashicorp/go-retryablehttp v0.6.7 // indirect
 	github.com/hashicorp/golang-lru/v2 v2.0.1 // indirect
 	github.com/hashicorp/memberlist v0.5.0 // indirect
 	github.com/hetznercloud/hcloud-go v1.33.2 // indirect
@@ -430,3 +434,7 @@ replace github.com/prometheus/alertmanager => github.com/grafana/prometheus-aler
 replace google.golang.org/grpc => google.golang.org/grpc v1.45.0
 
 replace google.golang.org/genproto => google.golang.org/genproto v0.0.0-20220421151946-72621c1f0bd3
+
+// This is for sending custom HTTP headers in druid client.
+// Change in upstream: https://github.com/grafadruid/go-druid/pull/71
+replace github.com/grafadruid/go-druid => github.com/fluxninja/go-druid v0.0.0-20220825112309-14a37dd3317d
