@@ -26,9 +26,7 @@ const intrinsics = ['duration', 'name', 'status', 'parent'];
 
 const scopes: string[] = ['resource', 'span'];
 
-const booleans = ['false', 'true'];
-
-const keywords = intrinsics.concat(scopes).concat(booleans);
+const keywords = intrinsics.concat(scopes);
 
 const statusValues = ['ok', 'unset', 'error', 'false', 'true'];
 

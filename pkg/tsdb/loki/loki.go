@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"net/textproto"
 	"regexp"
 	"strings"
 	"sync"

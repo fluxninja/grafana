@@ -149,7 +149,6 @@ func staticHandler(ctx *web.Context, log log.Logger, opt StaticOptions) bool {
 			log.Error("Failed to close file", "error", err)
 		}
 	}()
-	httpFile := f
 
 	fi, err := f.Stat()
 	if err != nil {
@@ -184,11 +183,10 @@ func staticHandler(ctx *web.Context, log log.Logger, opt StaticOptions) bool {
 			}
 		}()
 
-		fi, err = indexFile.Stat()
+		fi, err = f.Stat()
 		if err != nil || fi.IsDir() {
 			return true
 		}
-		httpFile = indexFile
 	}
 
 	if !opt.SkipLogging {
@@ -200,7 +198,7 @@ func staticHandler(ctx *web.Context, log log.Logger, opt StaticOptions) bool {
 		opt.AddHeaders(ctx)
 	}
 
-	http.ServeContent(ctx.Resp, ctx.Req, file, fi.ModTime(), httpFile)
+	http.ServeContent(ctx.Resp, ctx.Req, file, fi.ModTime(), f)
 	return true
 }
 

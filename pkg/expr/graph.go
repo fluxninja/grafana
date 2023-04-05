@@ -148,12 +148,11 @@ func (s *Service) buildGraph(req *Request) (*simple.DirectedGraph, error) {
 		}
 
 		rn := &rawNode{
-			Query:         rawQueryProp,
-			RefID:         query.RefID,
-			TimeRange:     query.TimeRange,
-			QueryType:     query.QueryType,
-			DataSource:    query.DataSource,
-			QueryEnricher: query.QueryEnricher,
+			Query:      rawQueryProp,
+			RefID:      query.RefID,
+			TimeRange:  query.TimeRange,
+			QueryType:  query.QueryType,
+			DataSource: query.DataSource,
 		}
 
 		var node Node

@@ -188,7 +188,6 @@ func (s *Service) handleExpressions(ctx context.Context, user *user.SignedInUser
 				From: pq.query.TimeRange.From,
 				To:   pq.query.TimeRange.To,
 			},
-			QueryEnricher: queryEnrichers[pq.datasource.Uid],
 		})
 	}
 
