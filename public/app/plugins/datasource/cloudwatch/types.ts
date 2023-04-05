@@ -1,6 +1,7 @@
 import { AwsAuthDataSourceJsonData, AwsAuthDataSourceSecureJsonData } from '@grafana/aws-sdk';
 import { DataFrame, DataQuery, DataSourceRef, SelectableValue } from '@grafana/data';
 
+import { SelectableResourceValue } from './api';
 import {
   QueryEditorArrayExpression,
   QueryEditorFunctionExpression,
@@ -341,4 +342,34 @@ export interface LogGroup {
   name: string;
   accountId?: string;
   accountLabel?: string;
+}
+
+export interface DescribeLogGroupsRequest extends ResourceRequest {
+  logGroupNamePrefix?: string;
+  logGroupPattern?: string;
+  // used by legacy requests, in the future deprecate these fields
+  refId?: string;
+  limit?: number;
+}
+
+export interface Account {
+  arn: string;
+  id: string;
+  label: string;
+  isMonitoringAccount: boolean;
+}
+
+export interface LogGroupResponse {
+  arn: string;
+  name: string;
+}
+
+export interface MetricResponse {
+  name: string;
+  namespace: string;
+}
+
+export interface ResourceResponse<T> {
+  accountId?: string;
+  value: T;
 }

@@ -711,9 +711,8 @@ func (hs *HTTPServer) GetDashboardVersions(c *contextmodel.ReqContext) response.
 // 500: internalServerError
 func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.Response {
 	var dashID int64
-
 	var err error
-	dashUID := web.Params(c.Req)[":uid"]
+	var dash *models.Dashboard
 
 	var dash *dashboards.Dashboard
 	if dashUID == "" {
@@ -736,6 +735,12 @@ func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.R
 	if canSave, err := guardian.CanSave(); err != nil || !canSave {
 		return dashboardGuardianResponse(err)
 	}
+	if canView, err := guardian.CanView(); err != nil || !canView {
+		return dashboardGuardianResponse(err)
+	}
+	canEdit, _ := guardian.CanEdit()
+	canAdmin, _ := guardian.CanAdmin()
+	canDelete, _ := guardian.CanDelete()
 
 	version, _ := strconv.ParseInt(web.Params(c.Req)[":id"], 10, 32)
 	query := dashver.GetDashboardVersionQuery{
@@ -768,7 +773,63 @@ func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.R
 		CreatedBy:     creator,
 	}
 
-	return response.JSON(http.StatusOK, dashVersionMeta)
+	hasPublicDashboard := false
+	publicDashboardEnabled := false
+	// If public dashboards is enabled and we have a public dashboard, update meta values
+	if hs.Features.IsEnabled(featuremgmt.FlagPublicDashboards) {
+		publicDashboard, err := hs.PublicDashboardsApi.PublicDashboardService.FindByDashboardUid(c.Req.Context(), c.OrgID, dash.Uid)
+		if err != nil && !errors.Is(err, publicdashboardModels.ErrPublicDashboardNotFound) {
+			return response.Error(500, "Error while retrieving public dashboards", err)
+		}
+		if publicDashboard != nil {
+			hasPublicDashboard = true
+			publicDashboardEnabled = publicDashboard.IsEnabled
+		}
+	}
+
+	meta := dtos.DashboardMeta{
+		Slug:                   dash.Slug,
+		Type:                   models.DashTypeDB,
+		CanStar:                c.IsSignedIn,
+		CanSave:                canSave,
+		CanEdit:                canEdit,
+		CanAdmin:               canAdmin,
+		CanDelete:              canDelete,
+		Created:                dash.Created,
+		Updated:                dash.Updated,
+		UpdatedBy:              "Someone",
+		CreatedBy:              creator,
+		Version:                dash.Version,
+		HasACL:                 dash.HasACL,
+		IsFolder:               dash.IsFolder,
+		FolderId:               dash.FolderId,
+		Url:                    dash.GetUrl(),
+		FolderTitle:            "General",
+		AnnotationsPermissions: annotationPermissions,
+		PublicDashboardEnabled: publicDashboardEnabled,
+		HasPublicDashboard:     hasPublicDashboard,
+	}
+
+	// lookup folder title
+	if dash.FolderId > 0 {
+		query := models.GetDashboardQuery{Id: dash.FolderId, OrgId: c.OrgID}
+		if err := hs.DashboardService.GetDashboard(c.Req.Context(), &query); err != nil {
+			if errors.Is(err, dashboards.ErrFolderNotFound) {
+				return response.Error(404, "Folder not found", err)
+			}
+			return response.Error(500, "Dashboard folder could not be read", err)
+		}
+		meta.FolderUid = query.Result.Uid
+		meta.FolderTitle = query.Result.Title
+		meta.FolderUrl = query.Result.GetUrl()
+	}
+
+	dto := dtos.DashboardFullWithMeta{
+		Dashboard: res.Data,
+		Meta:      meta,
+	}
+
+	return response.JSON(http.StatusOK, dto)
 }
 
 // swagger:route POST /dashboards/validate dashboards alpha validateDashboard

@@ -67,6 +67,9 @@ const QueryHeader: React.FC<Props> = ({
     (query.queryMode === 'Logs' ||
       (isCloudWatchMetricsQuery(query) && query.metricQueryType === MetricQueryType.Search));
 
+  const shouldDisplayMonitoringBadge =
+    queryMode === 'Logs' && isMonitoringAccount && config.featureToggles.cloudWatchCrossAccountQuerying;
+
   return (
     <>
       <EditorHeader>

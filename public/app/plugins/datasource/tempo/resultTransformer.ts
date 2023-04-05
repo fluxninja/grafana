@@ -649,6 +649,58 @@ export function createTableFrameFromTraceQlQuery(
           ],
         },
       },
+      { name: 'traceName', type: FieldType.string, config: { displayNameFromDS: 'Name' } },
+      { name: 'startTime', type: FieldType.string, config: { displayNameFromDS: 'Start time' } },
+      { name: 'traceDuration', type: FieldType.number, config: { displayNameFromDS: 'Duration', unit: 'ms' } },
+    ],
+    meta: {
+      preferredVisualisationType: 'table',
+    },
+  });
+
+  if (!data?.length) {
+    return [frame];
+  }
+
+  const subDataFrames: DataFrame[] = [];
+  const tableRows = data
+    // Show the most recent traces
+    .sort((a, b) => parseInt(b?.startTimeUnixNano!, 10) / 1000000 - parseInt(a?.startTimeUnixNano!, 10) / 1000000)
+    .reduce((rows: TraceTableData[], trace, currentIndex) => {
+      const traceData: TraceTableData = transformToTraceData(trace);
+      rows.push(traceData);
+      subDataFrames.push(traceSubFrame(trace, instanceSettings, currentIndex));
+      return rows;
+    }, []);
+
+  for (const row of tableRows) {
+    frame.add(row);
+  }
+
+  return [frame, ...subDataFrames];
+}
+
+const traceSubFrame = (
+  trace: TraceSearchMetadata,
+  instanceSettings: DataSourceInstanceSettings,
+  currentIndex: number
+): DataFrame => {
+  const spanDynamicAttrs: Record<string, FieldDTO> = {};
+  let hasNameAttribute = false;
+  trace.spanSet?.spans.forEach((span) => {
+    if (span.name) {
+      hasNameAttribute = true;
+    }
+    span.attributes?.forEach((attr) => {
+      spanDynamicAttrs[attr.key] = {
+        name: attr.key,
+        type: FieldType.string,
+        config: { displayNameFromDS: attr.key },
+      };
+    });
+  });
+  const subFrame = new MutableDataFrame({
+    fields: [
       {
         name: 'startTime',
         type: FieldType.string,
@@ -745,6 +797,11 @@ const traceSubFrame = (
                 query: {
                   query: '${__data.fields.traceIdHidden}',
                   queryType: 'traceql',
+                },
+                panelsState: {
+                  trace: {
+                    spanId: '${__value.raw}',
+                  },
                 },
                 panelsState: {
                   trace: {

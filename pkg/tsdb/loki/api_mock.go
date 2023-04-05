@@ -74,3 +74,11 @@ func makeCompressedMockedAPIWithUrl(url string, statusCode int, contentType stri
 
 	return newLokiAPI(&client, url, log.New("test"))
 }
+
+func makeCompressedMockedAPIWithUrl(url string, statusCode int, contentType string, responseBytes []byte, requestCallback mockRequestCallback) *LokiAPI {
+	client := http.Client{
+		Transport: &mockedCompressedRoundTripper{statusCode: statusCode, contentType: contentType, responseBytes: responseBytes, requestCallback: requestCallback},
+	}
+
+	return newLokiAPI(&client, url, log.New("test"), nil)
+}
