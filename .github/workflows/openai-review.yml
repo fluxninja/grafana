@@ -25,5 +25,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         with:
+          openai_heavy_model: gpt-4
           debug: false
           review_comment_lgtm: false
