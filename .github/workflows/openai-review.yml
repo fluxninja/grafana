@@ -28,3 +28,4 @@ jobs:
           openai_heavy_model: gpt-4
           debug: false
           review_comment_lgtm: false
+          max_files_to_review: 80
