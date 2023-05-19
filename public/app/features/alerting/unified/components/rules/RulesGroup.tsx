@@ -1,8 +1,9 @@
 import { css } from '@emotion/css';
 import pluralize from 'pluralize';
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
+import { Stack } from '@grafana/experimental';
 import { logInfo } from '@grafana/runtime';
 import { Badge, ConfirmModal, HorizontalGroup, Icon, Spinner, Tooltip, useStyles2 } from '@grafana/ui';
 import { useDispatch } from 'app/types';
@@ -14,7 +15,7 @@ import { useHasRuler } from '../../hooks/useHasRuler';
 import { deleteRulesGroupAction } from '../../state/actions';
 import { useRulesAccess } from '../../utils/accessControlHooks';
 import { GRAFANA_RULES_SOURCE_NAME, isCloudRulesSource } from '../../utils/datasource';
-import { makeFolderLink } from '../../utils/misc';
+import { makeFolderLink, makeFolderSettingsLink } from '../../utils/misc';
 import { isFederatedRuleGroup, isGrafanaRulerRule } from '../../utils/rules';
 import { CollapseToggle } from '../CollapseToggle';
 import { RuleLocation } from '../RuleLocation';
@@ -34,7 +35,7 @@ interface Props {
   viewMode: ViewMode;
 }
 
-export const RulesGroup: FC<Props> = React.memo(({ group, namespace, expandAll, viewMode }) => {
+export const RulesGroup = React.memo(({ group, namespace, expandAll, viewMode }: Props) => {
   const { rulesSource } = namespace;
   const dispatch = useDispatch();
   const styles = useStyles2(getStyles);
@@ -213,19 +214,42 @@ export const RulesGroup: FC<Props> = React.memo(({ group, namespace, expandAll, 
         </h6>
         <div className={styles.spacer} />
         <div className={styles.headerStats}>
-          <RuleStats showInactive={false} group={group} />
+          <RuleStats group={group} />
         </div>
+        {isProvisioned && (
+          <>
+            <div className={styles.actionsSeparator}>|</div>
+            <div className={styles.actionIcons}>
+              <Badge color="purple" text="Provisioned" />
+            </div>
+          </>
+        )}
         {!!actionIcons.length && (
           <>
             <div className={styles.actionsSeparator}>|</div>
-            <div className={styles.actionIcons}>{actionIcons}</div>
+            <div className={styles.actionIcons}>
+              <Stack gap={0.5}>{actionIcons}</Stack>
+            </div>
           </>
         )}
       </div>
       {!isCollapsed && (
-        <RulesTable showSummaryColumn={true} className={styles.rulesTable} showGuidelines={true} rules={group.rules} />
+        <RulesTable
+          showSummaryColumn={true}
+          className={styles.rulesTable}
+          showGuidelines={true}
+          showNextEvaluationColumn={Boolean(group.interval)}
+          rules={group.rules}
+        />
       )}
-      {isEditingGroup && <EditCloudGroupModal group={group} namespace={namespace} onClose={() => closeEditModal()} />}
+      {isEditingGroup && (
+        <EditCloudGroupModal
+          namespace={namespace}
+          group={group}
+          onClose={() => closeEditModal()}
+          folderUrl={folder?.canEdit ? makeFolderSettingsLink(folder) : undefined}
+        />
+      )}
       {isReorderingGroup && (
         <ReorderCloudGroupModal group={group} namespace={namespace} onClose={() => setIsReorderingGroup(false)} />
       )}
@@ -306,9 +330,8 @@ export const getStyles = (theme: GrafanaTheme2) => ({
     margin: 0 ${theme.spacing(2)};
   `,
   actionIcons: css`
-    & > * + * {
-      margin-left: ${theme.spacing(0.5)};
-    }
+    width: 80px;
+    align-items: center;
   `,
   rulesTable: css`
     margin-top: ${theme.spacing(3)};

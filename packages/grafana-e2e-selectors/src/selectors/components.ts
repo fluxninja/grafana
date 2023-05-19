@@ -10,6 +10,9 @@
  * @alpha
  */
 export const Components = {
+  Breadcrumbs: {
+    breadcrumb: (title: string) => `data-testid ${title} breadcrumb`,
+  },
   TimePicker: {
     openButton: 'data-testid TimePicker Open Button',
     fromField: 'Time Range from field',
@@ -21,6 +24,12 @@ export const Components = {
       closeButton: 'Close time range Calendar',
     },
     absoluteTimeRangeTitle: 'data-testid-absolute-time-range-narrow',
+  },
+  DataSourcePermissions: {
+    form: () => 'form[name="addPermission"]',
+    roleType: 'Role to add new permission to',
+    rolePicker: 'Built-in role picker',
+    permissionLevel: 'Permission Level',
   },
   DataSource: {
     TestData: {
@@ -63,11 +72,14 @@ export const Components = {
     Panel: {
       title: (title: string) => `data-testid Panel header ${title}`,
       headerItems: (item: string) => `Panel header item ${item}`,
+      menuItems: (item: string) => `data-testid Panel menu item ${item}`,
+      menu: (title: string) => `data-testid Panel menu ${title}`,
       containerByTitle: (title: string) => `${title} panel`,
       headerCornerInfo: (mode: string) => `Panel header ${mode}`,
     },
     Visualization: {
       Graph: {
+        container: 'Graph container',
         VisualizationTab: {
           legendSection: 'Legend section',
         },
@@ -107,7 +119,7 @@ export const Components = {
       expand: 'Drawer expand',
       contract: 'Drawer contract',
       close: 'Drawer close',
-      rcContentWrapper: () => '.drawer-content-wrapper',
+      rcContentWrapper: () => '.rc-drawer-content-wrapper',
     },
   },
   PanelEditor: {
@@ -225,9 +237,27 @@ export const Components = {
     },
     searchInput: 'search transformations',
   },
+  NavBar: {
+    Configuration: {
+      button: 'Configuration',
+    },
+    Toggle: {
+      button: 'Toggle menu',
+    },
+    Reporting: {
+      button: 'Reporting',
+    },
+  },
+  NavMenu: {
+    item: 'data-testid Nav menu item',
+  },
+  NavToolbar: {
+    container: 'data-testid Nav toolbar',
+  },
   PageToolbar: {
     container: () => '.page-toolbar',
     item: (tooltip: string) => `${tooltip}`,
+    itemButton: (title: string) => `data-testid ${title}`,
   },
   QueryEditorToolbarItem: {
     button: (title: string) => `QueryEditor toolbar item button ${title}`,
@@ -375,5 +405,14 @@ export const Components = {
   },
   DebugOverlay: {
     wrapper: 'debug-overlay',
+  },
+  OrgRolePicker: {
+    input: 'Role',
+  },
+  AnalyticsToolbarButton: {
+    button: 'Dashboard insights',
+  },
+  Variables: {
+    variableOption: 'data-testid variable-option',
   },
 };

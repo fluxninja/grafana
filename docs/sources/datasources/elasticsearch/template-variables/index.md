@@ -1,7 +1,6 @@
 ---
 aliases:
-  - /docs/grafana/latest/datasources/elasticsearch/template-variables/
-  - /docs/grafana/latest/data-sources/elasticsearch/template-variables/
+  - ../../data-sources/elasticsearch/template-variables/
 description: Using template variables with Elasticsearch in Grafana
 keywords:
   - grafana
@@ -64,4 +63,4 @@ You can alternatively use other sorting criteria, such as **Alphabetical**, to r
 In the above example, a Lucene query filters documents based on the `hostname` property using a variable named `$hostname`.
 The example also uses a variable in the _Terms_ group by field input box, which you can use to quickly change how data is grouped.
 
-To view an example dashboard on Grafana Play, see the [Elasticsearch Templated Dashboard](https://play.grafana.org/d/CknOEXDMk/elasticsearch-templated?orgId=1d).
+To view an example dashboard on Grafana Play, see the [Elasticsearch Templated Dashboard](https://play.grafana.org/d/z8OZC66nk/elasticsearch-8-2-0-sample-flight-data?orgId=1).

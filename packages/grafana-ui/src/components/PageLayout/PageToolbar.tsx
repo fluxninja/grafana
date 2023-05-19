@@ -1,5 +1,5 @@
 import { css, cx } from '@emotion/css';
-import React, { FC, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
@@ -24,10 +24,16 @@ export interface Props {
   className?: string;
   isFullscreen?: boolean;
   'aria-label'?: string;
+  buttonOverflowAlignment?: 'left' | 'right';
+  /**
+   * Forces left items to be visible on small screens.
+   * By default left items are hidden on small screens.
+   */
+  forceShowLeftItems?: boolean;
 }
 
 /** @alpha */
-export const PageToolbar: FC<Props> = React.memo(
+export const PageToolbar = React.memo(
   ({
     title,
     section,
@@ -42,13 +48,15 @@ export const PageToolbar: FC<Props> = React.memo(
     className,
     /** main nav-container aria-label **/
     'aria-label': ariaLabel,
-  }) => {
+    buttonOverflowAlignment = 'right',
+    forceShowLeftItems = false,
+  }: Props) => {
     const styles = useStyles2(getStyles);
 
     /**
      * .page-toolbar css class is used for some legacy css view modes (TV/Kiosk) and
      * media queries for mobile view when toolbar needs left padding to make room
-     * for mobile menu icon. This logic hopefylly can be changed when we move to a full react
+     * for mobile menu icon. This logic hopefully can be changed when we move to a full react
      * app and change how the app side menu & mobile menu is rendered.
      */
     const mainStyle = cx(
@@ -56,6 +64,7 @@ export const PageToolbar: FC<Props> = React.memo(
       styles.toolbar,
       {
         ['page-toolbar--fullscreen']: isFullscreen,
+        [styles.noPageIcon]: !pageIcon,
       },
       className
     );
@@ -124,7 +133,10 @@ export const PageToolbar: FC<Props> = React.memo(
                 )}
 
                 {leftItems?.map((child, index) => (
-                  <div className={styles.leftActionItem} key={index}>
+                  <div
+                    className={cx(styles.leftActionItem, { [styles.forceShowLeftActionItems]: forceShowLeftItems })}
+                    key={index}
+                  >
                     {child}
                   </div>
                 ))}
@@ -132,7 +144,9 @@ export const PageToolbar: FC<Props> = React.memo(
             )}
           </nav>
         </div>
-        <ToolbarButtonRow alignment="right">{React.Children.toArray(children).filter(Boolean)}</ToolbarButtonRow>
+        <ToolbarButtonRow alignment={buttonOverflowAlignment}>
+          {React.Children.toArray(children).filter(Boolean)}
+        </ToolbarButtonRow>
       </nav>
     );
   }
@@ -156,6 +170,15 @@ const getStyles = (theme: GrafanaTheme2) => {
       gap: ${theme.spacing(2)};
       justify-content: space-between;
       padding: ${theme.spacing(1.5, 2)};
+
+      ${theme.breakpoints.down('md')} {
+        padding-left: 53px;
+      }
+    `,
+    noPageIcon: css`
+      ${theme.breakpoints.down('md')} {
+        padding-left: ${theme.spacing(2)};
+      }
     `,
     leftWrapper: css`
       display: flex;
@@ -186,7 +209,7 @@ const getStyles = (theme: GrafanaTheme2) => {
       min-width: 0;
     `,
     h1Styles: css`
-      margin: 0;
+      margin: ${spacing(0, 1, 0, 0)};
       line-height: inherit;
       flex-grow: 1;
       min-width: 0;
@@ -199,7 +222,7 @@ const getStyles = (theme: GrafanaTheme2) => {
       font-size: ${typography.size.lg};
       margin: 0;
       max-width: 300px;
-      border-radius: 2px;
+      border-radius: ${theme.shape.radius.default};
     `,
     titleLink: css`
       &:focus-visible {
@@ -222,11 +245,14 @@ const getStyles = (theme: GrafanaTheme2) => {
     `,
     leftActionItem: css`
       display: none;
+      align-items: center;
+      padding-right: ${spacing(0.5)};
       ${theme.breakpoints.up('md')} {
-        align-items: center;
         display: flex;
-        padding-left: ${spacing(0.5)};
       }
+    `,
+    forceShowLeftActionItems: css`
+      display: flex;
     `,
   };
 };

@@ -1,7 +1,6 @@
 ---
 aliases:
-  - /docs/grafana/latest/enterprise/enterprise-configuration/
-  - /docs/grafana/latest/setup-grafana/configure-grafana/enterprise-configuration/
+  - ../../enterprise/enterprise-configuration/
 description: Learn about Grafana Enterprise configuration options that you can specify.
 title: Configure Grafana Enterprise
 weight: 100
@@ -102,6 +101,10 @@ Set the address for writing logs to Loki (format must be host:port).
 ### tls
 
 Decide whether or not to enable the TLS (Transport Layer Security) protocol when establishing the connection to Loki. Defaults to true.
+
+### tenant_id
+
+Set the tenant ID for Loki communication, which is disabled by default. The tenant ID is required to interact with Loki running in [multi-tenant mode](/docs/loki/latest/operations/multi-tenancy/).
 
 ## [analytics.summaries]
 
@@ -212,6 +215,10 @@ Set the URL for writing logs to Loki.
 ### tls
 
 If true, it establishes a secure connection to Loki. Defaults to true.
+
+### tenant_id
+
+Set the tenant ID for Loki communication, which is disabled by default. The tenant ID is required to interact with Loki running in [multi-tenant mode](/docs/loki/latest/operations/multi-tenancy/).
 
 ## [auth.saml]
 
@@ -457,18 +464,18 @@ The default is `25`.
 
 ### url
 
-The full Redis URL of your Redis server. For example: `redis://username:password@localhost:6739/0`. To enable TLS, use the `rediss` scheme.
+The full Redis URL of your Redis server. For example: `redis://username:password@localhost:6379`. To enable TLS, use the `redis` scheme.
 
 The default is `"redis://localhost:6379"`.
 
 ### cluster
 
-A comma-separated list of Redis cluster members, either in `host:port` format or using the full Redis URLs (`redis://username:password@localhost:6739`). For example, `localhost:7000, localhost: 7001, localhost:7002`.
+A comma-separated list of Redis cluster members, either in `host:port` format or using the full Redis URLs (`redis://username:password@localhost:6379`). For example, `localhost:7000, localhost: 7001, localhost:7002`.
 If you use the full Redis URLs, then you can specify the scheme, username, and password only once. For example, `redis://username:password@localhost:0000,localhost:1111,localhost:2222`. You cannot specify a different username and password for each URL.
 
 > **Note:** If you have specify `cluster`, the value for `url` is ignored.
 
-> **Note:** You can enable TLS for cluster mode using the `rediss` scheme in Grafana Enterprise v8.5 and later versions.
+> **Note:** You can enable TLS for cluster mode using the `redis` scheme in Grafana Enterprise v8.5 and later versions.
 
 ### prefix
 

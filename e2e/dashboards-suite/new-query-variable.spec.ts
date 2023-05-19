@@ -1,4 +1,5 @@
 import { e2e } from '@grafana/e2e';
+import { GrafanaBootConfig } from '@grafana/runtime';
 
 const PAGE_UNDER_TEST = '-Y-tnEDWk/templating-nested-template-variables';
 
@@ -102,9 +103,15 @@ describe('Variables - Query - Add variable', () => {
 
     e2e.pages.Dashboard.Settings.Variables.Edit.General.submitButton().scrollIntoView().should('be.visible').click();
 
-    e2e().wait(1500);
-
-    e2e.components.BackButton.backArrow().should('be.visible').click({ force: true });
+    e2e()
+      .window()
+      .then((win: Cypress.AUTWindow & { grafanaBootData: GrafanaBootConfig['bootData'] }) => {
+        if (win.grafanaBootData.settings.featureToggles.topnav) {
+          e2e.pages.Dashboard.Settings.Actions.close().click();
+        } else {
+          e2e.components.BackButton.backArrow().click({ force: true });
+        }
+      });
 
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('a label').should('be.visible');
     e2e.pages.Dashboard.SubMenu.submenuItem()
@@ -112,11 +119,10 @@ describe('Variables - Query - Add variable', () => {
       .eq(3)
       .within(() => {
         e2e().get('.variable-link-wrapper').should('be.visible').click();
-        e2e().wait(500);
         e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownDropDown()
           .should('be.visible')
           .within(() => {
-            e2e().get('.variable-option').should('have.length', 1);
+            e2e.components.Variables.variableOption().should('have.length', 1);
           });
 
         e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('C').should('be.visible');
@@ -169,9 +175,15 @@ describe('Variables - Query - Add variable', () => {
 
     e2e.pages.Dashboard.Settings.Variables.Edit.General.submitButton().scrollIntoView().should('be.visible').click();
 
-    e2e().wait(500);
-
-    e2e.components.BackButton.backArrow().should('be.visible').click({ force: true });
+    e2e()
+      .window()
+      .then((win: Cypress.AUTWindow & { grafanaBootData: GrafanaBootConfig['bootData'] }) => {
+        if (win.grafanaBootData.settings.featureToggles.topnav) {
+          e2e.pages.Dashboard.Settings.Actions.close().click();
+        } else {
+          e2e.components.BackButton.backArrow().click({ force: true });
+        }
+      });
 
     e2e.pages.Dashboard.SubMenu.submenuItemLabels('a label').should('be.visible');
     e2e.pages.Dashboard.SubMenu.submenuItem()
@@ -179,11 +191,10 @@ describe('Variables - Query - Add variable', () => {
       .eq(3)
       .within(() => {
         e2e().get('.variable-link-wrapper').should('be.visible').click();
-        e2e().wait(500);
         e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownDropDown()
           .should('be.visible')
           .within(() => {
-            e2e().get('.variable-option').should('have.length', 2);
+            e2e.components.Variables.variableOption().should('have.length', 2);
           });
 
         e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('All').should('be.visible');

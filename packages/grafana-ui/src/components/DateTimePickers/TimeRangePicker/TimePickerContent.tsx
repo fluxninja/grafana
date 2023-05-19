@@ -43,7 +43,7 @@ interface FormProps extends Omit<Props, 'history'> {
   historyOptions?: TimeOption[];
 }
 
-export const TimePickerContentWithScreenSize: React.FC<PropsWithScreenSize> = (props) => {
+export const TimePickerContentWithScreenSize = (props: PropsWithScreenSize) => {
   const {
     quickOptions = [],
     isReversed,
@@ -160,7 +160,6 @@ const NarrowScreenForm = (props: FormProps) => {
           <div className={styles.form}>
             <TimeRangeContent value={value} onApply={onChange} timeZone={timeZone} isFullscreen={false} />
           </div>
-          <p></p>
           {showHistory && (
             <TimeRangeList
               title={t('time-picker.absolute.recent-title', 'Recently used absolute ranges')}
@@ -175,7 +174,7 @@ const NarrowScreenForm = (props: FormProps) => {
   );
 };
 
-const FullScreenForm: React.FC<FormProps> = (props) => {
+const FullScreenForm = (props: FormProps) => {
   const { onChange, value, timeZone, fiscalYearStartMonth, isReversed, historyOptions } = props;
   const theme = useTheme2();
   const styles = getFullScreenStyles(theme, props.hideQuickRanges);
@@ -252,7 +251,8 @@ function mapToHistoryOptions(ranges?: TimeRange[], timeZone?: TimeZone): TimeOpt
   if (!Array.isArray(ranges) || ranges.length === 0) {
     return [];
   }
-  return ranges.slice(ranges.length - 4).map((range) => mapRangeToTimeOption(range, timeZone));
+
+  return ranges.map((range) => mapRangeToTimeOption(range, timeZone));
 }
 
 EmptyRecentList.displayName = 'EmptyRecentList';
@@ -273,10 +273,7 @@ const getStyles = stylesFactory((theme: GrafanaTheme2, isReversed, hideQuickRang
     container: css`
       background: ${theme.colors.background.primary};
       box-shadow: ${theme.shadows.z3};
-      position: absolute;
-      z-index: ${theme.zIndex.dropdown};
       width: ${isFullscreen ? '546px' : '262px'};
-      top: 116%;
       border-radius: 2px;
       border: 1px solid ${theme.colors.border.weak};
       ${isReversed ? 'left' : 'right'}: 0;

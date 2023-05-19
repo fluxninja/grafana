@@ -16,12 +16,18 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
+	"github.com/grafana/grafana/pkg/expr"
+
 	apimodels "github.com/grafana/grafana/pkg/services/ngalert/api/tooling/definitions"
 	ngmodels "github.com/grafana/grafana/pkg/services/ngalert/models"
 	ngstore "github.com/grafana/grafana/pkg/services/ngalert/store"
 	"github.com/grafana/grafana/pkg/services/org"
+	"github.com/grafana/grafana/pkg/services/org/orgimpl"
+	"github.com/grafana/grafana/pkg/services/quota/quotaimpl"
 	"github.com/grafana/grafana/pkg/services/sqlstore"
+	"github.com/grafana/grafana/pkg/services/supportbundles/supportbundlestest"
 	"github.com/grafana/grafana/pkg/services/user"
+	"github.com/grafana/grafana/pkg/services/user/userimpl"
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/tests/testinfra"
 )
@@ -31,7 +37,9 @@ type Response struct {
 	TraceID string `json:"traceID"`
 }
 
-func TestAMConfigAccess(t *testing.T) {
+func TestIntegrationAMConfigAccess(t *testing.T) {
+	testinfra.SQLiteIntegrationTest(t)
+
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		DisableLegacyAlerting: true,
 		EnableUnifiedAlerting: true,
@@ -205,11 +213,11 @@ func TestAMConfigAccess(t *testing.T) {
 	})
 
 	t.Run("when creating silence", func(t *testing.T) {
-		body := `
+		now := time.Now()
+		body := fmt.Sprintf(`
 		{
 			"comment": "string",
 			"createdBy": "string",
-			"endsAt": "2023-03-31T14:17:04.419Z",
 			"matchers": [
 			  {
 				"isRegex": true,
@@ -217,9 +225,10 @@ func TestAMConfigAccess(t *testing.T) {
 				"value": "string"
 			  }
 			],
-			"startsAt": "2021-03-31T13:17:04.419Z"
+			"startsAt": "%s",
+			"endsAt": "%s"
 		  }
-		`
+		`, now.Format(time.RFC3339), now.Add(10*time.Second).Format(time.RFC3339))
 
 		testCases := []testCase{
 			{
@@ -389,7 +398,9 @@ func TestAMConfigAccess(t *testing.T) {
 	})
 }
 
-func TestAlertAndGroupsQuery(t *testing.T) {
+func TestIntegrationAlertAndGroupsQuery(t *testing.T) {
+	testinfra.SQLiteIntegrationTest(t)
+
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		DisableLegacyAlerting: true,
 		EnableUnifiedAlerting: true,
@@ -494,14 +505,14 @@ func TestAlertAndGroupsQuery(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     "AlwaysFiring",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 									"type": "math",
 									"expression": "2 + 3 > 1"
@@ -546,7 +557,9 @@ func TestAlertAndGroupsQuery(t *testing.T) {
 	}
 }
 
-func TestRulerAccess(t *testing.T) {
+func TestIntegrationRulerAccess(t *testing.T) {
+	testinfra.SQLiteIntegrationTest(t)
+
 	// Setup Grafana and its Database
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		DisableLegacyAlerting: true,
@@ -633,14 +646,14 @@ func TestRulerAccess(t *testing.T) {
 						GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 							Title:     fmt.Sprintf("AlwaysFiring %d", i),
 							Condition: "A",
-							Data: []ngmodels.AlertQuery{
+							Data: []apimodels.AlertQuery{
 								{
 									RefID: "A",
-									RelativeTimeRange: ngmodels.RelativeTimeRange{
-										From: ngmodels.Duration(time.Duration(5) * time.Hour),
-										To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+									RelativeTimeRange: apimodels.RelativeTimeRange{
+										From: apimodels.Duration(time.Duration(5) * time.Hour),
+										To:   apimodels.Duration(time.Duration(3) * time.Hour),
 									},
-									DatasourceUID: "-100",
+									DatasourceUID: expr.DatasourceUID,
 									Model: json.RawMessage(`{
 								"type": "math",
 								"expression": "2 + 3 > 1"
@@ -661,7 +674,9 @@ func TestRulerAccess(t *testing.T) {
 	}
 }
 
-func TestDeleteFolderWithRules(t *testing.T) {
+func TestIntegrationDeleteFolderWithRules(t *testing.T) {
+	testinfra.SQLiteIntegrationTest(t)
+
 	// Setup Grafana and its Database
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		DisableLegacyAlerting: true,
@@ -741,7 +756,7 @@ func TestDeleteFolderWithRules(t *testing.T) {
 											"from": 18000,
 											"to": 10800
 										},
-										"datasourceUid": "-100",
+										"datasourceUid": "__expr__",
 										"model": {
 											"expression": "2 + 3 > 1",
 											"intervalMs": 1000,
@@ -752,6 +767,7 @@ func TestDeleteFolderWithRules(t *testing.T) {
 								],
 								"updated": "2021-05-19T19:47:55Z",
 								"intervalSeconds": 60,
+								"is_paused": false,
 								"version": 1,
 								"uid": "",
 								"namespace_uid": %q,
@@ -821,7 +837,9 @@ func TestDeleteFolderWithRules(t *testing.T) {
 	}
 }
 
-func TestAlertRuleCRUD(t *testing.T) {
+func TestIntegrationAlertRuleCRUD(t *testing.T) {
+	testinfra.SQLiteIntegrationTest(t)
+
 	// Setup Grafana and its Database
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		DisableLegacyAlerting: true,
@@ -870,7 +888,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 					},
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title: "AlwaysFiring",
-						Data:  []ngmodels.AlertQuery{},
+						Data:  []apimodels.AlertQuery{},
 					},
 				},
 				expectedMessage: "invalid rule specification at index [0]: invalid alert rule: no queries or expressions are found",
@@ -887,14 +905,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     "",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 									"type": "math",
 									"expression": "2 + 3 > 1"
@@ -917,14 +935,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     getLongString(t, ngstore.AlertRuleMaxTitleLength+1),
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 									"type": "math",
 									"expression": "2 + 3 > 1"
@@ -947,14 +965,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     "AlwaysFiring",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 									"type": "math",
 									"expression": "2 + 3 > 1"
@@ -978,14 +996,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     "AlwaysFiring",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 									"type": "math",
 									"expression": "2 + 3 > 1"
@@ -1008,12 +1026,12 @@ func TestAlertRuleCRUD(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     "AlwaysFiring",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
 								DatasourceUID: "unknown",
 								Model: json.RawMessage(`{
@@ -1038,14 +1056,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     "AlwaysFiring",
 						Condition: "B",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 									"type": "math",
 									"expression": "2 + 3 > 1"
@@ -1097,14 +1115,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     "AlwaysFiring",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 									"type": "math",
 									"expression": "2 + 3 > 1"
@@ -1117,14 +1135,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     "AlwaysFiringButSilenced",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 									"type": "math",
 									"expression": "2 + 3 > 1"
@@ -1195,7 +1213,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 								   "from":18000,
 								   "to":10800
 								},
-								"datasourceUid":"-100",
+								"datasourceUid":"__expr__",
 								"model":{
 								   "expression":"2 + 3 \u003e 1",
 								   "intervalMs":1000,
@@ -1206,6 +1224,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 						  ],
 						  "updated":"2021-02-21T01:10:30Z",
 						  "intervalSeconds":60,
+						  "is_paused": false,
 						  "version":1,
 						  "uid":"uid",
 						  "namespace_uid":"nsuid",
@@ -1231,7 +1250,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 								   "from":18000,
 								   "to":10800
 								},
-								"datasourceUid":"-100",
+								"datasourceUid":"__expr__",
 								"model":{
 								   "expression":"2 + 3 \u003e 1",
 								   "intervalMs":1000,
@@ -1242,6 +1261,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 						  ],
 						  "updated":"2021-02-21T01:10:30Z",
 						  "intervalSeconds":60,
+						  "is_paused": false,
 						  "version":1,
 						  "uid":"uid",
 						  "namespace_uid":"nsuid",
@@ -1282,14 +1302,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 						UID:       "unknown",
 						Title:     "AlwaysNormal",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 											"type": "math",
 											"expression": "2 + 3 < 1"
@@ -1355,14 +1375,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 						UID:       ruleUID,
 						Title:     "AlwaysNormal",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 												"type": "math",
 												"expression": "2 + 3 < 1"
@@ -1389,14 +1409,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 						UID:       ruleUID,
 						Title:     "AlwaysAlerting",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 												"type": "math",
 												"expression": "2 + 3 > 1"
@@ -1463,14 +1483,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 						UID:       ruleUID, // Including the UID in the payload makes the endpoint update the existing rule.
 						Title:     "AlwaysNormal",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 											"type": "math",
 											"expression": "2 + 3 < 1"
@@ -1538,7 +1558,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 		                           "from":18000,
 		                           "to":10800
 		                        },
-		                        "datasourceUid":"-100",
+		                        "datasourceUid":"__expr__",
 								"model":{
 		                           "expression":"2 + 3 \u003C 1",
 		                           "intervalMs":1000,
@@ -1549,6 +1569,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 		                  ],
 		                  "updated":"2021-02-21T01:10:30Z",
 		                  "intervalSeconds":60,
+		                  "is_paused": false,
 		                  "version":2,
 		                  "uid":"uid",
 		                  "namespace_uid":"nsuid",
@@ -1580,14 +1601,14 @@ func TestAlertRuleCRUD(t *testing.T) {
 						UID:       ruleUID, // Including the UID in the payload makes the endpoint update the existing rule.
 						Title:     "AlwaysNormal",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 												"type": "math",
 												"expression": "2 + 3 < 1"
@@ -1647,7 +1668,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 						   "from":18000,
 						   "to":10800
 						},
-						"datasourceUid":"-100",
+						"datasourceUid":"__expr__",
 									"model":{
 						   "expression":"2 + 3 \u003C 1",
 						   "intervalMs":1000,
@@ -1658,6 +1679,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 					  ],
 					  "updated":"2021-02-21T01:10:30Z",
 					  "intervalSeconds":60,
+					  "is_paused":false,
 					  "version":3,
 					  "uid":"uid",
 					  "namespace_uid":"nsuid",
@@ -1732,7 +1754,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 						   "from":18000,
 						   "to":10800
 						},
-						"datasourceUid":"-100",
+						"datasourceUid":"__expr__",
 									"model":{
 						   "expression":"2 + 3 \u003C 1",
 						   "intervalMs":1000,
@@ -1743,6 +1765,7 @@ func TestAlertRuleCRUD(t *testing.T) {
 					  ],
 					  "updated":"2021-02-21T01:10:30Z",
 					  "intervalSeconds":60,
+					  "is_paused":false,
 					  "version":3,
 					  "uid":"uid",
 					  "namespace_uid":"nsuid",
@@ -1799,7 +1822,9 @@ func TestAlertRuleCRUD(t *testing.T) {
 	}
 }
 
-func TestAlertmanagerStatus(t *testing.T) {
+func TestIntegrationAlertmanagerStatus(t *testing.T) {
+	testinfra.SQLiteIntegrationTest(t)
+
 	// Setup Grafana and its Database
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		DisableLegacyAlerting: true,
@@ -1862,7 +1887,9 @@ func TestAlertmanagerStatus(t *testing.T) {
 	}
 }
 
-func TestQuota(t *testing.T) {
+func TestIntegrationQuota(t *testing.T) {
+	testinfra.SQLiteIntegrationTest(t)
+
 	// Setup Grafana and its Database
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		DisableLegacyAlerting: true,
@@ -1933,14 +1960,14 @@ func TestQuota(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     "One more alert rule",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 									"type": "math",
 									"expression": "2 + 3 > 1"
@@ -1968,14 +1995,14 @@ func TestQuota(t *testing.T) {
 					GrafanaManagedAlert: &apimodels.PostableGrafanaRule{
 						Title:     "Updated alert rule",
 						Condition: "A",
-						Data: []ngmodels.AlertQuery{
+						Data: []apimodels.AlertQuery{
 							{
 								RefID: "A",
-								RelativeTimeRange: ngmodels.RelativeTimeRange{
-									From: ngmodels.Duration(time.Duration(5) * time.Hour),
-									To:   ngmodels.Duration(time.Duration(3) * time.Hour),
+								RelativeTimeRange: apimodels.RelativeTimeRange{
+									From: apimodels.Duration(time.Duration(5) * time.Hour),
+									To:   apimodels.Duration(time.Duration(3) * time.Hour),
 								},
-								DatasourceUID: "-100",
+								DatasourceUID: expr.DatasourceUID,
 								Model: json.RawMessage(`{
 									"type": "math",
 									"expression": "2 + 4 > 1"
@@ -2034,7 +2061,7 @@ func TestQuota(t *testing.T) {
 							   "from":18000,
 							   "to":10800
 							},
-							"datasourceUid":"-100",
+							"datasourceUid":"__expr__",
 										"model":{
 							   "expression":"2 + 4 \u003E 1",
 							   "intervalMs":1000,
@@ -2045,6 +2072,7 @@ func TestQuota(t *testing.T) {
 						  ],
 						  "updated":"2021-02-21T01:10:30Z",
 						  "intervalSeconds":60,
+						  "is_paused": false,
 						  "version":2,
 						  "uid":"uid",
 						  "namespace_uid":"nsuid",
@@ -2061,7 +2089,9 @@ func TestQuota(t *testing.T) {
 	})
 }
 
-func TestEval(t *testing.T) {
+func TestIntegrationEval(t *testing.T) {
+	testinfra.SQLiteIntegrationTest(t)
+
 	// Setup Grafana and its Database
 	dir, path := testinfra.CreateGrafDir(t, testinfra.GrafanaOpts{
 		DisableLegacyAlerting: true,
@@ -2103,7 +2133,7 @@ func TestEval(t *testing.T) {
 							"from": 18000,
 							"to": 10800
 						},
-						"datasourceUid":"-100",
+						"datasourceUid":"__expr__",
 						"model": {
 							"type":"math",
 							"expression":"1 < 2"
@@ -2167,7 +2197,7 @@ func TestEval(t *testing.T) {
 							"from": 18000,
 							"to": 10800
 						},
-						"datasourceUid": "-100",
+						"datasourceUid": "__expr__",
 						"model": {
 							"type":"math",
 							"expression":"1 > 2"
@@ -2231,7 +2261,7 @@ func TestEval(t *testing.T) {
 							"from": 18000,
 							"to": 10800
 						},
-						"datasourceUid": "-100",
+						"datasourceUid": "__expr__",
 						"model": {
 							"type":"math",
 							"expression":"1 > 2"
@@ -2332,7 +2362,7 @@ func TestEval(t *testing.T) {
 								"from": 18000,
 								"to": 10800
 							},
-							"datasourceUid": "-100",
+							"datasourceUid": "__expr__",
 							"model": {
 								"type":"math",
 								"expression":"1 < 2"
@@ -2389,7 +2419,7 @@ func TestEval(t *testing.T) {
 								"from": 18000,
 								"to": 10800
 							},
-							"datasourceUid": "-100",
+							"datasourceUid": "__expr__",
 							"model": {
 								"type":"math",
 								"expression":"1 > 2"
@@ -2534,15 +2564,15 @@ func createUser(t *testing.T, store *sqlstore.SQLStore, cmd user.CreateUserComma
 	store.Cfg.AutoAssignOrg = true
 	store.Cfg.AutoAssignOrgId = 1
 
-	u, err := store.CreateUser(context.Background(), cmd)
+	quotaService := quotaimpl.ProvideService(store, store.Cfg)
+	orgService, err := orgimpl.ProvideService(store, store.Cfg, quotaService)
+	require.NoError(t, err)
+	usrSvc, err := userimpl.ProvideService(store, orgService, store.Cfg, nil, nil, quotaService, supportbundlestest.NewFakeBundleService())
+	require.NoError(t, err)
+
+	u, err := usrSvc.Create(context.Background(), &cmd)
 	require.NoError(t, err)
 	return u.ID
-}
-
-func createOrg(t *testing.T, store *sqlstore.SQLStore, name string, userID int64) int64 {
-	org, err := store.CreateOrgWithMember(name, userID)
-	require.NoError(t, err)
-	return org.Id
 }
 
 func getLongString(t *testing.T, n int) string {

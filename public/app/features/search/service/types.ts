@@ -11,6 +11,8 @@ export interface SearchQuery {
   location?: string;
   sort?: string;
   ds_uid?: string;
+  ds_type?: string;
+  saved_query_uid?: string; // TODO: not implemented yet
   tags?: string[];
   kind?: string[];
   panel_type?: string;
@@ -38,6 +40,9 @@ export interface DashboardQueryResult {
   // debugging fields
   score: number;
   explain: {};
+
+  // enterprise sends extra properties through for sorting (views, errors, etc)
+  [key: string]: unknown;
 }
 
 export interface LocationInfo {
@@ -75,4 +80,9 @@ export interface GrafanaSearcher {
 
   /** Gets the default sort used for the Folder view */
   getFolderViewSort: () => string;
+}
+
+export interface NestedFolderDTO {
+  uid: string;
+  title: string;
 }

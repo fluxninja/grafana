@@ -3,6 +3,7 @@ import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { Provider } from 'react-redux';
 import { mockToolkitActionCreator } from 'test/core/redux/mocks';
+import { TestProvider } from 'test/helpers/TestProvider';
 
 import { NavModel } from '@grafana/data';
 import { ModalManager } from 'app/core/services/ModalManager';
@@ -63,9 +64,9 @@ const setup = (propOverrides?: object) => {
   Object.assign(props, propOverrides);
 
   render(
-    <Provider store={store}>
+    <TestProvider>
       <OrgDetailsPage {...props} />
-    </Provider>
+    </TestProvider>
   );
 };
 

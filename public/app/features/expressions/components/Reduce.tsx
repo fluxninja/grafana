@@ -1,9 +1,9 @@
-import React, { FC } from 'react';
+import React from 'react';
 
 import { SelectableValue } from '@grafana/data';
 import { InlineField, InlineFieldRow, Input, Select } from '@grafana/ui';
 
-import { ExpressionQuery, ExpressionQuerySettings, ReducerMode, reducerMode, reducerTypes } from '../types';
+import { ExpressionQuery, ExpressionQuerySettings, ReducerMode, reducerModes, reducerTypes } from '../types';
 
 interface Props {
   labelWidth?: number | 'auto';
@@ -12,7 +12,7 @@ interface Props {
   onChange: (query: ExpressionQuery) => void;
 }
 
-export const Reduce: FC<Props> = ({ labelWidth = 'auto', onChange, refIds, query }) => {
+export const Reduce = ({ labelWidth = 'auto', onChange, refIds, query }: Props) => {
   const reducer = reducerTypes.find((o) => o.value === query.reducer);
 
   const onRefIdChange = (value: SelectableValue<string>) => {
@@ -78,7 +78,7 @@ export const Reduce: FC<Props> = ({ labelWidth = 'auto', onChange, refIds, query
       </InlineFieldRow>
       <InlineFieldRow>
         <InlineField label="Mode" labelWidth={labelWidth}>
-          <Select onChange={onModeChanged} options={reducerMode} value={mode} width={25} />
+          <Select onChange={onModeChanged} options={reducerModes} value={mode} width={25} />
         </InlineField>
         {replaceWithNumber()}
       </InlineFieldRow>

@@ -14,8 +14,10 @@ type store interface {
 	// Delete deletes a folder from the folder store.
 	Delete(ctx context.Context, uid string, orgID int64) error
 
-	// Update updates the given folder's UID, Title, and Description.
-	// Use Move to change a dashboard's parent ID.
+	// Update updates the given folder's UID, Title, and Description (update mode).
+	// If the NewParentUID field is not nil, it updates also the parent UID (move mode).
+	// If it's a non empty string, it moves the folder under the folder with the specific UID
+	// otherwise, it moves the folder under the root folder (parent_uid column is set to NULL).
 	Update(ctx context.Context, cmd folder.UpdateFolderCommand) (*folder.Folder, error)
 
 	// Get returns a folder.
@@ -26,5 +28,9 @@ type store interface {
 
 	// GetChildren returns the set of immediate children folders (depth=1) of the
 	// given folder.
-	GetChildren(ctx context.Context, cmd folder.GetTreeQuery) ([]*folder.Folder, error)
+	GetChildren(ctx context.Context, cmd folder.GetChildrenQuery) ([]*folder.Folder, error)
+
+	// GetHeight returns the height of the folder tree. When parentUID is set, the function would
+	// verify in the meanwhile that parentUID is not present in the subtree of the folder with the given UID.
+	GetHeight(ctx context.Context, foldrUID string, orgID int64, parentUID *string) (int, error)
 }

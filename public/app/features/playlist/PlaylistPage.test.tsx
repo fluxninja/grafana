@@ -1,6 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
-import { Provider } from 'react-redux';
+import { TestProvider } from 'test/helpers/TestProvider';
 
 import { contextSrv } from 'app/core/services/context_srv';
 
@@ -11,7 +11,7 @@ import { PlaylistPage } from './PlaylistPage';
 const fnMock = jest.fn();
 
 jest.mock('@grafana/runtime', () => ({
-  ...(jest.requireActual('@grafana/runtime') as unknown as object),
+  ...jest.requireActual('@grafana/runtime'),
   getBackendSrv: () => ({
     get: fnMock,
   }),
@@ -24,11 +24,10 @@ jest.mock('app/core/services/context_srv', () => ({
 }));
 
 function getTestContext() {
-  const store = configureStore();
   return render(
-    <Provider store={store}>
+    <TestProvider>
       <PlaylistPage />
-    </Provider>
+    </TestProvider>
   );
 }
 

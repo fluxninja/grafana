@@ -1,8 +1,7 @@
 ---
 aliases:
-  - /docs/grafana/latest/datasources/influxdb/influxdb-flux/
-  - /docs/grafana/latest/datasources/influxdb/query-editor/
-  - /docs/grafana/latest/data-sources/influxdb/query-editor/
+  - ../../data-sources/influxdb/query-editor/
+  - influxdb-flux/
 description: Guide for Flux in Grafana
 title: Flux support in Grafana
 weight: 200
@@ -28,8 +27,8 @@ The InfluxQL query editor helps you select metrics and tags to create InfluxQL q
 
 **To enter edit mode:**
 
-1. Click the panel title.
-1. Click **Edit**.
+1. Hover over any part of the panel to display the actions menu on the top right corner.
+1. Click the menu and select **Edit**.
 
 ![InfluxQL query editor](/static/img/docs/influxdb/influxql-query-editor-8-0.png)
 

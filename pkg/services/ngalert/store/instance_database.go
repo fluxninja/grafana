@@ -13,8 +13,8 @@ import (
 
 // ListAlertInstances is a handler for retrieving alert instances within specific organisation
 // based on various filters.
-func (st DBstore) ListAlertInstances(ctx context.Context, cmd *models.ListAlertInstancesQuery) error {
-	return st.SQLStore.WithDbSession(ctx, func(sess *db.Session) error {
+func (st DBstore) ListAlertInstances(ctx context.Context, cmd *models.ListAlertInstancesQuery) (result []*models.AlertInstance, err error) {
+	err = st.SQLStore.WithDbSession(ctx, func(sess *db.Session) error {
 		alertInstances := make([]*models.AlertInstance, 0)
 
 		s := strings.Builder{}
@@ -30,22 +30,17 @@ func (st DBstore) ListAlertInstances(ctx context.Context, cmd *models.ListAlertI
 		if cmd.RuleUID != "" {
 			addToQuery(` AND rule_uid = ?`, cmd.RuleUID)
 		}
-
-		if cmd.State != "" {
-			addToQuery(` AND current_state = ?`, cmd.State)
+		if st.FeatureToggles.IsEnabled(featuremgmt.FlagAlertingNoNormalState) {
+			s.WriteString(fmt.Sprintf(" AND NOT (current_state = '%s' AND current_reason = '')", models.InstanceStateNormal))
 		}
-
-		if cmd.StateReason != "" {
-			addToQuery(` AND current_reason = ?`, cmd.StateReason)
-		}
-
 		if err := sess.SQL(s.String(), params...).Find(&alertInstances); err != nil {
 			return err
 		}
 
-		cmd.Result = alertInstances
+		result = alertInstances
 		return nil
 	})
+	return result, err
 }
 
 // SaveAlertInstances saves all the provided alert instances to the store.

@@ -1,8 +1,9 @@
 import { css, cx } from '@emotion/css';
-import React, { FC } from 'react';
+import React from 'react';
 
 import { DataLink, GrafanaTheme2, PanelData } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
+import { reportInteraction } from '@grafana/runtime';
 import { Icon, useStyles2, ClickOutsideWrapper } from '@grafana/ui';
 import { DashboardModel } from 'app/features/dashboard/state/DashboardModel';
 import { PanelModel } from 'app/features/dashboard/state/PanelModel';
@@ -42,6 +43,10 @@ export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, dat
   const title = panel.getDisplayTitle();
   const className = cx('panel-header', !(isViewing || isEditing) ? 'grid-drag-handle' : '');
   const styles = useStyles2(panelStyles);
+
+  const onOpenMenu = () => {
+    reportInteraction('dashboards_panelheader_menu', { item: 'menu' });
+  };
 
   return (
     <>
@@ -93,7 +98,7 @@ export const PanelHeader: FC<Props> = ({ panel, error, isViewing, isEditing, dat
       </div>
     </>
   );
-};
+}
 
 const panelStyles = (theme: GrafanaTheme2) => {
   return {

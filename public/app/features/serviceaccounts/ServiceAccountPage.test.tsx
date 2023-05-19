@@ -1,8 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { History, Location } from 'history';
 import React from 'react';
-import { Provider } from 'react-redux';
+import { TestProvider } from 'test/helpers/TestProvider';
 
+import { RouteDescriptor } from 'app/core/navigation/types';
 import { ApiKey, OrgRole, ServiceAccountDTO } from 'app/types';
 
 import { configureStore } from '../../store/configureStore';
@@ -38,10 +40,10 @@ const setup = (propOverrides: Partial<Props>) => {
       path: '/org/serviceaccounts/1',
       url: 'http://localhost:3000/org/serviceaccounts/1',
     },
-    history: {} as any,
-    location: {} as any,
+    history: {} as History,
+    location: {} as Location,
     queryParams: {},
-    route: {} as any,
+    route: {} as RouteDescriptor,
     timezone: '',
     createServiceAccountToken: createServiceAccountTokenMock,
     deleteServiceAccount: deleteServiceAccountMock,
@@ -54,9 +56,9 @@ const setup = (propOverrides: Partial<Props>) => {
   Object.assign(props, propOverrides);
 
   const { rerender } = render(
-    <Provider store={store}>
+    <TestProvider>
       <ServiceAccountPageUnconnected {...props} />
-    </Provider>
+    </TestProvider>
   );
   return {
     rerender,

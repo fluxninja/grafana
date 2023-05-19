@@ -8,6 +8,7 @@ import {
   LoadingState,
   MutableDataFrame,
   PanelData,
+  QueryHint,
   TimeRange,
 } from '@grafana/data';
 
@@ -149,7 +150,7 @@ describe('PromQueryBuilder', () => {
     });
     await openMetricSelect(container);
     await userEvent.click(screen.getByText('histogram_metric_bucket'));
-    await waitFor(() => expect(screen.getByText('hint: add histogram_quantile()')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('hint: add histogram_quantile')).toBeInTheDocument());
   });
 
   it('shows hints for counter metrics', async () => {
@@ -160,7 +161,7 @@ describe('PromQueryBuilder', () => {
     });
     await openMetricSelect(container);
     await userEvent.click(screen.getByText('histogram_metric_sum'));
-    await waitFor(() => expect(screen.getByText('hint: add rate()')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('hint: add rate')).toBeInTheDocument());
   });
 
   it('shows hints for counter metrics', async () => {
@@ -171,7 +172,7 @@ describe('PromQueryBuilder', () => {
     });
     await openMetricSelect(container);
     await userEvent.click(screen.getByText('histogram_metric_sum'));
-    await waitFor(() => expect(screen.getByText('hint: add rate()')).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByText('hint: add rate')).toBeInTheDocument());
   });
 
   it('shows multiple hints', async () => {
@@ -227,6 +228,45 @@ describe('PromQueryBuilder', () => {
       />
     );
     expect(await screen.queryByText(EXPLAIN_LABEL_FILTER_CONTENT)).not.toBeInTheDocument();
+  });
+
+  it('renders hint if initial hint provided', async () => {
+    const { datasource } = createDatasource();
+    datasource.getInitHints = (): QueryHint[] => [
+      {
+        label: 'Initial hint',
+        type: 'warning',
+      },
+    ];
+    const props = createProps(datasource);
+    render(
+      <PromQueryBuilder
+        {...props}
+        query={{
+          metric: 'histogram_metric_sum',
+          labels: [],
+          operations: [],
+        }}
+      />
+    );
+    expect(await screen.queryByText('Initial hint')).toBeInTheDocument();
+  });
+
+  it('renders no hint if no initial hint provided', async () => {
+    const { datasource } = createDatasource();
+    datasource.getInitHints = (): QueryHint[] => [];
+    const props = createProps(datasource);
+    render(
+      <PromQueryBuilder
+        {...props}
+        query={{
+          metric: 'histogram_metric_sum',
+          labels: [],
+          operations: [],
+        }}
+      />
+    );
+    expect(await screen.queryByText('Initial hint')).not.toBeInTheDocument();
   });
 
   // <ModernPrometheus>

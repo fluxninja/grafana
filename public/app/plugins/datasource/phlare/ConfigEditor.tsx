@@ -1,11 +1,18 @@
 import React from 'react';
 
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
-import { DataSourceHttpSettings, EventsWithValidation, LegacyForms, regexValidation } from '@grafana/ui';
+import {
+  DataSourceHttpSettings,
+  EventsWithValidation,
+  LegacyForms,
+  regexValidation,
+  SecureSocksProxySettings,
+} from '@grafana/ui';
+import { config } from 'app/core/config';
 
-import { FireDataSourceOptions } from './types';
+import { PhlareDataSourceOptions } from './types';
 
-interface Props extends DataSourcePluginOptionsEditorProps<FireDataSourceOptions> {}
+interface Props extends DataSourcePluginOptionsEditorProps<PhlareDataSourceOptions> {}
 
 export const ConfigEditor = (props: Props) => {
   const { options, onOptionsChange } = props;
@@ -19,6 +26,9 @@ export const ConfigEditor = (props: Props) => {
         onChange={onOptionsChange}
       />
 
+      {config.featureToggles.secureSocksDatasourceProxy && (
+        <SecureSocksProxySettings options={options} onOptionsChange={onOptionsChange} />
+      )}
       <h3 className="page-heading">Querying</h3>
       <div className="gf-form-group">
         <div className="gf-form-inline">
@@ -51,7 +61,7 @@ export const ConfigEditor = (props: Props) => {
                   }}
                 />
               }
-              tooltip="Minimal step used for metric query. Should be the same or higher as the scrape interval setting in the Fire database."
+              tooltip="Minimal step used for metric query. Should be the same or higher as the scrape interval setting in the Phlare database."
             />
           </div>
         </div>

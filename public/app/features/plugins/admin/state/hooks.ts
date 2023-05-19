@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from 'app/types';
 import { sortPlugins, Sorters } from '../helpers';
 import { CatalogPlugin, PluginListDisplayMode } from '../types';
 
-import { fetchAll, fetchDetails, fetchRemotePlugins, install, uninstall } from './actions';
+import { fetchAll, fetchDetails, fetchRemotePlugins, install, uninstall, fetchAllLocal, unsetInstall } from './actions';
 import { setDisplayMode } from './reducer';
 import {
   find,
@@ -58,6 +58,11 @@ export const useGetSingle = (id: string): CatalogPlugin | undefined => {
   return useSelector((state) => selectById(state, id));
 };
 
+export const useGetSingleLocalWithoutDetails = (id: string): CatalogPlugin | undefined => {
+  useFetchAllLocal();
+  return useSelector((state) => selectById(state, id));
+};
+
 export const useGetErrors = (): PluginError[] => {
   useFetchAll();
 
@@ -67,6 +72,12 @@ export const useGetErrors = (): PluginError[] => {
 export const useInstall = () => {
   const dispatch = useDispatch();
   return (id: string, version?: string, isUpdating?: boolean) => dispatch(install({ id, version, isUpdating }));
+};
+
+export const useUnsetInstall = () => {
+  const dispatch = useDispatch();
+
+  return () => dispatch(unsetInstall());
 };
 
 export const useUninstall = () => {
@@ -115,6 +126,16 @@ export const useFetchAll = () => {
 
   useEffect(() => {
     isNotFetched && dispatch(fetchAll());
+  }, []); // eslint-disable-line
+};
+
+// Only fetches in case they were not fetched yet
+export const useFetchAllLocal = () => {
+  const dispatch = useDispatch();
+  const isNotFetched = useSelector(selectIsRequestNotFetched(fetchAllLocal.typePrefix));
+
+  useEffect(() => {
+    isNotFetched && dispatch(fetchAllLocal());
   }, []); // eslint-disable-line
 };
 

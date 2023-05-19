@@ -1,13 +1,26 @@
-import { cx } from '@emotion/css';
+import { css, cx } from '@emotion/css';
 import { isUndefined, isEmpty, noop } from 'lodash';
 import React, { PureComponent, } from 'react';
+import DropZone, { FileRejection, DropEvent, ErrorCode } from 'react-dropzone';
 import { connect, ConnectedProps, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
-import { NavModel, NavModelItem, TimeRange, PageLayoutType, locationUtil } from '@grafana/data';
+import {
+  NavModel,
+  NavModelItem,
+  TimeRange,
+  PageLayoutType,
+  locationUtil,
+  dataFrameToJSON,
+  DataFrameJSON,
+  GrafanaTheme2,
+  getValueFormat,
+  formattedValueToString,
+} from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { config, locationService } from '@grafana/runtime';
-import { Themeable2, withTheme2 } from '@grafana/ui';
+import { Icon, Themeable2, withTheme2 } from '@grafana/ui';
 import { notifyApp } from 'app/core/actions';
+import ErrorPage from 'app/core/components/ErrorPage/ErrorPage';
 import { Page } from 'app/core/components/Page/Page';
 import { GrafanaContext, GrafanaContextType } from 'app/core/context/GrafanaContext';
 import { createErrorNotification } from 'app/core/copy/appNotification';
@@ -16,10 +29,12 @@ import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { FnGlobalState } from 'app/core/reducers/fn-slice';
 import { getNavModel } from 'app/core/selectors/navModel';
 import { PanelModel } from 'app/features/dashboard/state';
+import * as DFImport from 'app/features/dataframe-import';
 import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
 import { getPageNavFromSlug, getRootContentNavModel } from 'app/features/storage/StorageFolderPage';
 import { FNDashboardProps } from 'app/fn-app/types';
 import { RenderPortal } from 'app/fn-app/utils';
+import { GrafanaQueryType } from 'app/plugins/datasource/grafana/types';
 import { DashboardRoutes, DashboardState, KioskMode, StoreState } from 'app/types';
 import { PanelEditEnteredEvent, PanelEditExitedEvent } from 'app/types/events';
 
@@ -32,13 +47,13 @@ import { DashboardPrompt } from '../components/DashboardPrompt/DashboardPrompt';
 import { DashboardSettings } from '../components/DashboardSettings';
 import { PanelInspector } from '../components/Inspector/PanelInspector';
 import { PanelEditor } from '../components/PanelEditor/PanelEditor';
-import { PublicDashboardFooter } from '../components/PublicDashboardFooter/PublicDashboardsFooter';
 import { SubMenu } from '../components/SubMenu/SubMenu';
 import { DashboardGrid } from '../dashgrid/DashboardGrid';
 import { liveTimer } from '../dashgrid/liveTimer';
 import { getTimeSrv } from '../services/TimeSrv';
 import { cleanUpDashboardAndVariables } from '../state/actions';
 import { initDashboard } from '../state/initDashboard';
+import { calculateNewPanelGridPos } from '../utils/panel';
 
 export interface DashboardPageRouteParams {
   uid?: string;
@@ -49,7 +64,7 @@ export interface DashboardPageRouteParams {
 
 export type DashboardPageRouteSearchParams = {
   tab?: string;
-  folderId?: string;
+  folderUid?: string;
   editPanel?: string;
   viewPanel?: string;
   editview?: string;
@@ -136,6 +151,60 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   state: State = this.getCleanState();
 
   pageNav?: NavModelItem;
+  onFileDrop = (acceptedFiles: File[], fileRejections: FileRejection[], event: DropEvent) => {
+    const grafanaDS = {
+      type: 'grafana',
+      uid: 'grafana',
+    };
+    DFImport.filesToDataframes(acceptedFiles).subscribe((next) => {
+      const snapshot: DataFrameJSON[] = [];
+      next.dataFrames.forEach((df) => {
+        const dataframeJson = dataFrameToJSON(df);
+        snapshot.push(dataframeJson);
+      });
+      this.props.dashboard?.addPanel({
+        type: 'table',
+        gridPos: { x: 0, y: 0, w: 12, h: 8 },
+        title: next.file.name,
+        datasource: grafanaDS,
+        targets: [
+          {
+            queryType: GrafanaQueryType.Snapshot,
+            snapshot,
+            file: { name: next.file.name, size: next.file.size },
+            datasource: grafanaDS,
+          },
+        ],
+      });
+    });
+
+    fileRejections.forEach((fileRejection) => {
+      const errors = fileRejection.errors.map((error) => {
+        switch (error.code) {
+          case ErrorCode.FileTooLarge:
+            const formattedSize = getValueFormat('decbytes')(DFImport.maxFileSize);
+            return `File size must be less than ${formattedValueToString(formattedSize)}.`;
+          case ErrorCode.FileInvalidType:
+            return `File type must be one of the following types ${DFImport.formatFileTypes(DFImport.acceptedFiles)}.`;
+          default:
+            return error.message;
+        }
+      });
+      this.props.notifyApp(
+        createErrorNotification(
+          `Failed to load ${fileRejection.file.name}`,
+          undefined,
+          undefined,
+          <ul>
+            {errors.map((err) => {
+              return <li key={err}>{err}</li>;
+            })}
+          </ul>
+        )
+      );
+    });
+  };
+
   getCleanState(): State {
     return {
       editPanel: null,
@@ -176,7 +245,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       urlSlug: match.params.slug,
       urlUid: match.params.uid,
       urlType: match.params.type,
-      urlFolderId: queryParams.folderId,
+      urlFolderUid: queryParams.folderUid,
       version: match.params.version,
       panelType: queryParams.panelType,
       routeName: this.props.route.routeName,
@@ -341,17 +410,9 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       return;
     }
 
-    // Move all panels down by the height of the "add panel" widget.
-    // This is to work around an issue with react-grid-layout that can mess up the layout
-    // in certain configurations. (See https://github.com/react-grid-layout/react-grid-layout/issues/1787)
-    const addPanelWidgetHeight = 8;
-    for (const panel of dashboard.panelIterator()) {
-      panel.gridPos.y += addPanelWidgetHeight;
-    }
-
     dashboard.addPanel({
       type: 'add-panel',
-      gridPos: { x: 0, y: 0, w: 12, h: addPanelWidgetHeight },
+      gridPos: calculateNewPanelGridPos(dashboard),
       title: 'Panel Title',
     });
 
@@ -438,15 +499,53 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           {!FNDashboard && <DashboardPrompt dashboard={dashboard} />}
 
           {initError && <DashboardFailed />}
-          {showSubMenu && (
-            <section aria-label={selectors.pages.Dashboard.SubMenu.submenu}>
-              <SubMenu dashboard={dashboard} annotations={dashboard.annotations.list} links={dashboard.links} />
-            </section>
+          {dashboard.meta.dashboardNotFound ? (
+            <ErrorPage />
+          ) : (
+            <>
+              {showSubMenu && (
+                <section aria-label={selectors.pages.Dashboard.SubMenu.submenu}>
+                  <SubMenu dashboard={dashboard} annotations={dashboard.annotations.list} links={dashboard.links} />
+                </section>
+              )}
+              {config.featureToggles.editPanelCSVDragAndDrop ? (
+                <DropZone
+                  onDrop={this.onFileDrop}
+                  accept={DFImport.acceptedFiles}
+                  maxSize={DFImport.maxFileSize}
+                  noClick={true}
+                >
+                  {({ getRootProps, isDragActive }) => {
+                    const styles = getStyles(this.props.theme, isDragActive);
+                    return (
+                      <div {...getRootProps({ className: styles.dropZone })}>
+                        <div className={styles.dropOverlay}>
+                          <div className={styles.dropHint}>
+                            <Icon name="upload" size="xxxl"></Icon>
+                            <h3>Create tables from spreadsheets</h3>
+                          </div>
+                        </div>
+                        <DashboardGrid
+                          dashboard={dashboard}
+                          isEditable={!!dashboard.meta.canEdit}
+                          viewPanel={viewPanel}
+                          editPanel={editPanel}
+                        />
+                      </div>
+                    );
+                  }}
+                </DropZone>
+              ) : (
+                <DashboardGrid
+                  dashboard={dashboard}
+                  isEditable={!!dashboard.meta.canEdit}
+                  viewPanel={viewPanel}
+                  editPanel={editPanel}
+                />
+              )}
+              {inspectPanel && <PanelInspector dashboard={dashboard} panel={inspectPanel} />}
+            </>
           )}
-
-          <DashboardGrid dashboard={dashboard} viewPanel={viewPanel} editPanel={editPanel} />
-
-          {inspectPanel && <PanelInspector dashboard={dashboard} panel={inspectPanel} />}
         </Page>
         {editPanel && (
           <PanelEditor
@@ -465,10 +564,6 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
             sectionNav={sectionNav}
           />
         )}
-        {
-          // TODO: assess if there are other places where we may want a footer, which may reveal a better place to add this
-          isPublic && <PublicDashboardFooter />
-        }
       </>
     );
   }
@@ -534,6 +629,32 @@ function updateStatePageNavFromProps(props: Props, state: State): State {
     ...state,
     pageNav,
     sectionNav,
+  };
+}
+
+function getStyles(theme: GrafanaTheme2, isDragActive: boolean) {
+  return {
+    dropZone: css`
+      height: 100%;
+    `,
+    dropOverlay: css`
+      background-color: ${isDragActive ? theme.colors.action.hover : `inherit`};
+      border: ${isDragActive ? `2px dashed ${theme.colors.border.medium}` : 0};
+      position: absolute;
+      display: ${isDragActive ? 'flex' : 'none'};
+      z-index: ${theme.zIndex.modal};
+      top: 0px;
+      left: 0px;
+      height: 100%;
+      width: 100%;
+      align-items: center;
+      justify-content: center;
+    `,
+    dropHint: css`
+      align-items: center;
+      display: flex;
+      flex-direction: column;
+    `,
   };
 }
 

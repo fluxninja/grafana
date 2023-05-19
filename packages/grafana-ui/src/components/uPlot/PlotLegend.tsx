@@ -27,8 +27,8 @@ interface PlotLegendProps extends VizLegendOptions, Omit<VizLayoutLegendProps, '
   config: UPlotConfigBuilder;
 }
 
-export const PlotLegend: React.FC<PlotLegendProps> = React.memo(
-  ({ data, config, placement, calcs, displayMode, ...vizLayoutLegendProps }) => {
+export const PlotLegend = React.memo(
+  ({ data, config, placement, calcs, displayMode, ...vizLayoutLegendProps }: PlotLegendProps) => {
     const theme = useTheme2();
     const legendItems = config
       .getSeries()
@@ -56,7 +56,7 @@ export const PlotLegend: React.FC<PlotLegendProps> = React.memo(
           fieldIndex,
           color: seriesColor,
           label,
-          yAxis: axisPlacement === AxisPlacement.Left ? 1 : 2,
+          yAxis: axisPlacement === AxisPlacement.Left || axisPlacement === AxisPlacement.Bottom ? 1 : 2,
           getDisplayValues: () => {
             if (!calcs?.length) {
               return [];
@@ -80,7 +80,7 @@ export const PlotLegend: React.FC<PlotLegendProps> = React.memo(
                     ...field,
                     config: {
                       ...field.config,
-                      unit: 'percent',
+                      unit: 'percentunit',
                     },
                   },
                   theme,

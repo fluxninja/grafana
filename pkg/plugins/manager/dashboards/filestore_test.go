@@ -117,20 +117,27 @@ func TestDashboardFileStore(t *testing.T) {
 		t.Run("With filesystem", func(t *testing.T) {
 			origOpenDashboardFile := openDashboardFile
 			mapFs := fstest.MapFS{
-				"plugins/plugin-id/dashboards/dash1.json": {
+				"dashboards/dash1.json": {
 					Data: []byte("dash1"),
 				},
-				"plugins/plugin-id/dashboards/dash2.json": {
+				"dashboards/dash2.json": {
 					Data: []byte("dash2"),
 				},
-				"plugins/plugin-id/dashboards/dash3.json": {
+				"dashboards/dash3.json": {
 					Data: []byte("dash3"),
 				},
-				"plugins/plugin-id/dash2.json": {
+				"dash2.json": {
 					Data: []byte("dash2"),
 				},
 			}
-			openDashboardFile = mapFs.Open
+			openDashboardFile = func(ctx context.Context, pluginFiles plugins.FileStore, pluginID, name string) (*plugins.File, error) {
+				f, err := mapFs.Open(name)
+				require.NoError(t, err)
+
+				b, err := io.ReadAll(f)
+				require.NoError(t, err)
+				return &plugins.File{Content: b}, nil
+			}
 			t.Cleanup(func() {
 				openDashboardFile = origOpenDashboardFile
 			})
@@ -152,11 +159,7 @@ func TestDashboardFileStore(t *testing.T) {
 				})
 				require.NoError(t, err)
 				require.NotNil(t, res)
-				require.NotNil(t, res.Content)
-				b, err := io.ReadAll(res.Content)
-				require.NoError(t, err)
-				require.Equal(t, "dash1", string(b))
-				require.NoError(t, res.Content.Close())
+				require.Equal(t, "dash1", string(res.Content))
 			})
 
 			t.Run("Should return file content for dashboards/dash2.json", func(t *testing.T) {
@@ -166,11 +169,7 @@ func TestDashboardFileStore(t *testing.T) {
 				})
 				require.NoError(t, err)
 				require.NotNil(t, res)
-				require.NotNil(t, res.Content)
-				b, err := io.ReadAll(res.Content)
-				require.NoError(t, err)
-				require.Equal(t, "dash2", string(b))
-				require.NoError(t, res.Content.Close())
+				require.Equal(t, "dash2", string(res.Content))
 			})
 
 			t.Run("Should return error when trying to read relative file", func(t *testing.T) {
@@ -189,39 +188,39 @@ func TestDashboardFileStore(t *testing.T) {
 func setupPluginDashboardsForTest(t *testing.T) *FileStoreManager {
 	t.Helper()
 
-	return &FileStoreManager{
-		pluginStore: &plugins.FakePluginStore{
-			PluginList: []plugins.PluginDTO{
+	p1 := &plugins.Plugin{
+		JSONData: plugins.JSONData{
+			ID: "pluginWithoutDashboards",
+			Includes: []*plugins.Includes{
 				{
-					JSONData: plugins.JSONData{
-						ID: "pluginWithoutDashboards",
-						Includes: []*plugins.Includes{
-							{
-								Type: "page",
-							},
-						},
-					},
-				},
-				{
-					PluginDir: "plugins/plugin-id",
-					JSONData: plugins.JSONData{
-						ID: "pluginWithDashboards",
-						Includes: []*plugins.Includes{
-							{
-								Type: "page",
-							},
-							{
-								Type: "dashboard",
-								Path: "dashboards/dash1.json",
-							},
-							{
-								Type: "dashboard",
-								Path: "dashboards/dash2.json",
-							},
-						},
-					},
+					Type: "page",
 				},
 			},
+		},
+	}
+
+	p2 := &plugins.Plugin{
+		JSONData: plugins.JSONData{
+			ID: "pluginWithDashboards",
+			Includes: []*plugins.Includes{
+				{
+					Type: "page",
+				},
+				{
+					Type: "dashboard",
+					Path: "dashboards/dash1.json",
+				},
+				{
+					Type: "dashboard",
+					Path: "dashboards/dash2.json",
+				},
+			},
+		},
+	}
+
+	return &FileStoreManager{
+		pluginStore: &plugins.FakePluginStore{
+			PluginList: []plugins.PluginDTO{p1.ToDTO(), p2.ToDTO()},
 		},
 	}
 }
