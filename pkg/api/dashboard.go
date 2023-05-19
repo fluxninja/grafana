@@ -739,7 +739,7 @@ func (hs *HTTPServer) GetDashboardVersions(c *contextmodel.ReqContext) response.
 func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.Response {
 	var dashID int64
 	var err error
-	var dash *models.Dashboard
+	var dash *dashboards.Dashboard
 
 	dashUID := web.Params(c.Req)[":uid"]
 	if dashUID == "" {
@@ -748,18 +748,22 @@ func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.R
 			return response.Error(http.StatusBadRequest, "dashboardId is invalid", err)
 		}
 	} else {
-		q := models.GetDashboardQuery{
-			OrgId: c.SignedInUser.OrgID,
-			Uid:   dashUID,
+		q := dashboards.GetDashboardQuery{
+			OrgID: c.SignedInUser.OrgID,
+			UID:   dashUID,
 		}
-		if err := hs.DashboardService.GetDashboard(c.Req.Context(), &q); err != nil {
+		queryResult, err := hs.DashboardService.GetDashboard(c.Req.Context(), &q)
+		if err != nil {
 			return response.Error(http.StatusBadRequest, "failed to get dashboard by UID", err)
 		}
-		dashID = q.Result.Id
-		dash = q.Result
+		dashID = queryResult.ID
+		dash = queryResult
 	}
 
-	guardian := guardian.New(c.Req.Context(), dashID, c.OrgID, c.SignedInUser)
+	guardian, err := guardian.New(c.Req.Context(), dashID, c.OrgID, c.SignedInUser)
+	if err != nil {
+		return response.Err(err)
+	}
 	canSave := true
 	if canSave, err = guardian.CanSave(); err != nil || !canSave {
 		return dashboardGuardianResponse(err)
@@ -795,23 +799,21 @@ func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.R
 		hs.getAnnotationPermissionsByScope(c, &annotationPermissions.Organization, accesscontrol.ScopeAnnotationsTypeOrganization)
 	}
 
-	hasPublicDashboard := false
 	publicDashboardEnabled := false
 	// If public dashboards is enabled and we have a public dashboard, update meta values
 	if hs.Features.IsEnabled(featuremgmt.FlagPublicDashboards) {
-		publicDashboard, err := hs.PublicDashboardsApi.PublicDashboardService.FindByDashboardUid(c.Req.Context(), c.OrgID, dash.Uid)
+		publicDashboard, err := hs.PublicDashboardsApi.PublicDashboardService.FindByDashboardUid(c.Req.Context(), c.OrgID, dash.UID)
 		if err != nil && !errors.Is(err, publicdashboardModels.ErrPublicDashboardNotFound) {
 			return response.Error(500, "Error while retrieving public dashboards", err)
 		}
 		if publicDashboard != nil {
-			hasPublicDashboard = true
 			publicDashboardEnabled = publicDashboard.IsEnabled
 		}
 	}
 
 	meta := dtos.DashboardMeta{
 		Slug:                   dash.Slug,
-		Type:                   models.DashTypeDB,
+		Type:                   dashboards.DashTypeDB,
 		CanStar:                c.IsSignedIn,
 		CanSave:                canSave,
 		CanEdit:                canEdit,
@@ -824,26 +826,26 @@ func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.R
 		Version:                dash.Version,
 		HasACL:                 dash.HasACL,
 		IsFolder:               dash.IsFolder,
-		FolderId:               dash.FolderId,
-		Url:                    dash.GetUrl(),
+		FolderId:               dash.FolderID,
+		Url:                    dash.GetURL(),
 		FolderTitle:            "General",
 		AnnotationsPermissions: annotationPermissions,
 		PublicDashboardEnabled: publicDashboardEnabled,
-		HasPublicDashboard:     hasPublicDashboard,
 	}
 
 	// lookup folder title
-	if dash.FolderId > 0 {
-		query := models.GetDashboardQuery{Id: dash.FolderId, OrgId: c.OrgID}
-		if err := hs.DashboardService.GetDashboard(c.Req.Context(), &query); err != nil {
+	if dash.FolderID > 0 {
+		query := dashboards.GetDashboardQuery{ID: dash.FolderID, OrgID: c.OrgID}
+		queryResult, err := hs.DashboardService.GetDashboard(c.Req.Context(), &query)
+		if err != nil {
 			if errors.Is(err, dashboards.ErrFolderNotFound) {
 				return response.Error(404, "Folder not found", err)
 			}
 			return response.Error(500, "Dashboard folder could not be read", err)
 		}
-		meta.FolderUid = query.Result.Uid
-		meta.FolderTitle = query.Result.Title
-		meta.FolderUrl = query.Result.GetUrl()
+		meta.FolderUid = queryResult.UID
+		meta.FolderTitle = queryResult.Title
+		meta.FolderUrl = queryResult.GetURL()
 	}
 
 	dto := dtos.DashboardFullWithMeta{

@@ -159,10 +159,6 @@ const (
 	// Enables cross-account querying in CloudWatch datasources
 	FlagCloudWatchCrossAccountQuerying = "cloudWatchCrossAccountQuerying"
 
-	// FlagCloudWatchCrossAccountQuerying
-	// Use cross-account querying in CloudWatch datasource
-	FlagCloudWatchCrossAccountQuerying = "cloudWatchCrossAccountQuerying"
-
 	// FlagRedshiftAsyncQueryDataSupport
 	// Enable async query data support for Redshift
 	FlagRedshiftAsyncQueryDataSupport = "redshiftAsyncQueryDataSupport"

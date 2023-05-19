@@ -6,11 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"net/http/httptest"
 	"testing"
 
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
-	"github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
@@ -18,7 +16,6 @@ import (
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/expr"
 	"github.com/grafana/grafana/pkg/infra/db"
-	"github.com/grafana/grafana/pkg/infra/httpclient/httpclientprovider"
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/models/roletype"
 	"github.com/grafana/grafana/pkg/plugins"
@@ -61,33 +58,6 @@ func TestParseMetricRequest(t *testing.T) {
 		assert.Len(t, parsedReq.parsedQueries, 1)
 		assert.Contains(t, parsedReq.parsedQueries, "gIEkMvIVz")
 		assert.Len(t, parsedReq.getFlattenedQueries(), 2)
-
-		t.Run("createDataSourceQueryEnrichers should return 0 enrichers when no HTTP request", func(t *testing.T) {
-			enrichers := parsedReq.createDataSourceQueryEnrichers(context.Background(), nil, tc.oauthTokenService, []string{})
-			require.Empty(t, enrichers)
-		})
-
-		t.Run("createDataSourceQueryEnrichers should return 1 enricher", func(t *testing.T) {
-			parsedReq.httpRequest = httptest.NewRequest(http.MethodGet, "/", nil)
-			parsedReq.httpRequest.AddCookie(&http.Cookie{Name: "cookie1"})
-			parsedReq.httpRequest.AddCookie(&http.Cookie{Name: "cookie2"})
-			parsedReq.httpRequest.AddCookie(&http.Cookie{Name: "cookie3"})
-			parsedReq.httpRequest.AddCookie(&http.Cookie{Name: "login"})
-
-			enrichers := parsedReq.createDataSourceQueryEnrichers(context.Background(), nil, tc.oauthTokenService, []string{"login"})
-			require.Len(t, enrichers, 1)
-			require.NotNil(t, enrichers["gIEkMvIVz"])
-			req := &backend.QueryDataRequest{}
-			ctx := enrichers["gIEkMvIVz"](context.Background(), req)
-			require.Len(t, req.Headers, 3)
-			require.Equal(t, "Bearer access-token", req.Headers["Authorization"])
-			require.Equal(t, "id-token", req.Headers["X-ID-Token"])
-			require.Equal(t, "cookie1=; cookie3=", req.Headers["Cookie"])
-			middlewares := httpclient.ContextualMiddlewareFromContext(ctx)
-			require.Len(t, middlewares, 2)
-			require.Equal(t, httpclientprovider.ForwardedCookiesMiddlewareName, middlewares[0].(httpclient.MiddlewareName).MiddlewareName())
-			require.Equal(t, httpclientprovider.ForwardedOAuthIdentityMiddlewareName, middlewares[1].(httpclient.MiddlewareName).MiddlewareName())
-		})
 	})
 
 	t.Run("Test a single datasource query with expressions", func(t *testing.T) {
@@ -223,13 +193,6 @@ func TestParseMetricRequest(t *testing.T) {
 		_, err = tc.queryService.handleExpressions(context.Background(), tc.signedInUser, parsedReq)
 		assert.NoError(t, err)
 
-		t.Run("createDataSourceQueryEnrichers should return 2 enrichers", func(t *testing.T) {
-			parsedReq.httpRequest = &http.Request{}
-			enrichers := parsedReq.createDataSourceQueryEnrichers(context.Background(), nil, tc.oauthTokenService, []string{})
-			require.Len(t, enrichers, 2)
-			require.NotNil(t, enrichers["gIEkMvIVz"])
-			require.NotNil(t, enrichers["sEx6ZvSVk"])
-		})
 	})
 
 	t.Run("Header validation", func(t *testing.T) {

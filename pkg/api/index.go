@@ -90,11 +90,6 @@ func (hs *HTTPServer) setIndexViewData(c *contextmodel.ReqContext) (*dtos.IndexV
 		weekStart = *prefs.WeekStart
 	}
 
-	weekStart := ""
-	if prefs.WeekStart != nil {
-		weekStart = *prefs.WeekStart
-	}
-
 	data := dtos.IndexViewData{
 		User: &dtos.CurrentUser{
 			Id:                         c.UserID,
