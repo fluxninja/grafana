@@ -1,14 +1,10 @@
 ---
 aliases:
-  - /docs/grafana/latest/panels/add-panels-dynamically/
-  - /docs/grafana/latest/panels/repeat-panels-or-rows/
-  - /docs/grafana/latest/panels/working-with-panels/add-title-and-description/
-  - /docs/grafana/latest/panels/working-with-panels/view-json-model/
-  - /docs/grafana/latest/panels/configure-panel-options/
-  - /docs/grafana/latest/panels-visualizations/configure-panel-options/
-title: Configure panel options
-menuTitle: Configure panel options
-weight: 2
+  - ../panels/add-panels-dynamically/
+  - ../panels/configure-panel-options/
+  - ../panels/repeat-panels-or-rows/
+  - ../panels/working-with-panels/add-title-and-description/
+  - ../panels/working-with-panels/view-json-model/
 keywords:
   - panel
   - dynamic
@@ -16,6 +12,9 @@ keywords:
   - title
   - description
   - JSON model
+menuTitle: Configure panel options
+title: Configure panel options
+weight: 2
 ---
 
 # Configure panel options
@@ -37,7 +36,13 @@ After you add a panel to a dashboard, you can open it at any time to change chan
 
 1. Open the dashboard that contains the panel you want to edit.
 
-1. Click in the panel title and select **Edit**. To use a keyboard shortcut to open the panel, hover over the panel and press `e`.
+1. Hover over any part of the panel to display the actions menu on the top right corner.
+
+1. Click the menu and select **Edit**.
+
+   ![Panel with menu displayed](/media/docs/grafana/screenshot-panel-menu.png)
+
+   To use a keyboard shortcut to open the panel, hover over the panel and press `e`.
 
    The panel opens in edit mode.
 
@@ -67,8 +72,8 @@ Explore and export panel, panel data, and data frame JSON models.
 
 1. Open the dashboard that contains the panel.
 
-1. Click in the panel title and select **Inspect > Panel JSON**.
-
+1. Hover over any part of the panel to display the actions menu on the top right corner.
+1. Click the menu and select **Inspect > Panel JSON**.
 1. In the **Select source** field, select one of the following options:
 
    - **Panel JSON:** Displays a JSON object representing the panel.

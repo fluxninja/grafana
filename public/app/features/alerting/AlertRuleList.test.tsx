@@ -4,6 +4,7 @@ import React from 'react';
 import { Provider } from 'react-redux';
 import { openMenu } from 'react-select-event';
 import { mockToolkitActionCreator } from 'test/core/redux/mocks';
+import { TestProvider } from 'test/helpers/TestProvider';
 
 import { locationService } from '@grafana/runtime';
 import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
@@ -38,13 +39,13 @@ const setup = (propOverrides?: object) => {
   };
 
   const { rerender } = render(
-    <Provider store={store}>
+    <TestProvider>
       <AlertRuleListUnconnected {...props} />
-    </Provider>
+    </TestProvider>
   );
 
   return {
-    rerender: (element: JSX.Element) => rerender(<Provider store={store}>{element}</Provider>),
+    rerender: (element: JSX.Element) => rerender(<TestProvider>{element}</TestProvider>),
   };
 };
 

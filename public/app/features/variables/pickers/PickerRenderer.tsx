@@ -10,6 +10,7 @@ import { FnGlobalState } from 'app/core/reducers/fn-slice';
 import type { StoreState } from 'app/types';
 
 import { variableAdapters } from '../adapters';
+import { VARIABLE_PREFIX } from '../constants';
 import { VariableHide, VariableModel } from '../types';
 import { FnLoggerService } from 'app/fn_logger';
 
@@ -85,8 +86,7 @@ function PickerLabel({ variable }: PropsWithChildren<Props>): ReactElement | nul
     return null;
   }
 
-  const elementId = `var-${variable.id}`;
-
+  const elementId = VARIABLE_PREFIX + variable.id;
   if (variable.description) {
     return (
       <Tooltip content={variable.description} placement={'bottom'}>

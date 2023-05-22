@@ -2,7 +2,7 @@ import {
   createAggregationOperation,
   createAggregationOperationWithParam,
 } from '../../prometheus/querybuilder/shared/operationUtils';
-import { QueryBuilderOperationDef } from '../../prometheus/querybuilder/shared/types';
+import { QueryBuilderOperationDef, QueryBuilderOperationParamValue } from '../../prometheus/querybuilder/shared/types';
 
 import { binaryScalarOperations } from './binaryScalarOperations';
 import { UnwrapParamEditor } from './components/UnwrapParamEditor';
@@ -15,7 +15,7 @@ import {
   labelFilterRenderer,
   pipelineRenderer,
 } from './operationUtils';
-import { LokiOperationId, LokiOperationOrder, LokiVisualQueryOperationCategory } from './types';
+import { LokiOperationId, LokiOperationOrder, lokiOperators, LokiVisualQueryOperationCategory } from './types';
 
 export function getOperationDefinitions(): QueryBuilderOperationDef[] {
   const aggregations = [
@@ -324,7 +324,7 @@ Example: \`\`error_level=\`level\` \`\`
       orderRank: LokiOperationOrder.LineFilters,
       renderer: getLineFilterRenderer('|~'),
       addOperationHandler: addLokiOperation,
-      explainHandler: (op) => `Return log lines that match regex \`${op.params[0]}\`.`,
+      explainHandler: (op) => `Return log lines that match a \`RE2\` regex pattern. \`${op.params[0]}\`.`,
     },
     {
       id: LokiOperationId.LineMatchesRegexNot,
@@ -346,13 +346,18 @@ Example: \`\`error_level=\`level\` \`\`
       orderRank: LokiOperationOrder.LineFilters,
       renderer: getLineFilterRenderer('!~'),
       addOperationHandler: addLokiOperation,
-      explainHandler: (op) => `Return log lines that does not match regex \`${op.params[0]}\`.`,
+      explainHandler: (op) => `Return log lines that doesn't match a \`RE2\` regex pattern. \`${op.params[0]}\`.`,
     },
     {
       id: LokiOperationId.LineFilterIpMatches,
       name: 'IP line filter expression',
       params: [
-        { name: 'Operator', type: 'string', options: ['|=', '!='] },
+        {
+          name: 'Operator',
+          type: 'string',
+          minWidth: 16,
+          options: [lokiOperators.contains, lokiOperators.doesNotContain],
+        },
         {
           name: 'Pattern',
           type: 'string',
@@ -373,9 +378,23 @@ Example: \`\`error_level=\`level\` \`\`
       id: LokiOperationId.LabelFilter,
       name: 'Label filter expression',
       params: [
-        { name: 'Label', type: 'string' },
-        { name: 'Operator', type: 'string', options: ['=', '!=', ' =~', '!~', '>', '<', '>=', '<='] },
-        { name: 'Value', type: 'string' },
+        { name: 'Label', type: 'string', minWidth: 14 },
+        {
+          name: 'Operator',
+          type: 'string',
+          minWidth: 14,
+          options: [
+            lokiOperators.equals,
+            lokiOperators.doesNotEqual,
+            lokiOperators.matchesRegex,
+            lokiOperators.doesNotMatchRegex,
+            lokiOperators.greaterThan,
+            lokiOperators.lessThan,
+            lokiOperators.greaterThanOrEqual,
+            lokiOperators.lessThanOrEqual,
+          ],
+        },
+        { name: 'Value', type: 'string', minWidth: 14 },
       ],
       defaultParams: ['', '=', ''],
       alternativesKey: 'label filter',
@@ -389,9 +408,14 @@ Example: \`\`error_level=\`level\` \`\`
       id: LokiOperationId.LabelFilterIpMatches,
       name: 'IP label filter expression',
       params: [
-        { name: 'Label', type: 'string' },
-        { name: 'Operator', type: 'string', options: ['=', '!='] },
-        { name: 'Value', type: 'string' },
+        { name: 'Label', type: 'string', minWidth: 14 },
+        {
+          name: 'Operator',
+          type: 'string',
+          minWidth: 14,
+          options: [lokiOperators.equals, lokiOperators.doesNotEqual],
+        },
+        { name: 'Value', type: 'string', minWidth: 14 },
       ],
       defaultParams: ['', '=', ''],
       alternativesKey: 'label filter',
@@ -479,4 +503,17 @@ export function explainOperator(id: LokiOperationId | string): string {
 
   // Strip markdown links
   return explain.replace(/\[(.*)\]\(.*\)/g, '$1');
+}
+
+export function getDefinitionById(id: string): QueryBuilderOperationDef | undefined {
+  return definitions.find((x) => x.id === id);
+}
+
+export function checkParamsAreValid(def: QueryBuilderOperationDef, params: QueryBuilderOperationParamValue[]): boolean {
+  // For now we only check if the operation has all the required params.
+  if (params.length < def.params.filter((param) => !param.optional).length) {
+    return false;
+  }
+
+  return true;
 }

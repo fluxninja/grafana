@@ -2,8 +2,7 @@ import React, { PureComponent } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 
 import { ValueLinkConfig, applyFieldOverrides, TimeZone, SplitOpen, DataFrame } from '@grafana/data';
-import { Collapse, Table } from '@grafana/ui';
-import { FilterItem } from '@grafana/ui/src/components/Table/types';
+import { Collapse, Table, AdHocFilterItem } from '@grafana/ui';
 import { config } from 'app/core/config';
 import { PANEL_BORDER } from 'app/core/constants';
 import { StoreState } from 'app/types';
@@ -17,7 +16,7 @@ interface TableContainerProps {
   exploreId: ExploreId;
   width: number;
   timeZone: TimeZone;
-  onCellFilterAdded?: (filter: FilterItem) => void;
+  onCellFilterAdded?: (filter: AdHocFilterItem) => void;
   splitOpenFn: SplitOpen;
 }
 
@@ -48,7 +47,7 @@ export class TableContainer extends PureComponent<Props> {
     }
 
     // tries to estimate table height
-    return Math.max(Math.min(600, mainFrame.length * 35) + 35);
+    return Math.min(600, Math.max(mainFrame.length * 35, 300) + 35);
   }
 
   render() {

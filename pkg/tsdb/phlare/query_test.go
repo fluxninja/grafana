@@ -10,8 +10,9 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/stretchr/testify/require"
 
-	commonv1 "github.com/grafana/grafana/pkg/tsdb/phlare/gen/common/v1"
-	querierv1 "github.com/grafana/grafana/pkg/tsdb/phlare/gen/querier/v1"
+	googlev1 "github.com/grafana/phlare/api/gen/proto/go/google/v1"
+	querierv1 "github.com/grafana/phlare/api/gen/proto/go/querier/v1"
+	typesv1 "github.com/grafana/phlare/api/gen/proto/go/types/v1"
 )
 
 // This is where the tests for the datasource backend live.
@@ -105,6 +106,14 @@ func makeDataQuery() *backend.DataQuery {
 	}
 }
 
+func fieldValues[T any](field *data.Field) []T {
+	values := make([]T, field.Len())
+	for i := 0; i < field.Len(); i++ {
+		values[i] = field.At(i).(T)
+	}
+	return values
+}
+
 // This is where the tests for the datasource backend live.
 func Test_profileToDataFrame(t *testing.T) {
 	resp := &connect.Response[querierv1.SelectMergeStacktracesResponse]{
@@ -120,12 +129,14 @@ func Test_profileToDataFrame(t *testing.T) {
 			},
 		},
 	}
-	frame := responseToDataFrames(resp, "memory:alloc_objects:count:space:bytes")
+	frame := responseToDataFrames(resp.Msg, "memory:alloc_objects:count:space:bytes")
 	require.Equal(t, 4, len(frame.Fields))
 	require.Equal(t, data.NewField("level", nil, []int64{0, 1, 1}), frame.Fields[0])
 	require.Equal(t, data.NewField("value", nil, []int64{20, 10, 5}).SetConfig(&data.FieldConfig{Unit: "short"}), frame.Fields[1])
 	require.Equal(t, data.NewField("self", nil, []int64{1, 3, 5}).SetConfig(&data.FieldConfig{Unit: "short"}), frame.Fields[2])
-	require.Equal(t, data.NewField("label", nil, []string{"func1", "func2", "func3"}), frame.Fields[3])
+	require.Equal(t, "label", frame.Fields[3].Name)
+	require.Equal(t, []int64{0, 1, 2}, fieldValues[int64](frame.Fields[3]))
+	require.Equal(t, []string{"func1", "func2", "func3"}, frame.Fields[3].Config.TypeConfig.Enum.Text)
 }
 
 // This is where the tests for the datasource backend live.
@@ -177,33 +188,49 @@ func Test_levelsToTree(t *testing.T) {
 }
 
 func Test_treeToNestedDataFrame(t *testing.T) {
-	tree := &ProfileTree{
-		Start: 0, Value: 100, Level: 0, Self: 1, Name: "root", Nodes: []*ProfileTree{
-			{
-				Start: 10, Value: 40, Level: 1, Self: 2, Name: "func1",
+	t.Run("sample profile tree", func(t *testing.T) {
+		tree := &ProfileTree{
+			Value: 100, Level: 0, Self: 1, Name: "root", Nodes: []*ProfileTree{
+				{
+					Value: 40, Level: 1, Self: 2, Name: "func1",
+				},
+				{Value: 30, Level: 1, Self: 3, Name: "func2", Nodes: []*ProfileTree{
+					{Value: 15, Level: 2, Self: 4, Name: "func1:func3"},
+				}},
 			},
-			{Start: 60, Value: 30, Level: 1, Self: 3, Name: "func2", Nodes: []*ProfileTree{
-				{Start: 61, Value: 15, Level: 2, Self: 4, Name: "func1:func3"},
-			}},
-		},
-	}
+		}
 
-	frame := treeToNestedSetDataFrame(tree, "memory:alloc_objects:count:space:bytes")
-	require.Equal(t,
-		[]*data.Field{
-			data.NewField("level", nil, []int64{0, 1, 1, 2}),
-			data.NewField("value", nil, []int64{100, 40, 30, 15}).SetConfig(&data.FieldConfig{Unit: "short"}),
-			data.NewField("self", nil, []int64{1, 2, 3, 4}).SetConfig(&data.FieldConfig{Unit: "short"}),
-			data.NewField("label", nil, []string{"root", "func1", "func2", "func1:func3"}),
-		}, frame.Fields)
+		frame := treeToNestedSetDataFrame(tree, "memory:alloc_objects:count:space:bytes")
+
+		labelConfig := &data.FieldConfig{
+			TypeConfig: &data.FieldTypeConfig{
+				Enum: &data.EnumFieldConfig{
+					Text: []string{"root", "func1", "func2", "func1:func3"},
+				},
+			},
+		}
+		require.Equal(t,
+			[]*data.Field{
+				data.NewField("level", nil, []int64{0, 1, 1, 2}),
+				data.NewField("value", nil, []int64{100, 40, 30, 15}).SetConfig(&data.FieldConfig{Unit: "short"}),
+				data.NewField("self", nil, []int64{1, 2, 3, 4}).SetConfig(&data.FieldConfig{Unit: "short"}),
+				data.NewField("label", nil, []int64{0, 1, 2, 3}).SetConfig(labelConfig),
+			}, frame.Fields)
+	})
+
+	t.Run("nil profile tree", func(t *testing.T) {
+		frame := treeToNestedSetDataFrame(nil, "memory:alloc_objects:count:space:bytes")
+		require.Equal(t, 4, len(frame.Fields))
+		require.Equal(t, 0, frame.Fields[0].Len())
+	})
 }
 
 func Test_seriesToDataFrame(t *testing.T) {
 	t.Run("single series", func(t *testing.T) {
 		resp := &connect.Response[querierv1.SelectSeriesResponse]{
 			Msg: &querierv1.SelectSeriesResponse{
-				Series: []*commonv1.Series{
-					{Labels: []*commonv1.LabelPair{}, Points: []*commonv1.Point{{Timestamp: int64(1000), Value: 30}, {Timestamp: int64(2000), Value: 10}}},
+				Series: []*typesv1.Series{
+					{Labels: []*typesv1.LabelPair{}, Points: []*typesv1.Point{{Timestamp: int64(1000), Value: 30}, {Timestamp: int64(2000), Value: 10}}},
 				},
 			},
 		}
@@ -215,8 +242,8 @@ func Test_seriesToDataFrame(t *testing.T) {
 		// with a label pair, the value field should name itself with a label pair name and not the profile type
 		resp = &connect.Response[querierv1.SelectSeriesResponse]{
 			Msg: &querierv1.SelectSeriesResponse{
-				Series: []*commonv1.Series{
-					{Labels: []*commonv1.LabelPair{{Name: "app", Value: "bar"}}, Points: []*commonv1.Point{{Timestamp: int64(1000), Value: 30}, {Timestamp: int64(2000), Value: 10}}},
+				Series: []*typesv1.Series{
+					{Labels: []*typesv1.LabelPair{{Name: "app", Value: "bar"}}, Points: []*typesv1.Point{{Timestamp: int64(1000), Value: 30}, {Timestamp: int64(2000), Value: 10}}},
 				},
 			},
 		}
@@ -227,9 +254,9 @@ func Test_seriesToDataFrame(t *testing.T) {
 	t.Run("single series", func(t *testing.T) {
 		resp := &connect.Response[querierv1.SelectSeriesResponse]{
 			Msg: &querierv1.SelectSeriesResponse{
-				Series: []*commonv1.Series{
-					{Labels: []*commonv1.LabelPair{{Name: "foo", Value: "bar"}}, Points: []*commonv1.Point{{Timestamp: int64(1000), Value: 30}, {Timestamp: int64(2000), Value: 10}}},
-					{Labels: []*commonv1.LabelPair{{Name: "foo", Value: "baz"}}, Points: []*commonv1.Point{{Timestamp: int64(1000), Value: 30}, {Timestamp: int64(2000), Value: 10}}},
+				Series: []*typesv1.Series{
+					{Labels: []*typesv1.LabelPair{{Name: "foo", Value: "bar"}}, Points: []*typesv1.Point{{Timestamp: int64(1000), Value: 30}, {Timestamp: int64(2000), Value: 10}}},
+					{Labels: []*typesv1.LabelPair{{Name: "foo", Value: "baz"}}, Points: []*typesv1.Point{{Timestamp: int64(1000), Value: 30}, {Timestamp: int64(2000), Value: 10}}},
 				},
 			},
 		}
@@ -261,8 +288,8 @@ func (f *FakeClient) LabelNames(context.Context, *connect.Request[querierv1.Labe
 func (f *FakeClient) Series(ctx context.Context, c *connect.Request[querierv1.SeriesRequest]) (*connect.Response[querierv1.SeriesResponse], error) {
 	return &connect.Response[querierv1.SeriesResponse]{
 		Msg: &querierv1.SeriesResponse{
-			LabelsSet: []*commonv1.Labels{{
-				Labels: []*commonv1.LabelPair{
+			LabelsSet: []*typesv1.Labels{{
+				Labels: []*typesv1.LabelPair{
 					{
 						Name:  "__unit__",
 						Value: "cpu",
@@ -303,12 +330,40 @@ func (f *FakeClient) SelectSeries(ctx context.Context, req *connect.Request[quer
 	f.Req = req
 	return &connect.Response[querierv1.SelectSeriesResponse]{
 		Msg: &querierv1.SelectSeriesResponse{
-			Series: []*commonv1.Series{
+			Series: []*typesv1.Series{
 				{
-					Labels: []*commonv1.LabelPair{{Name: "foo", Value: "bar"}},
-					Points: []*commonv1.Point{{Timestamp: int64(1000), Value: 30}, {Timestamp: int64(2000), Value: 10}},
+					Labels: []*typesv1.LabelPair{{Name: "foo", Value: "bar"}},
+					Points: []*typesv1.Point{{Timestamp: int64(1000), Value: 30}, {Timestamp: int64(2000), Value: 10}},
 				},
 			},
 		},
 	}, nil
+}
+
+func (f *FakeClient) SelectMergeProfile(ctx context.Context, c *connect.Request[querierv1.SelectMergeProfileRequest]) (*connect.Response[googlev1.Profile], error) {
+	f.Req = c
+	p := &googlev1.Profile{
+		SampleType: []*googlev1.ValueType{
+			{Type: 1, Unit: 2},
+		},
+		Sample: []*googlev1.Sample{
+			{
+				Value: []int64{1},
+				LocationId: []uint64{
+					1, 2,
+				},
+			},
+		},
+		Mapping: []*googlev1.Mapping{{Id: 1}},
+		Location: []*googlev1.Location{
+			{Id: 1, MappingId: 1, Line: []*googlev1.Line{{FunctionId: 1}}},
+			{Id: 2, MappingId: 1, Line: []*googlev1.Line{{FunctionId: 2}}},
+		},
+		Function: []*googlev1.Function{
+			{Id: 1, Name: 3},
+			{Id: 2, Name: 4},
+		},
+		StringTable: []string{"", "cpu", "nanoseconds", "foo", "bar"},
+	}
+	return connect.NewResponse(p), nil
 }

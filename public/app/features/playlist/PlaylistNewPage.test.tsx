@@ -1,13 +1,12 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { Provider } from 'react-redux';
+import { TestProvider } from 'test/helpers/TestProvider';
 
 import { selectors } from '@grafana/e2e-selectors';
 import { locationService } from '@grafana/runtime';
 
 import { backendSrv } from '../../core/services/backend_srv';
-import { configureStore } from '../../store/configureStore';
 
 import { PlaylistNewPage } from './PlaylistNewPage';
 import { Playlist } from './types';
@@ -30,9 +29,9 @@ function getTestContext({ name, interval, items }: Partial<Playlist> = {}) {
   const backendSrvMock = jest.spyOn(backendSrv, 'post');
 
   const { rerender } = render(
-    <Provider store={store}>
+    <TestProvider>
       <PlaylistNewPage />
-    </Provider>
+    </TestProvider>
   );
 
   return { playlist, rerender, backendSrvMock };

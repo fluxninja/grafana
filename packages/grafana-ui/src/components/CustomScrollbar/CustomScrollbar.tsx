@@ -49,7 +49,7 @@ export const CustomScrollbar = ({
   onScroll,
   children,
 }: React.PropsWithChildren<Props>) => {
-  const ref = useRef<Scrollbars & { view: HTMLDivElement }>(null);
+  const ref = useRef<Scrollbars & { view: HTMLDivElement; update: () => void }>(null);
   const styles = useStyles2(getStyles);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export const CustomScrollbar = ({
       return;
     }
     setTimeout(() => {
-      const scrollbar = ref.current as any;
+      const scrollbar = ref.current;
       if (scrollbar?.update) {
         scrollbar.update();
       }
@@ -111,6 +111,11 @@ export const CustomScrollbar = ({
   }, []);
 
   const renderView = useCallback((passedProps: JSX.IntrinsicElements['div']) => {
+    // fixes issues of visibility on safari and ios devices
+    if (passedProps.style && passedProps.style['WebkitOverflowScrolling'] === 'touch') {
+      passedProps.style['WebkitOverflowScrolling'] = 'auto';
+    }
+
     return <div {...passedProps} className="scrollbar-view" />;
   }, []);
 

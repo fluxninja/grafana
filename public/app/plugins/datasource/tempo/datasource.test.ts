@@ -13,8 +13,14 @@ import {
   MutableDataFrame,
   PluginType,
 } from '@grafana/data';
-import { BackendDataSourceResponse, FetchResponse, setBackendSrv, setDataSourceSrv } from '@grafana/runtime';
-import config from 'app/core/config';
+import {
+  BackendDataSourceResponse,
+  FetchResponse,
+  setBackendSrv,
+  setDataSourceSrv,
+  TemplateSrv,
+} from '@grafana/runtime';
+import { BarGaugeDisplayMode, TableCellDisplayMode } from '@grafana/schema';
 
 import {
   DEFAULT_LIMIT,
@@ -22,7 +28,7 @@ import {
   buildExpr,
   buildLinkExpr,
   getRateAlignedValues,
-  makeApmRequest,
+  makeServiceGraphViewRequest,
   makeTempoLink,
   getFieldConfig,
 } from './datasource';
@@ -49,9 +55,10 @@ describe('Tempo data source', () => {
   beforeEach(() => (console.error = consoleErrorMock));
 
   it('returns empty response when traceId is empty', async () => {
-    const ds = new TempoDatasource(defaultSettings);
+    const templateSrv: TemplateSrv = { replace: jest.fn() } as unknown as TemplateSrv;
+    const ds = new TempoDatasource(defaultSettings, templateSrv);
     const response = await lastValueFrom(
-      ds.query({ targets: [{ refId: 'refid1', queryType: 'traceId', query: '' } as Partial<TempoQuery>] } as any),
+      ds.query({ targets: [{ refId: 'refid1', queryType: 'traceql', query: '' } as Partial<TempoQuery>] } as any),
       { defaultValue: 'empty' }
     );
     expect(response).toBe('empty');
@@ -61,7 +68,7 @@ describe('Tempo data source', () => {
     function getQuery(): TempoQuery {
       return {
         refId: 'x',
-        queryType: 'traceId',
+        queryType: 'traceql',
         linkedQuery: {
           refId: 'linked',
           expr: '{instance="$interpolationVar"}',
@@ -70,6 +77,7 @@ describe('Tempo data source', () => {
         search: '$interpolationVar',
         minDuration: '$interpolationVar',
         maxDuration: '$interpolationVar',
+        filters: [],
       };
     }
 
@@ -237,6 +245,7 @@ describe('Tempo data source', () => {
       minDuration: '$interpolationVar',
       maxDuration: '$interpolationVar',
       limit: 10,
+      filters: [],
     };
     const builtQuery = ds.buildSearchQuery(tempoQuery);
     expect(builtQuery).toStrictEqual({
@@ -254,6 +263,7 @@ describe('Tempo data source', () => {
       refId: 'A',
       query: '',
       search: '',
+      filters: [],
     };
     const builtQuery = ds.buildSearchQuery(tempoQuery);
     expect(builtQuery).toStrictEqual({
@@ -269,6 +279,7 @@ describe('Tempo data source', () => {
       refId: 'A',
       query: '',
       search: '',
+      filters: [],
     };
     const timeRange = { startTime: 0, endTime: 1000 };
     const builtQuery = ds.buildSearchQuery(tempoQuery, timeRange);
@@ -283,6 +294,7 @@ describe('Tempo data source', () => {
   it('formats native search query history correctly', () => {
     const ds = new TempoDatasource(defaultSettings);
     const tempoQuery: TempoQuery = {
+      filters: [],
       queryType: 'nativeSearch',
       refId: 'A',
       query: '',
@@ -388,7 +400,7 @@ describe('Tempo data source', () => {
           raw: { from: '15m', to: 'now' },
         },
       },
-      [{ refId: 'refid1', queryType: 'traceId', query: '' } as TempoQuery]
+      [{ refId: 'refid1', queryType: 'traceql', query: '' } as TempoQuery]
     );
 
     expect(request.range.from.unix()).toBe(dateTime(new Date(2022, 8, 13, 15, 58, 0, 0)).unix());
@@ -417,7 +429,7 @@ describe('Tempo data source', () => {
           raw: { from: '15m', to: 'now' },
         },
       },
-      [{ refId: 'refid1', queryType: 'traceId', query: '' } as TempoQuery]
+      [{ refId: 'refid1', queryType: 'traceql', query: '' } as TempoQuery]
     );
 
     expect(request.range.from.unix()).toBe(dateTime(0).unix());
@@ -425,7 +437,7 @@ describe('Tempo data source', () => {
   });
 });
 
-describe('Tempo apm table', () => {
+describe('Tempo service graph view', () => {
   it('runs service graph queries', async () => {
     const ds = new TempoDatasource({
       ...defaultSettings,
@@ -435,7 +447,6 @@ describe('Tempo apm table', () => {
         },
       },
     });
-    config.featureToggles.tempoApmTable = true;
     setDataSourceSrv(backendSrvWithPrometheus as any);
     const response = await lastValueFrom(
       ds.query({ targets: [{ queryType: 'serviceMap' }], range: getDefaultTimeRange() } as any)
@@ -444,7 +455,7 @@ describe('Tempo apm table', () => {
     expect(response.data).toHaveLength(3);
     expect(response.state).toBe(LoadingState.Done);
 
-    // APM table
+    // Service Graph view
     expect(response.data[0].fields[0].name).toBe('Name');
     expect(response.data[0].fields[0].values.toArray().length).toBe(2);
     expect(response.data[0].fields[0].values.toArray()[0]).toBe('HTTP Client');
@@ -467,7 +478,8 @@ describe('Tempo apm table', () => {
     expect(response.data[0].fields[2].values.toArray()[0]).toBe(12.75164671814457);
     expect(response.data[0].fields[2].values.toArray()[1]).toBe(12.121331111401608);
     expect(response.data[0].fields[2].config.color.mode).toBe('continuous-BlPu');
-    expect(response.data[0].fields[2].config.custom.displayMode).toBe('lcd-gauge');
+    expect(response.data[0].fields[2].config.custom.cellOptions.mode).toBe(BarGaugeDisplayMode.Lcd);
+    expect(response.data[0].fields[2].config.custom.cellOptions.type).toBe(TableCellDisplayMode.Gauge);
     expect(response.data[0].fields[2].config.decimals).toBe(3);
 
     expect(response.data[0].fields[3].name).toBe('Error Rate');
@@ -487,7 +499,8 @@ describe('Tempo apm table', () => {
     expect(response.data[0].fields[4].values[0]).toBe(3.75164671814457);
     expect(response.data[0].fields[4].values[1]).toBe(3.121331111401608);
     expect(response.data[0].fields[4].config.color.mode).toBe('continuous-RdYlGr');
-    expect(response.data[0].fields[4].config.custom.displayMode).toBe('lcd-gauge');
+    expect(response.data[0].fields[4].config.custom.cellOptions.mode).toBe(BarGaugeDisplayMode.Lcd);
+    expect(response.data[0].fields[4].config.custom.cellOptions.type).toBe(TableCellDisplayMode.Gauge);
     expect(response.data[0].fields[4].config.decimals).toBe(3);
 
     expect(response.data[0].fields[5].name).toBe('Duration (p90)');
@@ -559,6 +572,16 @@ describe('Tempo apm table', () => {
     );
     expect(builtQuery).toBe(
       'topk(5, sum(rate(traces_spanmetrics_calls_total{service="app",service="app"}[$__range])) by (span_name))'
+    );
+
+    targets = { targets: [{ queryType: 'serviceMap', serviceMapQuery: '{client="${app}",service="$app"}' }] } as any;
+    builtQuery = buildExpr(
+      { expr: 'topk(5, sum(rate(traces_spanmetrics_calls_total{}[$__range])) by (span_name))', params: [] },
+      '',
+      targets
+    );
+    expect(builtQuery).toBe(
+      'topk(5, sum(rate(traces_spanmetrics_calls_total{service="${app}",service="$app"}[$__range])) by (span_name))'
     );
   });
 
@@ -662,26 +685,26 @@ describe('Tempo apm table', () => {
     ];
     const objToAlign = {
       'HTTP GET - root': {
-        value: 0.1234,
+        value: '0.1234',
       },
       'HTTP GET': {
-        value: 0.6789,
+        value: '0.6789',
       },
       'HTTP POST - post': {
-        value: 0.4321,
+        value: '0.4321',
       },
     };
 
-    let value = getRateAlignedValues(resp, objToAlign as any);
+    let value = getRateAlignedValues(resp, objToAlign);
     expect(value.toString()).toBe('0,0.6789,0.1234,0,0.4321');
   });
 
-  it('should make apm request correctly', () => {
-    const apmRequest = makeApmRequest([
+  it('should make service graph view request correctly', () => {
+    const request = makeServiceGraphViewRequest([
       'topk(5, sum(rate(traces_spanmetrics_calls_total{service="app"}[$__range])) by (span_name))"',
       'histogram_quantile(.9, sum(rate(traces_spanmetrics_latency_bucket{status_code="STATUS_CODE_ERROR",service="app",service="app",span_name=~"HTTP Client"}[$__range])) by (le))',
     ]);
-    expect(apmRequest).toEqual([
+    expect(request).toEqual([
       {
         refId: 'topk(5, sum(rate(traces_spanmetrics_calls_total{service="app"}[$__range])) by (span_name))"',
         expr: 'topk(5, sum(rate(traces_spanmetrics_calls_total{service="app"}[$__range])) by (span_name))"',

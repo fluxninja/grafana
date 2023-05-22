@@ -1,5 +1,5 @@
 import { css, cx } from '@emotion/css';
-import React, { FC } from 'react';
+import React from 'react';
 
 import { NavModelItem, NavModelBreadcrumb, GrafanaTheme2 } from '@grafana/data';
 import { Tab, TabsBar, Icon, useStyles2, toIconName } from '@grafana/ui';
@@ -86,7 +86,7 @@ const Navigation = ({ children }: { children: NavModelItem[] }) => {
   );
 };
 
-export const PageHeader: FC<Props> = ({ navItem: model, renderTitle, actions, info, subTitle }) => {
+export const PageHeader = ({ navItem: model, renderTitle, actions, info, subTitle }: Props) => {
   const styles = useStyles2(getStyles);
 
   if (!model) {
@@ -102,7 +102,7 @@ export const PageHeader: FC<Props> = ({ navItem: model, renderTitle, actions, in
       <div className="page-header__inner">
         <span className="page-header__logo">
           {icon && <Icon name={icon} size="xxxl" style={{ marginTop }} />}
-          {main.img && <img className="page-header__img" src={main.img} alt={`logo of ${main.text}`} />}
+          {main.img && <img className="page-header__img" src={main.img} alt="" />}
         </span>
 
         <div className={cx('page-header__info-block', styles.headerText)}>

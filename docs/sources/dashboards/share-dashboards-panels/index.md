@@ -1,23 +1,18 @@
 ---
 aliases:
-  - /docs/grafana/latest/sharing/
-  - /docs/grafana/latest/dashboards/share-dashboard/
-  - /docs/grafana/latest/reference/share_dashboard/
-  - /docs/grafana/latest/sharing/share-dashboard/
-  - /docs/grafana/latest/dashboards/share-dashboard/
-  - /docs/grafana/latest/reference/share_panel/
-  - /docs/grafana/latest/sharing/share-panel/
-  - /docs/grafana/latest/sharing/playlists/
-  - /docs/grafana/latest/administration/reports/
-  - /docs/grafana/latest/enterprise/reporting/
-  - /docs/grafana/latest/administration/reports/
-  - /docs/grafana/latest/dashboards/reporting/
-  - /docs/grafana/latest/enterprise/export-pdf/
-  - docs/grafana/latest/dashboards/share-dashboards-panels/
-  - /docs/grafana/latest/share-dashboards-panels/
-title: Share dashboards and panels
-menuTitle: Sharing
-weight: 85
+  - ../administration/reports/
+  - ../enterprise/export-pdf/
+  - ../enterprise/reporting/
+  - ../reference/share_dashboard/
+  - ../reference/share_panel/
+  - ../share-dashboards-panels/
+  - ../sharing/
+  - ../sharing/playlists/
+  - ../sharing/share-dashboard/
+  - ../sharing/share-panel/
+  - ./
+  - reporting/
+  - share-dashboard/
 keywords:
   - grafana
   - dashboard
@@ -29,6 +24,9 @@ keywords:
   - reporting
   - export
   - pdf
+menuTitle: Sharing
+title: Share dashboards and panels
+weight: 85
 ---
 
 # Share dashboards and panels
@@ -54,12 +52,11 @@ You can share a dashboard as a direct link or as a snapshot. You can also export
 
 > **Note:** If you change a dashboard, ensure that you save the changes before sharing.
 
-1. Navigate to the home page of your Grafana instance.
-1. Click on the share icon in the top navigation.
+1. Click **Dashboards** in the left-side menu.
+1. Click the dashboard you want to share.
+1. Click the share icon at the top of the screen.
 
-   The share dialog opens and shows the **Link** tab.
-
-   ![Dashboard share direct link](/static/img/docs/sharing/share-dashboard-direct-link-7-3.png)
+   The share dialog opens and shows the Link tab.
 
 ### Share a direct link
 
@@ -77,9 +74,8 @@ A dashboard snapshot shares an interactive dashboard publicly. Grafana strips se
 
 You can publish snapshots to your local instance or to [snapshots.raintank.io](http://snapshots.raintank.io). The latter is a free service provided by Grafana Labs that enables you to publish dashboard snapshots to an external Grafana instance. Anyone with the link can view it. You can set an expiration time if you want the snapshot removed after a certain time period.
 
-![Dashboard share snapshot](/static/img/docs/sharing/share-dashboard-snapshot-7-3.png)
-
-1. Click **Local Snapshot** or **Publish to snapshots.raintank.io**.
+1. Click the **Snapshot** tab.
+1. Click **Publish to snapshots.raintank.io** or **Local Snapshot**.
 
    Grafana generates a link of the snapshot.
 
@@ -91,15 +87,15 @@ If you created a snapshot by mistake, click **Delete snapshot** to remove the sn
 
 Grafana dashboards can easily be exported and imported. For more information, refer to [Export and import dashboards]({{< relref "./manage-dashboards/#export-and-import-dashboards" >}}).
 
-![Export](/static/img/docs/sharing/share-dashboard-export-7-3.png)
-
 ## Export dashboard as PDF
 
 You can generate and save PDF files of any dashboard.
 
 > **Note:** Available in [Grafana Enterprise]({{< relref "../../introduction/grafana-enterprise/" >}}).
 
-1. In the upper-right corner of the dashboard that you want to export as PDF, click the **Share dashboard** icon.
+1. Click **Dashboards** in the left-side menu.
+1. Click the dashboard you want to share.
+1. Click the share icon at the top of the screen.
 1. On the PDF tab, select a layout option for the exported dashboard: **Portrait** or **Landscape**.
 1. Click **Save as PDF** to render the dashboard as a PDF file.
 
@@ -109,12 +105,10 @@ You can generate and save PDF files of any dashboard.
 
 You can share a panel as a direct link, as a snapshot, or as an embedded link. You can also create library panels using the **Share** option on any panel.
 
-1. Click a panel title to open the panel menu.
-1. Click **Share**.
+1. Hover over any part of the panel to display the actions menu on the top right corner.
+1. Click the menu and select **Share**.
 
    The share dialog opens and shows the **Link** tab.
-
-   ![Panel share direct link](/static/img/docs/sharing/share-panel-direct-link-8-0.png)
 
 ### Use direct link
 
@@ -149,10 +143,8 @@ A panel snapshot shares an interactive panel publicly. Grafana strips sensitive 
 
 You can publish snapshots to your local instance or to [snapshots.raintank.io](http://snapshots.raintank.io). The latter is a free service provided by [Grafana Labs](https://grafana.com), that enables you to publish dashboard snapshots to an external Grafana instance. You can optionally set an expiration time if you want the snapshot to be removed after a certain time period.
 
-![Panel share snapshot](/static/img/docs/sharing/share-panel-snapshot-8-0.png)
-
-1. In the **Share Panel** dialog, click **Snapshot** to open the tab.
-1. Click **Local Snapshot** or **Publish to snapshots.raintank.io**.
+1. In the **Share Panel** dialog, click **Snapshot** to go to the tab.
+1. Click **Publish to snapshots.raintank.io** or **Local Snapshot**.
 
    Grafana generates the link of the snapshot.
 
@@ -166,8 +158,6 @@ You can embed a panel using an iframe on another web site. A viewer must be sign
 
 **> Note:** As of Grafana 8.0, anonymous access permission is no longer available for Grafana Cloud.
 
-![Panel share embed](/static/img/docs/sharing/share-panel-embedded-link-8-0.png)
-
 Here is an example of the HTML code:
 
 ```html
@@ -179,16 +169,13 @@ Here is an example of the HTML code:
 ></iframe>
 ```
 
-The result is an interactive Grafana graph embedded in an iframe:
-
-<iframe src="https://snapshots.raintank.io/dashboard-solo/snapshot/y7zwi2bZ7FcoTlB93WN7yWO4aMiz3pZb?from=1493369923321&to=1493377123321&panelId=4" width="650" height="300" frameborder="0"></iframe>
+The result is an interactive Grafana graph embedded in an iframe.
 
 ### Library panel
 
 To create a library panel from the **Share Panel** dialog:
 
 1. Click **Library panel**.
-   {{< figure src="/static/img/docs/library-panels/create-lib-panel-8-0.png" class="docs-image--no-shadow" max-width= "900px" caption="Screenshot of the create library panel dialog" >}}
 1. In **Library panel name**, enter the name.
 1. In **Save in folder**, select the folder in which to save the library panel. By default, the General folder is selected.
 1. Click **Create library panel** to save your changes.

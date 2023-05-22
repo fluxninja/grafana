@@ -1,11 +1,22 @@
 import { css } from '@emotion/css';
 import { negate } from 'lodash';
 import React, { memo, useCallback, useEffect, useMemo, useState } from 'react';
-import { CellProps, SortByFn } from 'react-table';
 
 import { GrafanaTheme2 } from '@grafana/data';
 import { isFetchError, reportInteraction } from '@grafana/runtime';
-import { Badge, Button, DeleteButton, HorizontalGroup, LoadingPlaceholder, useStyles2, Alert } from '@grafana/ui';
+import {
+  Badge,
+  Button,
+  DeleteButton,
+  HorizontalGroup,
+  LoadingPlaceholder,
+  useStyles2,
+  Alert,
+  InteractiveTable,
+  type Column,
+  type CellProps,
+  type SortByFn,
+} from '@grafana/ui';
 import { Page } from 'app/core/components/Page/Page';
 import { contextSrv } from 'app/core/core';
 import { useNavModel } from 'app/core/hooks/useNavModel';
@@ -14,7 +25,6 @@ import { AccessControlAction } from 'app/types';
 import { AddCorrelationForm } from './Forms/AddCorrelationForm';
 import { EditCorrelationForm } from './Forms/EditCorrelationForm';
 import { EmptyCorrelationsCTA } from './components/EmptyCorrelationsCTA';
-import { Column, Table } from './components/Table';
 import type { RemoveCorrelationParams } from './types';
 import { CorrelationData, useCorrelations } from './useCorrelations';
 
@@ -97,8 +107,9 @@ export default function CorrelationsPage() {
   const columns = useMemo<Array<Column<CorrelationData>>>(
     () => [
       {
+        id: 'info',
         cell: InfoCell,
-        shrink: true,
+        disableGrow: true,
         visible: (data) => data.some(isSourceReadOnly),
       },
       {
@@ -115,8 +126,9 @@ export default function CorrelationsPage() {
       },
       { id: 'label', header: 'Label', sortType: 'alphanumeric' },
       {
+        id: 'actions',
         cell: RowActions,
-        shrink: true,
+        disableGrow: true,
         visible: (data) => canWriteCorrelations && data.some(negate(isSourceReadOnly)),
       },
     ],
@@ -133,7 +145,6 @@ export default function CorrelationsPage() {
         <div>
           <HorizontalGroup justify="space-between">
             <div>
-              <h4>Correlations</h4>
               <p>Define how data living in different data sources relates to each other.</p>
             </div>
             {canWriteCorrelations && data?.length !== 0 && data !== undefined && !isAdding && (
@@ -166,7 +177,7 @@ export default function CorrelationsPage() {
           {isAdding && <AddCorrelationForm onClose={() => setIsAdding(false)} onCreated={handleAdded} />}
 
           {data && data.length >= 1 && (
-            <Table
+            <InteractiveTable
               renderExpandedRow={(correlation) => (
                 <ExpendedRow
                   correlation={correlation}

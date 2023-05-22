@@ -1,4 +1,5 @@
 import { e2e } from '@grafana/e2e';
+import { GrafanaBootConfig } from '@grafana/runtime';
 
 const PAGE_UNDER_TEST = 'kVi2Gex7z/test-variable-output';
 
@@ -21,7 +22,15 @@ describe('Variables - Constant', () => {
 
     // Navigate back to the homepage and change the selected variable value
     e2e.pages.Dashboard.Settings.Variables.Edit.General.submitButton().click();
-    e2e.components.BackButton.backArrow().click({ force: true });
+    e2e()
+      .window()
+      .then((win: Cypress.AUTWindow & { grafanaBootData: GrafanaBootConfig['bootData'] }) => {
+        if (win.grafanaBootData.settings.featureToggles.topnav) {
+          e2e.pages.Dashboard.Settings.Actions.close().click();
+        } else {
+          e2e.components.BackButton.backArrow().click({ force: true });
+        }
+      });
     e2e.components.RefreshPicker.runButtonV2().click();
 
     // Assert it was rendered

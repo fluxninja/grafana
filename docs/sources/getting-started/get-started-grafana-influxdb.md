@@ -1,7 +1,6 @@
 ---
 aliases:
-  - /docs/grafana/latest/getting-started/get-started-grafana-influxdb/
-  - /docs/grafana/latest/getting-started/getting-started-influxdb/
+  - getting-started-influxdb/
 description: Learn how to build your first InfluxDB dashboard in Grafana.
 title: Get started with Grafana and InfluxDB
 weight: 400
@@ -10,8 +9,6 @@ weight: 400
 # Get started with Grafana and InfluxDB
 
 {{< docs/shared "influxdb/intro.md" >}}
-
-{{< docs/shared "getting-started/first-step.md" >}}
 
 #### Get InfluxDB
 

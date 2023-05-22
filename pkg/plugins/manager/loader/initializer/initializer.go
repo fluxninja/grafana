@@ -9,20 +9,19 @@ import (
 	"github.com/grafana/grafana-aws-sdk/pkg/awsds"
 	"github.com/grafana/grafana-azure-sdk-go/azsettings"
 
-	"github.com/grafana/grafana/pkg/infra/log"
-	"github.com/grafana/grafana/pkg/models"
 	"github.com/grafana/grafana/pkg/plugins"
 	"github.com/grafana/grafana/pkg/plugins/config"
+	"github.com/grafana/grafana/pkg/plugins/log"
 )
 
 type Initializer struct {
 	cfg             *config.Cfg
-	license         models.Licensing
+	license         plugins.Licensing
 	backendProvider plugins.BackendFactoryProvider
 	log             log.Logger
 }
 
-func New(cfg *config.Cfg, backendProvider plugins.BackendFactoryProvider, license models.Licensing) Initializer {
+func New(cfg *config.Cfg, backendProvider plugins.BackendFactoryProvider, license plugins.Licensing) Initializer {
 	return Initializer{
 		cfg:             cfg,
 		license:         license,
@@ -57,19 +56,33 @@ func (i *Initializer) envVars(plugin *plugins.Plugin) []string {
 		hostEnv = append(
 			hostEnv,
 			fmt.Sprintf("GF_EDITION=%s", i.license.Edition()),
-			fmt.Sprintf("GF_ENTERPRISE_LICENSE_PATH=%s", i.cfg.EnterpriseLicensePath),
+			fmt.Sprintf("GF_ENTERPRISE_LICENSE_PATH=%s", i.license.Path()),
+			fmt.Sprintf("GF_ENTERPRISE_APP_URL=%s", i.license.AppURL()),
 		)
-
-		if envProvider, ok := i.license.(models.LicenseEnvironment); ok {
-			for k, v := range envProvider.Environment() {
-				hostEnv = append(hostEnv, fmt.Sprintf("%s=%s", k, v))
-			}
-		}
+		hostEnv = append(hostEnv, i.license.Environment()...)
 	}
 
 	hostEnv = append(hostEnv, i.awsEnvVars()...)
 	hostEnv = append(hostEnv, azsettings.WriteToEnvStr(i.cfg.Azure)...)
-	return getPluginSettings(plugin.ID, i.cfg).asEnvVar("GF_PLUGIN", hostEnv)
+
+	// Tracing
+	var pluginTracingEnabled bool
+	if v, exists := i.cfg.PluginSettings[plugin.ID]["tracing"]; exists {
+		pluginTracingEnabled = v == "true"
+	}
+	if i.cfg.Opentelemetry.IsEnabled() && pluginTracingEnabled {
+		if plugin.Info.Version != "" {
+			hostEnv = append(hostEnv, fmt.Sprintf("GF_PLUGIN_VERSION=%s", plugin.Info.Version))
+		}
+		hostEnv = append(
+			hostEnv,
+			fmt.Sprintf("GF_INSTANCE_OTLP_ADDRESS=%s", i.cfg.Opentelemetry.Address),
+			fmt.Sprintf("GF_INSTANCE_OTLP_PROPAGATION=%s", i.cfg.Opentelemetry.Propagation),
+		)
+	}
+
+	ev := getPluginSettings(plugin.ID, i.cfg).asEnvVar("GF_PLUGIN", hostEnv)
+	return ev
 }
 
 func (i *Initializer) awsEnvVars() []string {
@@ -87,7 +100,7 @@ func (i *Initializer) awsEnvVars() []string {
 type pluginSettings map[string]string
 
 func (ps pluginSettings) asEnvVar(prefix string, hostEnv []string) []string {
-	var env []string
+	env := make([]string, 0, len(ps))
 	for k, v := range ps {
 		key := fmt.Sprintf("%s_%s", prefix, strings.ToUpper(k))
 		if value := os.Getenv(key); value != "" {

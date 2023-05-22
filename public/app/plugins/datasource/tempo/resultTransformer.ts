@@ -32,7 +32,7 @@ export function createTableFrame(
         type: FieldType.time,
         config: {
           custom: {
-            width: 150,
+            width: 200,
           },
         },
       },
@@ -41,7 +41,7 @@ export function createTableFrame(
         type: FieldType.string,
         config: {
           displayNameFromDS: 'Trace ID',
-          custom: { width: 300 },
+          custom: { width: 180 },
           links: [
             {
               title: 'Click to open trace ${__value.raw}',
@@ -567,7 +567,7 @@ export function createTableFrameFromSearch(data: TraceSearchMetadata[], instance
                 datasourceName: instanceSettings.name,
                 query: {
                   query: '${__value.raw}',
-                  queryType: 'traceId',
+                  queryType: 'traceql',
                 },
               },
             },
@@ -630,6 +630,9 @@ export function createTableFrameFromTraceQlQuery(
         config: {
           unit: 'string',
           displayNameFromDS: 'Trace ID',
+          custom: {
+            width: 200,
+          },
           links: [
             {
               title: 'Trace: ${__value.raw}',
@@ -639,7 +642,7 @@ export function createTableFrameFromTraceQlQuery(
                 datasourceName: instanceSettings.name,
                 query: {
                   query: '${__value.raw}',
-                  queryType: 'traceId',
+                  queryType: 'traceql',
                 },
               },
             },
@@ -699,68 +702,53 @@ const traceSubFrame = (
   const subFrame = new MutableDataFrame({
     fields: [
       {
-        name: 'traceIdHidden',
-        config: {
-          custom: { hidden: true },
-        },
-      },
-      {
-        name: 'spanID',
+        name: 'startTime',
         type: FieldType.string,
         config: {
-          unit: 'string',
-          displayNameFromDS: 'Span ID',
-          links: [
-            {
-              title: 'Span: ${__value.raw}',
-              url: '',
-              internal: {
-                datasourceUid: instanceSettings.uid,
-                datasourceName: instanceSettings.name,
-                query: {
-                  query: '${__data.fields.traceIdHidden}',
-                  queryType: 'traceId',
-                },
-                panelsState: {
-                  trace: {
-                    spanId: '${__value.raw}',
-                  },
-                },
-              },
-            },
-          ],
+          displayNameFromDS: 'Start time',
+          custom: {
+            width: 200,
+          },
         },
       },
+      { name: 'traceName', type: FieldType.string, config: { displayNameFromDS: 'Name' } },
       {
-        name: 'name',
-        type: FieldType.string,
-        config: { displayNameFromDS: 'Name', custom: { hidden: !hasNameAttribute } },
-      },
-      {
-        name: 'spanStartTime',
-        type: FieldType.string,
-        config: { displayNameFromDS: 'Start time' },
-      },
-      ...Object.values(spanDynamicAttrs),
-      {
-        name: 'duration',
+        name: 'traceDuration',
         type: FieldType.number,
-        config: { displayNameFromDS: 'Duration', unit: 'ns' },
+        config: {
+          displayNameFromDS: 'Duration',
+          unit: 'ms',
+          custom: {
+            width: 120,
+          },
+        },
       },
     ],
     meta: {
       preferredVisualisationType: 'table',
-      custom: {
-        parentRowIndex: currentIndex,
-      },
     },
   });
 
-  trace.spanSet?.spans.forEach((span) => {
-    subFrame.add(transformSpanToTraceData(span, trace.traceID));
-  });
+  if (!data?.length) {
+    return [frame];
+  }
 
-  return subFrame;
+  const subDataFrames: DataFrame[] = [];
+  const tableRows = data
+    // Show the most recent traces
+    .sort((a, b) => parseInt(b?.startTimeUnixNano!, 10) / 1000000 - parseInt(a?.startTimeUnixNano!, 10) / 1000000)
+    .reduce((rows: TraceTableData[], trace, currentIndex) => {
+      const traceData: TraceTableData = transformToTraceData(trace);
+      rows.push(traceData);
+      subDataFrames.push(traceSubFrame(trace, instanceSettings, currentIndex));
+      return rows;
+    }, []);
+
+  for (const row of tableRows) {
+    frame.add(row);
+  }
+
+  return [frame, ...subDataFrames];
 };
 
 interface TraceTableData {
