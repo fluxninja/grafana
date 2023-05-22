@@ -65,6 +65,14 @@ export const Picker: FC<PickerProps> = ({ values, onSaveToStore, pickerProps }) 
   );
 };
 
+function convertIfJson(history: TimeRange[]): TimeRange[] {
+  return history.map((time) => {
+    if (isDateTime(time.from)) {
+      return time;
+    }
+  });
+}
+
 function deserializeHistory(values: TimePickerHistoryItem[], timeZone: TimeZone | undefined): TimeRange[] {
   return values.map((item) => rangeUtil.convertRawToRange(item, timeZone));
 }

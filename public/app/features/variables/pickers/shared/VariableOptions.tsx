@@ -66,8 +66,6 @@ class VariableOptions extends PureComponent<Props> {
 
     const isAllOption = option.value === ALL_VARIABLE_VALUE;
 
-    const isAllOption = option.value === ALL_VARIABLE_VALUE;
-
     return (
       <li key={`${option.value}`}>
         <button

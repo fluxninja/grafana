@@ -33,12 +33,8 @@ import { getDashboardSrv } from 'app/features/dashboard/services/DashboardSrv';
 import { DashboardModel } from 'app/features/dashboard/state';
 import { playlistSrv } from 'app/features/playlist/PlaylistSrv';
 import { updateTimeZoneForSession } from 'app/features/profile/state/reducers';
-import { DashboardMetaChangedEvent, ShowModalReactEvent } from 'app/types/events';
 import { KioskMode, StoreState } from 'app/types';
-
-import { setStarred } from '../../../../core/reducers/navBarTree';
-import { getDashboardSrv } from '../../services/DashboardSrv';
-import { DashboardModel } from '../../state';
+import { DashboardMetaChangedEvent, ShowModalReactEvent } from 'app/types/events';
 
 import { DashNavButton } from './DashNavButton';
 import { DashNavTimeControls } from './DashNavTimeControls';

@@ -50,6 +50,7 @@ import { getPanelChromeProps } from '../utils/getPanelChromeProps';
 import { loadSnapshotData } from '../utils/loadSnapshotData';
 
 import { PanelHeader } from './PanelHeader/PanelHeader';
+import { PanelHeaderLoadingIndicator } from './PanelHeader/PanelHeaderLoadingIndicator';
 import { PanelHeaderMenuWrapperNew } from './PanelHeader/PanelHeaderMenuWrapper';
 import { seriesVisibilityConfigFactory } from './SeriesVisibilityConfigFactory';
 import { liveTimer } from './liveTimer';
@@ -68,7 +69,7 @@ export interface Props {
   onInstanceStateChange: (value: any) => void;
   timezone?: string;
   FNDashboard?: boolean;
-  mode?: "light" | "dark";
+  mode?: 'light' | 'dark';
   hideMenu?: boolean;
 }
 
@@ -277,7 +278,6 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
     if (width !== prevProps.width) {
       liveTimer.updateInterval(this);
     }
-    
   }
 
   // Updates the response with information from the stream
@@ -618,6 +618,14 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
       [`panel-alert-state--${alertState}`]: alertState !== undefined,
     });
 
+    // for new panel header design
+    const onCancelQuery = () => panel.getQueryRunner().cancelQuery();
+    const title = panel.getDisplayTitle();
+    const noPadding: PanelPadding = plugin.noPadding ? 'none' : 'md';
+    const leftItems = [
+      <PanelHeaderLoadingIndicator state={data.state} onClick={onCancelQuery} key="loading-indicator" />,
+    ];
+
     const panelChromeProps = getPanelChromeProps({ ...this.props, data });
 
     if (config.featureToggles.newPanelChromeUI) {
@@ -656,7 +664,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
           className={containerClassNames}
           aria-label={selectors.components.Panels.Panel.containerByTitle(panel.title)}
         >
-          <div style={FNDashboard ?  FN_TITLE_STYLE : {}}>
+          <div style={FNDashboard ? FN_TITLE_STYLE : {}}>
             <PanelHeader
               panel={panel}
               dashboard={dashboard}
@@ -669,7 +677,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
               alertState={alertState}
               data={data}
             />
-            </div>
+          </div>
           <ErrorBoundary
             dependencies={[data, plugin, panel.getOptions()]}
             onError={this.onPanelError}
