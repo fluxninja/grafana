@@ -63,8 +63,6 @@ export const Table = memo((props: Props) => {
   const tableStyles = useTableStyles(theme, cellHeight);
   const headerHeight = noHeader ? 0 : tableStyles.rowHeight;
   const [footerItems, setFooterItems] = useState<FooterItem[] | undefined>(footerValues);
-  const [expandedIndexes, setExpandedIndexes] = useState<Set<number>>(new Set());
-  const prevExpandedIndexes = usePrevious(expandedIndexes);
 
   const footerHeight = useMemo(() => {
     const EXTENDED_ROW_HEIGHT = FOOTER_ROW_HEIGHT;
