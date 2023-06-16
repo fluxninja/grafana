@@ -1,5 +1,5 @@
-import { merge, uniqBy } from 'lodash';
-import React, { CSSProperties, FC, useEffect } from 'react';
+import { isEqual, uniqBy } from 'lodash';
+import React, { CSSProperties, FC, useEffect, useRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 
@@ -41,24 +41,31 @@ export const Picker: FC<PickerProps> = ({ values, onSaveToStore, pickerProps }) 
   const { fnGlobalTimeRange } = useSelector<StoreState, FnGlobalState>(({ fnGlobalState }) => fnGlobalState);
   const dispatch = useDispatch();
 
+  const didMountRef = useRef(false);
   useEffect(() => {
-    if (!fnGlobalTimeRange) {
-      return;
+    /* The condition below skips the first run of useeffect that happens when this component gets mounted */
+    if (didMountRef.current) {
+      /* If the current timerange value has changed, update fnGlobalTimeRange */
+      if (!isEqual(fnGlobalTimeRange?.raw, pickerProps.value.raw)) {
+        dispatch(
+          updatePartialFnStates({
+            fnGlobalTimeRange: pickerProps.value,
+          })
+        );
+      }
     }
-    onAppendToHistory(fnGlobalTimeRange, values, onSaveToStore);
-    pickerProps.onChange(fnGlobalTimeRange);
-  }, [fnGlobalTimeRange, onSaveToStore, pickerProps, values]);
+
+    didMountRef.current = true;
+  }, [dispatch, fnGlobalTimeRange?.raw, pickerProps.value]);
 
   return (
     <TimeRangePicker
-      {...merge({}, pickerProps, { value: pickerProps.value })}
+      {...pickerProps}
+      value={fnGlobalTimeRange || pickerProps.value}
       history={convertIfJson(values)}
       onChange={(value) => {
-        dispatch(
-          updatePartialFnStates({
-            fnGlobalTimeRange: value,
-          })
-        );
+        onAppendToHistory(value, values, onSaveToStore);
+        pickerProps.onChange(value);
       }}
       fnText={<FnText />}
     />
