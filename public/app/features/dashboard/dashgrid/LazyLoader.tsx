@@ -1,3 +1,4 @@
+import { isFunction } from 'lodash';
 import React, { useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 
@@ -55,7 +56,7 @@ LazyLoader.addCallback = (id: string, c: (e: IntersectionObserverEntry) => void)
 LazyLoader.observer = new IntersectionObserver(
   (entries) => {
     for (const entry of entries) {
-      LazyLoader.callbacks[entry.target.id](entry);
+      isFunction(LazyLoader.callbacks[entry.target.id]) && LazyLoader.callbacks[entry.target.id](entry);
     }
   },
   { rootMargin: '100px' }
