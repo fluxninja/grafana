@@ -1,5 +1,4 @@
-import { useId, useRef, useState } from 'react';
-import * as React from 'react';
+import React, { useId, useRef, useState } from 'react';
 import { useEffectOnce } from 'react-use';
 
 export interface Props {
