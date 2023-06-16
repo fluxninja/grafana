@@ -49,12 +49,12 @@ export const FnAppProvider: FC<FnAppProviderProps> = (props) => {
       <BrowserRouter>
         <ErrorBoundaryAlert style="page">
           <GrafanaContext.Provider value={app.context}>
-            <ThemeProvider value={config.theme2} children={
+            <ThemeProvider value={config.theme2}>
               <>
                 <GlobalStyles />
-                {children || null}
-              </>}
-            />
+                {children}
+              </>
+            </ThemeProvider>
           </GrafanaContext.Provider>
         </ErrorBoundaryAlert>
       </BrowserRouter>

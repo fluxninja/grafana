@@ -1,4 +1,4 @@
-import { FC } from 'react';
+import { FC, PropsWithChildren } from 'react';
 import ReactDOM from 'react-dom';
 
 export interface RenderPortalProps {
@@ -7,14 +7,12 @@ export interface RenderPortalProps {
 
 export const getPortalContainer = (ID: string): HTMLElement | null => document.getElementById(ID);
 
-export const RenderPortal: FC<RenderPortalProps> = ({ ID, children }) => {
-  const portalDiv = getPortalContainer(ID)
-  
-  if(!portalDiv){
+export const RenderPortal: FC<PropsWithChildren<RenderPortalProps>> = ({ ID, children }) => {
+  const portalDiv = getPortalContainer(ID);
+
+  if (!portalDiv) {
     return null;
   }
 
   return ReactDOM.createPortal(children, portalDiv);
 };
-
-
