@@ -65,7 +65,7 @@ export const Picker: FC<PickerProps> = ({ rawValues, onSaveToStore, pickerProps 
           })
         );
       }
-    } else if (fnGlobalTimeRange) {
+    } else if (fnGlobalTimeRange && !isEqual(fnGlobalTimeRange, pickerProps.value)) {
       /* If fnGlobalTimeRange exists in the initial render, set the time as that */
       pickerProps.onChange(fnGlobalTimeRange);
     }
