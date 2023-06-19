@@ -3,7 +3,7 @@ import React, { CSSProperties, FC, useEffect, useRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 
-import { TimeRange, isDateTime, rangeUtil, TimeZone, toUtc } from '@grafana/data';
+import { TimeRange, isDateTime, rangeUtil } from '@grafana/data';
 import { TimeRangePickerProps, TimeRangePicker, useTheme2 } from '@grafana/ui';
 import { FnGlobalState, updatePartialFnStates } from 'app/core/reducers/fn-slice';
 import { StoreState } from 'app/types';
@@ -13,6 +13,15 @@ import { LocalStorageValueProvider } from '../LocalStorageValueProvider';
 const LOCAL_STORAGE_KEY = 'grafana.dashboard.timepicker.history';
 
 interface Props extends Omit<TimeRangePickerProps, 'history' | 'theme'> {}
+
+// Simplified object to store in local storage
+interface TimePickerHistoryItem {
+  from: string;
+  to: string;
+}
+
+// We should only be storing TimePickerHistoryItem, but in the past we also stored TimeRange
+type LSTimePickerHistoryItem = TimePickerHistoryItem | TimeRange;
 
 const FnText: React.FC = () => {
   const { FNDashboard } = useSelector<StoreState, FnGlobalState>(({ fnGlobalState }) => fnGlobalState);
@@ -24,22 +33,25 @@ const FnText: React.FC = () => {
 };
 
 export const TimePickerWithHistory: FC<Props> = (props) => (
-  <LocalStorageValueProvider<TimeRange[]> storageKey={LOCAL_STORAGE_KEY} defaultValue={[]}>
-    {(values, onSaveToStore) => {
-      return <Picker values={values} onSaveToStore={onSaveToStore} pickerProps={props} />;
+  <LocalStorageValueProvider<LSTimePickerHistoryItem[]> storageKey={LOCAL_STORAGE_KEY} defaultValue={[]}>
+    {(rawValues, onSaveToStore) => {
+      return <Picker rawValues={rawValues} onSaveToStore={onSaveToStore} pickerProps={props} />;
     }}
   </LocalStorageValueProvider>
 );
 
 export interface PickerProps {
-  values: TimeRange[];
-  onSaveToStore: (value: TimeRange[]) => void;
+  rawValues: LSTimePickerHistoryItem[];
+  onSaveToStore: (value: LSTimePickerHistoryItem[]) => void;
   pickerProps: Props;
 }
 
-export const Picker: FC<PickerProps> = ({ values, onSaveToStore, pickerProps }) => {
+export const Picker: FC<PickerProps> = ({ rawValues, onSaveToStore, pickerProps }) => {
   const { fnGlobalTimeRange } = useSelector<StoreState, FnGlobalState>(({ fnGlobalState }) => fnGlobalState);
   const dispatch = useDispatch();
+
+  const values = migrateHistory(rawValues);
+  const history = deserializeHistory(values);
 
   const didMountRef = useRef(false);
   useEffect(() => {
@@ -62,7 +74,7 @@ export const Picker: FC<PickerProps> = ({ values, onSaveToStore, pickerProps }) 
     <TimeRangePicker
       {...pickerProps}
       value={fnGlobalTimeRange || pickerProps.value}
-      history={convertIfJson(values)}
+      history={history}
       onChange={(value) => {
         onAppendToHistory(value, values, onSaveToStore);
         pickerProps.onChange(value);
@@ -72,16 +84,9 @@ export const Picker: FC<PickerProps> = ({ values, onSaveToStore, pickerProps }) 
   );
 };
 
-function convertIfJson(history: TimeRange[]): TimeRange[] {
-  return history.map((time) => {
-    if (isDateTime(time.from)) {
-      return time;
-    }
-  });
-}
-
-function deserializeHistory(values: TimePickerHistoryItem[], timeZone: TimeZone | undefined): TimeRange[] {
-  return values.map((item) => rangeUtil.convertRawToRange(item, timeZone));
+function deserializeHistory(values: TimePickerHistoryItem[]): TimeRange[] {
+  // The history is saved in UTC and with the default date format, so we need to pass those values to the convertRawToRange
+  return values.map((item) => rangeUtil.convertRawToRange(item, 'utc', undefined, 'YYYY-MM-DD HH:mm:ss'));
 }
 
 function migrateHistory(values: LSTimePickerHistoryItem[]): TimePickerHistoryItem[] {
