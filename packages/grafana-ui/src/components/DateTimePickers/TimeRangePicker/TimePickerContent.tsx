@@ -288,7 +288,7 @@ const getStyles = stylesFactory((theme: GrafanaTheme2, isReversed, hideQuickRang
       flex-direction: column;
       border-right: ${isReversed ? 'none' : `1px solid ${theme.colors.border.weak}`};
       width: ${!hideQuickRanges ? '50%' : '100%'};
-      overflow: hidden;
+      overflow: auto;
       order: ${isReversed ? 1 : 0};
     `,
     rightSide: css`
