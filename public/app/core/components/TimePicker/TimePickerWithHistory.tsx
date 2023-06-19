@@ -65,15 +65,17 @@ export const Picker: FC<PickerProps> = ({ rawValues, onSaveToStore, pickerProps 
           })
         );
       }
+    } else if (fnGlobalTimeRange && !isEqual(fnGlobalTimeRange, pickerProps.value)) {
+      /* If fnGlobalTimeRange exists in the initial render, set the time as that */
+      pickerProps.onChange(fnGlobalTimeRange);
     }
 
     didMountRef.current = true;
-  }, [dispatch, fnGlobalTimeRange?.raw, pickerProps.value]);
+  }, [dispatch, fnGlobalTimeRange, pickerProps]);
 
   return (
     <TimeRangePicker
       {...pickerProps}
-      value={fnGlobalTimeRange || pickerProps.value}
       history={history}
       onChange={(value) => {
         onAppendToHistory(value, values, onSaveToStore);
