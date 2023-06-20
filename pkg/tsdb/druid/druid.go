@@ -11,6 +11,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/Knetic/govaluate"
 	"github.com/bitly/go-simplejson"
 	"github.com/grafadruid/go-druid"
 	druidquerybuilder "github.com/grafadruid/go-druid/builder"
@@ -440,6 +441,9 @@ func (ds *Service) prepareQuery(qry []byte, s *druidInstanceSettings) (druidquer
 			defaultQueryContext,
 			ds.prepareQueryContext(queryContextParameters.([]interface{})))
 	}
+	if g, ok := q.Builder["granularity"].(map[string]any); ok {
+		q.Builder["granularity"] = resolveGranularity(g)
+	}
 	jsonQuery, err := json.Marshal(q.Builder)
 	if err != nil {
 		return nil, nil, err
@@ -447,6 +451,28 @@ func (ds *Service) prepareQuery(qry []byte, s *druidInstanceSettings) (druidquer
 	query, err := s.client.Query().Load(jsonQuery)
 	// feature: could ensure __time column is selected, time interval is set based on qry given timerange and consider max data points ?
 	return query, mergeSettings(s.defaultQuerySettings, q.Settings), err
+}
+
+func resolveGranularity(m map[string]any) map[string]any {
+	// granularity is optional, so return early if not set and is of wrong type
+	if m == nil || m["type"] != "duration" {
+		return m
+	}
+	expr, ok := m["duration"].(string)
+	if !ok {
+		return m
+	}
+
+	eval, err := govaluate.NewEvaluableExpression(expr)
+	if err != nil {
+		return m
+	}
+	result, err := eval.Evaluate(nil)
+	if err != nil {
+		return m
+	}
+	m["duration"] = result
+	return m
 }
 
 func (ds *Service) prepareQueryContext(parameters []interface{}) map[string]interface{} {
