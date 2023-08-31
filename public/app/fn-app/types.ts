@@ -26,7 +26,6 @@ export interface FNDashboardProps {
   mode: GrafanaThemeType.Dark | GrafanaThemeType.Light;
   queryParams: ParsedQuery<string>;
   fnError?: ReactNode;
-  fnLoader?: ReactNode;
   pageTitle?: string;
   controlsContainer: string;
   isLoading: (isLoading: boolean) => void;

@@ -33,7 +33,7 @@ import { findTemplateVarChanges } from '../../variables/utils';
 import { AddWidgetModal } from '../components/AddWidgetModal/AddWidgetModal';
 import { DashNav } from '../components/DashNav';
 import { DashboardFailed } from '../components/DashboardLoading/DashboardFailed';
-import { DashboardLoading } from '../components/DashboardLoading/DashboardLoading';
+import { FnLoader } from '../components/DashboardLoading/FnLoader';
 import { DashboardPrompt } from '../components/DashboardPrompt/DashboardPrompt';
 import { DashboardSettings } from '../components/DashboardSettings';
 import { PanelInspector } from '../components/Inspector/PanelInspector';
@@ -93,8 +93,7 @@ type OwnProps = {
   isPublic?: boolean;
   controlsContainer?: string | null;
   version?: FNDashboardProps['version'];
-  fnLoader?: FNDashboardProps['fnLoader'];
-  isLoading?: FNDashboardProps['isLoading']
+  isLoading?: FNDashboardProps['isLoading'];
 };
 
 export type DashboardPageProps = OwnProps &
@@ -402,17 +401,18 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   };
 
   render() {
-    const { dashboard, initError, queryParams, isPublic, FNDashboard, fnLoader, isLoading = noop } = this.props;
+    const { dashboard, initError, queryParams, isPublic, FNDashboard, isLoading = noop } = this.props;
     const { editPanel, viewPanel, updateScrollTop, pageNav, sectionNav } = this.state;
     const kioskMode = FNDashboard ? KioskMode.FN : !isPublic ? getKioskMode(this.props.queryParams) : KioskMode.Full;
 
     if (!dashboard || isEmpty(queryParams)) {
-      isLoading(true)
+      isLoading(true);
 
-      return isUndefined(fnLoader) ? <DashboardLoading initPhase={this.props.initPhase} />: <>{fnLoader}</>;
+      // return isUndefined(fnLoader) ? <DashboardLoading initPhase={this.props.initPhase} />: <>{fnLoader}</>;
+      return <FnLoader />;
     }
 
-    isLoading(false)
+    isLoading(false);
 
     const inspectPanel = this.getInspectPanel();
     const showSubMenu = !editPanel && !this.props.queryParams.editview;
