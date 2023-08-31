@@ -27,7 +27,7 @@ const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'history' | 'route'
 };
 
 export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
-  const { queryParams, controlsContainer, setErrors, fnLoader, hiddenVariables, isLoading } = props;
+  const { queryParams, controlsContainer, setErrors, hiddenVariables, isLoading } = props;
 
   const firstError = useSelector((state: StoreState) => {
     const { appNotifications } = state;
@@ -66,10 +66,9 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
         queryParams,
         hiddenVariables,
         controlsContainer,
-        fnLoader,
         isLoading
       }),
-    [controlsContainer, fnLoader, hiddenVariables, isLoading, props, queryParams]
+    [controlsContainer, hiddenVariables, isLoading, props, queryParams]
   );
 
   return <DashboardPage {...dashboardPageProps} />;
