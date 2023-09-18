@@ -60,6 +60,7 @@ export interface DashboardPageRouteParams {
   type?: string;
   slug?: string;
   accessToken?: string;
+  version?: number;
 }
 
 export type DashboardPageRouteSearchParams = {
@@ -250,7 +251,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       routeName: this.props.route.routeName,
       fixUrl: !isPublic && !FNDashboard,
       accessToken: match.params.accessToken,
-      keybindingSrv: this.context.keybindings,
+      keybindingSrv: this.context?.keybindings,
     });
 
     // small delay to start live updates

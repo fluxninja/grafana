@@ -41,7 +41,7 @@ export interface InitDashboardArgs {
   accessToken?: string;
   routeName?: string;
   fixUrl: boolean;
-  keybindingSrv: KeybindingSrv;
+  keybindingSrv?: KeybindingSrv;
 }
 
 async function fetchDashboard(
@@ -79,7 +79,12 @@ async function fetchDashboard(
         return await dashboardLoaderSrv.loadDashboard('public', args.urlSlug, args.accessToken, args.version);
       }
       case DashboardRoutes.Normal: {
-        const dashDTO: DashboardDTO = await dashboardLoaderSrv.loadDashboard(args.urlType, args.urlSlug, args.urlUid, args.version);
+        const dashDTO: DashboardDTO = await dashboardLoaderSrv.loadDashboard(
+          args.urlType,
+          args.urlSlug,
+          args.urlUid,
+          args.version
+        );
 
         if (args.fixUrl && dashDTO.meta.url && !playlistSrv.isPlaying) {
           // check if the current url is correct (might be old slug)
