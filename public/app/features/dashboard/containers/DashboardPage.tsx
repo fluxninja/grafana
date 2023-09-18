@@ -47,7 +47,14 @@ import { explicitlyControlledMigrationPanels, autoMigrateAngular } from '../stat
 import { cleanUpDashboardAndVariables } from '../state/actions';
 import { initDashboard } from '../state/initDashboard';
 
-import { DashboardPageRouteParams, DashboardPageRouteSearchParams } from './types';
+import { DashboardPageRouteSearchParams } from './types';
+export interface DashboardPageRouteParams {
+  uid?: string;
+  type?: string;
+  slug?: string;
+  accessToken?: string;
+  version?: number;
+}
 
 import 'react-grid-layout/css/styles.css';
 import 'react-resizable/css/styles.css';
@@ -207,7 +214,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       routeName: this.props.route.routeName,
       fixUrl: !isPublic && !FNDashboard,
       accessToken: match.params.accessToken,
-      keybindingSrv: this.context.keybindings,
+      keybindingSrv: this.context?.keybindings,
     });
 
     // small delay to start live updates
