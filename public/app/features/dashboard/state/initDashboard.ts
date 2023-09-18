@@ -41,7 +41,7 @@ export interface InitDashboardArgs {
   accessToken?: string;
   routeName?: string;
   fixUrl: boolean;
-  keybindingSrv: KeybindingSrv;
+  keybindingSrv?: KeybindingSrv;
 }
 
 async function fetchDashboard(
