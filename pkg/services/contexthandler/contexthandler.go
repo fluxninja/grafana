@@ -191,7 +191,7 @@ func (h *ContextHandler) Middleware(next http.Handler) http.Handler {
 			case h.initContextWithJWT(reqContext, orgID):
 			// Disabled as it does not work with Aperture Cloud User API Keys.
 			//case h.initContextWithAPIKey(reqContext):
-			case h.initContextWithBasicAuth(reqContext, orgID):
+			//case h.initContextWithBasicAuth(reqContext, orgID):
 			case h.initContextWithAuthProxy(reqContext, orgID):
 			case h.initContextWithToken(reqContext, orgID):
 			case h.initContextWithAnonymousUser(reqContext):
