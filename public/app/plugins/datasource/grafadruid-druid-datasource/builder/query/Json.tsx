@@ -1,6 +1,7 @@
 import React from 'react';
-import { QueryBuilderProps, QueryBuilderOptions } from '../types';
+
 import { Code, Row } from '../abstract';
+import { QueryBuilderProps, QueryBuilderOptions } from '../types';
 
 export const Json = (props: QueryBuilderProps) => {
   const options: any = { builder: JSON.stringify(props.options.builder, null, '\t') };

@@ -1,6 +1,9 @@
 import React, { ChangeEvent } from 'react';
+
 import { Input as InputField, InlineField } from '@grafana/ui';
+
 import { QueryBuilderFieldProps } from './types';
+
 import { onBuilderChange } from '.';
 
 interface Props extends QueryBuilderFieldProps {

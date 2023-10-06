@@ -1,6 +1,8 @@
-import React, { ChangeEvent } from 'react';
-import { LegacyForms, FieldSet, Field, Switch } from '@grafana/ui';
 import { css } from '@emotion/css';
+import React, { ChangeEvent } from 'react';
+
+import { LegacyForms, FieldSet, Field, Switch } from '@grafana/ui';
+
 import { ConnectionSettingsProps } from './types';
 
 const { FormField } = LegacyForms;

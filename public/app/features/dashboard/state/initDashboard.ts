@@ -9,6 +9,7 @@ import store from 'app/core/store';
 import { dashboardLoaderSrv } from 'app/features/dashboard/services/DashboardLoaderSrv';
 import { DashboardSrv, getDashboardSrv } from 'app/features/dashboard/services/DashboardSrv';
 import { getTimeSrv, TimeSrv } from 'app/features/dashboard/services/TimeSrv';
+import { getFolderByUid } from 'app/features/folders/state/actions';
 import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
 import { playlistSrv } from 'app/features/playlist/PlaylistSrv';
 import { toStateKey } from 'app/features/variables/utils';
@@ -25,6 +26,7 @@ import {
 import { createDashboardQueryRunner } from '../../query/state/DashboardQueryRunner/DashboardQueryRunner';
 import { initVariablesTransaction } from '../../variables/state/actions';
 import { getIfExistsLastKey } from '../../variables/state/selectors';
+import { trackDashboardLoaded } from '../utils/tracking';
 
 import { DashboardModel } from './DashboardModel';
 import { PanelModel } from './PanelModel';
@@ -36,12 +38,12 @@ export interface InitDashboardArgs {
   urlSlug?: string;
   urlType?: string;
   urlFolderUid?: string;
-  version?: number;
   panelType?: string;
   accessToken?: string;
   routeName?: string;
   fixUrl: boolean;
   keybindingSrv: KeybindingSrv;
+  dashboardDto?: DashboardDTO;
 }
 
 async function fetchDashboard(
@@ -76,11 +78,22 @@ async function fetchDashboard(
         return dashDTO;
       }
       case DashboardRoutes.Public: {
-        return await dashboardLoaderSrv.loadDashboard('public', args.urlSlug, args.accessToken, args.version);
+        return await dashboardLoaderSrv.loadDashboard('public', args.urlSlug, args.accessToken);
+      }
+      case DashboardRoutes.Embedded: {
+        if (args.dashboardDto) {
+          return args.dashboardDto;
+        }
       }
       case DashboardRoutes.Normal: {
-        const dashDTO: DashboardDTO = await dashboardLoaderSrv.loadDashboard(args.urlType, args.urlSlug, args.urlUid, args.version);
+        const dashDTO: DashboardDTO = await dashboardLoaderSrv.loadDashboard(args.urlType, args.urlSlug, args.urlUid);
 
+        // only the folder API has information about ancestors
+        // get parent folder (if it exists) and put it in the store
+        // this will be used to populate the full breadcrumb trail
+        if (config.featureToggles.nestedFolders && dashDTO.meta.folderUid) {
+          await dispatch(getFolderByUid(dashDTO.meta.folderUid));
+        }
         if (args.fixUrl && dashDTO.meta.url && !playlistSrv.isPlaying) {
           // check if the current url is correct (might be old slug)
           const dashboardUrl = locationUtil.stripBaseFromUrl(dashDTO.meta.url);
@@ -98,11 +111,17 @@ async function fetchDashboard(
         return dashDTO;
       }
       case DashboardRoutes.New: {
+        // only the folder API has information about ancestors
+        // get parent folder (if it exists) and put it in the store
+        // this will be used to populate the full breadcrumb trail
+        if (config.featureToggles.nestedFolders && args.urlFolderUid) {
+          await dispatch(getFolderByUid(args.urlFolderUid));
+        }
         return getNewDashboardModelData(args.urlFolderUid, args.panelType);
       }
       case DashboardRoutes.Path: {
         const path = args.urlSlug ?? '';
-        return await dashboardLoaderSrv.loadDashboard(DashboardRoutes.Path, path, path, args.version);
+        return await dashboardLoaderSrv.loadDashboard(DashboardRoutes.Path, path, path);
       }
       default:
         throw { message: 'Unknown route ' + args.routeName };
@@ -158,6 +177,8 @@ export function initDashboard(args: InitDashboardArgs): ThunkResult<void> {
     // fetch dashboard data
     const dashDTO = await fetchDashboard(args, dispatch, getState);
 
+    const versionBeforeMigration = dashDTO?.dashboard?.version;
+
     // returns null if there was a redirect or error
     if (!dashDTO) {
       return;
@@ -186,7 +207,7 @@ export function initDashboard(args: InitDashboardArgs): ThunkResult<void> {
     }
 
     // init services
-    const timeSrv: TimeSrv = getTimeSrv(); // FN: We might need to return this to main app so that we can render it elsewhere
+    const timeSrv: TimeSrv = getTimeSrv();
     const dashboardSrv: DashboardSrv = getDashboardSrv();
 
     // legacy srv state, we need this value updated for built-in annotations
@@ -223,7 +244,7 @@ export function initDashboard(args: InitDashboardArgs): ThunkResult<void> {
         dashboard.autoFitPanels(window.innerHeight, queryParams.kiosk);
       }
 
-      args.keybindingSrv?.setupDashboardBindings(dashboard);
+      args.keybindingSrv.setupDashboardBindings(dashboard);
     } catch (err) {
       if (err instanceof Error) {
         dispatch(notifyApp(createErrorNotification('Dashboard init failed', err)));
@@ -258,6 +279,8 @@ export function initDashboard(args: InitDashboardArgs): ThunkResult<void> {
         queries: getQueriesByDatasource(dashboard.panels),
       })
     );
+
+    trackDashboardLoaded(dashboard, versionBeforeMigration);
 
     // yay we are done
     dispatch(dashboardInitCompleted(dashboard));

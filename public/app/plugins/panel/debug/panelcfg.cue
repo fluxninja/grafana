@@ -14,37 +14,70 @@
 
 package grafanaplugin
 
-import (
-	// "github.com/grafana/grafana/packages/grafana-schema/src/common"
-	"github.com/grafana/grafana/pkg/plugins/pfs"
-)
-
-// This file (with its sibling .cue files) implements pfs.GrafanaPlugin
-pfs.GrafanaPlugin
-
+<<<<<<<< HEAD:public/app/plugins/panel/alertGroups/panelcfg.cue
 composableKinds: PanelCfg: {
-	maturity: "experimental"
-
 	lineage: {
 		seqs: [
 			{
 				schemas: [
 					{
-						UpdateConfig: {
-							render:        bool
-							dataChanged:   bool
-							schemaChanged: bool
-						} @cuetsy(kind="type")
-
-						DebugMode: "render" | "events" | "cursor" | "State" | "ThrowError" @cuetsy(kind="enum")
-
 						PanelOptions: {
-							mode:      DebugMode
-							counters?: UpdateConfig
+							// Comma-separated list of values used to filter alert results
+							labels: string
+							// Name of the alertmanager used as a source for alerts
+							alertmanager: string
+							// Expand all alert groups by default
+							expandAll: bool
 						} @cuetsy(kind="interface")
 					},
 				]
 			},
 		]
 	}
+|||||||| 78f0340031:public/app/plugins/panel/heatmap/models.cue
+import "github.com/grafana/thema"
+
+Panel: thema.#Lineage & {
+	name: "heatmap"
+	seqs: [
+		{
+			schemas: [
+				{
+					PanelOptions: {
+						// anything for now
+						...
+					} @cuetsy(kind="interface")
+					PanelFieldConfig: {
+						// anything for now
+						...
+					} @cuetsy(kind="interface")
+				},
+			]
+		},
+	]
+========
+composableKinds: PanelCfg: {
+	maturity: "experimental"
+
+	lineage: {
+		schemas: [{
+			version: [0, 0]
+			schema: {
+				UpdateConfig: {
+					render:        bool
+					dataChanged:   bool
+					schemaChanged: bool
+				} @cuetsy(kind="type")
+
+				DebugMode: "render" | "events" | "cursor" | "State" | "ThrowError" @cuetsy(kind="enum")
+
+				Options: {
+					mode:      DebugMode
+					counters?: UpdateConfig
+				} @cuetsy(kind="interface")
+			}
+		}]
+		lenses: []
+	}
+>>>>>>>> v10.1.1:public/app/plugins/panel/debug/panelcfg.cue
 }

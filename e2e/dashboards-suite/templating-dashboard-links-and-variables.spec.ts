@@ -47,15 +47,7 @@ e2e.scenario({
 
     e2e.pages.Dashboard.SubMenu.submenuItemValueDropDownOptionTexts('p2').should('be.visible').click();
 
-    e2e()
-      .window()
-      .then((win: Cypress.AUTWindow & { grafanaBootData: GrafanaBootConfig['bootData'] }) => {
-        if (win.grafanaBootData.settings.featureToggles.topnav) {
-          e2e.components.NavToolbar.container().click();
-        } else {
-          e2e.components.PageToolbar.container().click();
-        }
-      });
+    e2e.components.NavToolbar.container().click();
     e2e.components.DashboardLinks.dropDown()
       .scrollIntoView()
       .should('be.visible')

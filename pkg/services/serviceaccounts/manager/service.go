@@ -58,7 +58,6 @@ func ProvideServiceAccountsService(
 		userService,
 		orgService,
 	)
-	log := log.New("serviceaccounts")
 	s := &ServiceAccountsService{
 		store:         serviceAccountsStore,
 		log:           log,
@@ -235,9 +234,9 @@ func (sa *ServiceAccountsService) MigrateApiKey(ctx context.Context, orgID, keyI
 	}
 	return sa.store.MigrateApiKey(ctx, orgID, keyID)
 }
-func (sa *ServiceAccountsService) MigrateApiKeysToServiceAccounts(ctx context.Context, orgID int64) error {
+func (sa *ServiceAccountsService) MigrateApiKeysToServiceAccounts(ctx context.Context, orgID int64) (*serviceaccounts.MigrationResult, error) {
 	if err := validOrgID(orgID); err != nil {
-		return err
+		return nil, err
 	}
 	return sa.store.MigrateApiKeysToServiceAccounts(ctx, orgID)
 }

@@ -1,7 +1,8 @@
-import React, { ReactNode } from 'react';
-import { InlineFieldRow, stylesFactory, useTheme } from '@grafana/ui';
-import { GrafanaTheme } from '@grafana/data';
 import { css, cx } from '@emotion/css';
+import React, { ReactNode } from 'react';
+
+import { GrafanaTheme } from '@grafana/data';
+import { InlineFieldRow, stylesFactory, useTheme } from '@grafana/ui';
 
 interface Props {
   children: ReactNode | ReactNode[];

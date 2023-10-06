@@ -41,8 +41,8 @@ export class FN_DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOp
     this.basicAuth = instanceSettings.basicAuth;
     this.withCredentials = instanceSettings.withCredentials;
 
-    console.log({instanceSettings})
-    const url = instanceSettings.jsonData["connection.url"]
+    console.log({ instanceSettings });
+    const url = instanceSettings.jsonData['connection.url'];
     // const url = "http://localhost:8081/api/query"
     this.url = url;
 

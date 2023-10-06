@@ -1,4 +1,4 @@
-import { merge,  isFunction } from 'lodash';
+import { merge, isFunction } from 'lodash';
 import React, { useEffect, FC, useMemo } from 'react';
 
 import { locationService as locationSrv, HistoryWrapper } from '@grafana/runtime';
@@ -66,7 +66,7 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
         queryParams,
         hiddenVariables,
         controlsContainer,
-        isLoading
+        isLoading,
       }),
     [controlsContainer, hiddenVariables, isLoading, props, queryParams]
   );

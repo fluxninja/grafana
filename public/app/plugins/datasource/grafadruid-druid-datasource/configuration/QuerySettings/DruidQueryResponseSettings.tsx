@@ -1,8 +1,10 @@
 import React, { ChangeEvent } from 'react';
-import { InlineFieldRow, InlineField, InlineSwitch, Select, Input } from '@grafana/ui';
+
 import { SelectableValue } from '@grafana/data';
-import { QuerySettingsProps } from './types';
+import { InlineFieldRow, InlineField, InlineSwitch, Select, Input } from '@grafana/ui';
+
 import { DruidQueryLogSettings } from './DruidQueryLogSettings';
+import { QuerySettingsProps } from './types';
 
 export const DruidQueryResponseSettings = (props: QuerySettingsProps) => {
   const { options, onOptionsChange } = props;

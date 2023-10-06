@@ -1,9 +1,11 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Input, Row } from '../abstract';
 import { ExtractionFn } from '../extractionfn';
-import { FilterTuning } from '.';
 import { SearchQuerySpec } from '../searchqueryspec';
+import { QueryBuilderProps } from '../types';
+
+import { FilterTuning } from '.';
 
 export const Search = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Search);

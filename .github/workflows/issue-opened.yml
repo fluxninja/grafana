@@ -24,5 +24,13 @@ jobs:
         uses: ./actions/commands
         with:
           metricsWriteAPIKey: ${{secrets.GRAFANA_MISC_STATS_API_KEY}}
+<<<<<<<< HEAD:.github/workflows/issue-opened.yml
           token: ${{secrets.ISSUE_COMMANDS_TOKEN}}
           configPath: "issue-opened"
+|||||||| 78f0340031:.github/workflows/commands.yml
+          token: ${{secrets.GH_BOT_ACCESS_TOKEN}}
+          configPath: commands
+========
+          token: ${{secrets.ISSUE_COMMANDS_TOKEN}}
+          configPath: commands
+>>>>>>>> v10.1.1:.github/workflows/commands.yml

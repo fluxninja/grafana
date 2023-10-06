@@ -1,6 +1,7 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/data';
-import { QuerySettings } from './configuration/QuerySettings/types';
+
 import { ConnectionSettings } from './configuration/ConnectionSettings/types';
+import { QuerySettings } from './configuration/QuerySettings/types';
 
 //expr is a workaround: https://github.com/grafana/grafana/issues/30013
 export interface DruidQuery extends DataQuery {

@@ -13,10 +13,24 @@ import {
   ExtendedStats,
   MovingAverage as SchemaMovingAverage,
   BucketAggregation,
+  Logs as SchemaLogs,
+  Elasticsearch,
 } from './dataquery.gen';
 
 export * from './dataquery.gen';
 export { Elasticsearch as ElasticsearchQuery } from './dataquery.gen';
+
+// We want to extend the settings of the Logs query with additional properties that
+// are not part of the schema. This is a workaround, because exporting LogsSettings
+// from dataquery.gen.ts and extending that produces error in SettingKeyOf.
+type ExtendedLogsSettings = SchemaLogs['settings'] & {
+  searchAfter?: unknown[];
+  sortDirection?: 'asc' | 'desc';
+};
+
+export interface Logs extends SchemaLogs {
+  settings?: ExtendedLogsSettings;
+}
 
 export type MetricAggregationWithMeta = ExtendedStats;
 
@@ -49,7 +63,10 @@ export interface ElasticsearchOptions extends DataSourceJsonData {
   logLevelField?: string;
   dataLinks?: DataLinkConfig[];
   includeFrozen?: boolean;
+  index?: string;
 }
+
+export type QueryType = 'metrics' | 'logs' | 'raw_data' | 'raw_document';
 
 interface MetricConfiguration<T extends MetricAggregationType> {
   label: string;
@@ -63,7 +80,7 @@ interface MetricConfiguration<T extends MetricAggregationType> {
    */
   versionRange?: string;
   supportsMultipleBucketPaths: boolean;
-  isSingleMetric?: boolean;
+  impliedQueryType: QueryType;
   hasSettings: boolean;
   hasMeta: boolean;
   defaults: Omit<Extract<MetricAggregation, { type: T }>, 'id' | 'type'>;
@@ -105,3 +122,17 @@ export type DataLinkConfig = {
   urlDisplayLabel?: string;
   datasourceUid?: string;
 };
+
+export interface ElasticsearchAnnotationQuery {
+  target: Elasticsearch;
+  timeField?: string;
+  titleField?: string;
+  timeEndField?: string;
+  query?: string;
+  tagsField?: string;
+  textField?: string;
+  // @deprecated index is deprecated and will be removed in the future
+  index?: string;
+}
+
+export type RangeMap = Record<string, { from: number; to: number; format: string }>;

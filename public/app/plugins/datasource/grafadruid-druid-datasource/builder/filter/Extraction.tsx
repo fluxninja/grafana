@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+
 import { InfoBox } from '@grafana/ui';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Input, Row } from '../abstract';
 import { ExtractionFn } from '../extractionfn';
+import { QueryBuilderProps } from '../types';
 
 export const Extraction = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Extraction);

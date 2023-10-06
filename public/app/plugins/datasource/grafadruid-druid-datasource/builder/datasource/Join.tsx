@@ -1,6 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderProps, useScopedQueryBuilderFieldProps, Input, Select, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { DataSource } from '.';
 
 export const Join = (props: QueryBuilderProps) => {

@@ -1,7 +1,9 @@
 import React from 'react';
+
 import { InlineLabel } from '@grafana/ui';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Input, Checkbox, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
 
 export const FilterTuning = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, FilterTuning);

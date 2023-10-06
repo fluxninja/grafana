@@ -1,6 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Multiple, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { HavingSpec } from './';
 
 export const And = (props: QueryBuilderProps) => {

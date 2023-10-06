@@ -1,15 +1,16 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderProps, useScopedQueryBuilderFieldProps, Multiple, Row } from '../abstract';
+import { Aggregation } from '../aggregation';
 import { DataSource } from '../datasource';
 import { Dimension } from '../dimension';
-import { LimitSpec } from '../limitspec';
-import { HavingSpec } from '../havingspec';
-import { Granularity } from '../granularity';
 import { Filter } from '../filter';
-import { Aggregation } from '../aggregation';
+import { Granularity } from '../granularity';
+import { HavingSpec } from '../havingspec';
+import { LimitSpec } from '../limitspec';
 import { PostAggregation } from '../postaggregation';
 import { Intervals } from '../querysegmentspec';
+import { QueryBuilderProps } from '../types';
 import { VirtualColumn } from '../virtualcolumn';
 
 export const GroupBy = (props: QueryBuilderProps) => {

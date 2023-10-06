@@ -1,13 +1,14 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderProps, useScopedQueryBuilderFieldProps, Multiple, Input, Row } from '../abstract';
 import { DataSource } from '../datasource';
-import { Granularity } from '../granularity';
-import { Filter } from '../filter';
-import { Intervals } from '../querysegmentspec';
 import { Dimension } from '../dimension';
+import { Filter } from '../filter';
+import { Granularity } from '../granularity';
+import { Intervals } from '../querysegmentspec';
 import { SearchQuerySpec } from '../searchqueryspec';
 import { SearchSortSpec } from '../searchsortspec';
+import { QueryBuilderProps } from '../types';
 
 export const Search = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Search);

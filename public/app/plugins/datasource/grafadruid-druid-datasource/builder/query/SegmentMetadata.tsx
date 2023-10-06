@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import {
   useScopedQueryBuilderProps,
   useScopedQueryBuilderFieldProps,
@@ -12,6 +12,7 @@ import {
 import { DataSource } from '../datasource';
 import { Intervals } from '../querysegmentspec';
 import { ToInclude } from '../toinclude';
+import { QueryBuilderProps } from '../types';
 
 export const SegmentMetadata = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, SegmentMetadata);

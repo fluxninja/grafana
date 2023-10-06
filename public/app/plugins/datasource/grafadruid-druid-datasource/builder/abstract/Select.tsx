@@ -1,7 +1,10 @@
 import React from 'react';
-import { InlineField, Select as SelectField } from '@grafana/ui';
+
 import { SelectableValue } from '@grafana/data';
+import { InlineField, Select as SelectField } from '@grafana/ui';
+
 import { QueryBuilderFieldProps } from './types';
+
 import { onBuilderChange } from '.';
 
 interface Props extends QueryBuilderFieldProps {

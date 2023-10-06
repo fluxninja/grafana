@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/benbjohnson/clock"
+	"github.com/grafana/dskit/concurrency"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 
 	"github.com/grafana/grafana/pkg/infra/log"
@@ -39,7 +40,8 @@ type Manager struct {
 	historian     Historian
 	externalURL   *url.URL
 
-	doNotSaveNormalState bool
+	doNotSaveNormalState    bool
+	maxStateSaveConcurrency int
 }
 
 type ManagerCfg struct {
@@ -51,20 +53,23 @@ type ManagerCfg struct {
 	Historian     Historian
 	// DoNotSaveNormalState controls whether eval.Normal state is persisted to the database and returned by get methods
 	DoNotSaveNormalState bool
+	// MaxStateSaveConcurrency controls the number of goroutines (per rule) that can save alert state in parallel.
+	MaxStateSaveConcurrency int
 }
 
 func NewManager(cfg ManagerCfg) *Manager {
 	return &Manager{
-		cache:                newCache(),
-		ResendDelay:          ResendDelay, // TODO: make this configurable
-		log:                  log.New("ngalert.state.manager"),
-		metrics:              cfg.Metrics,
-		instanceStore:        cfg.InstanceStore,
-		images:               cfg.Images,
-		historian:            cfg.Historian,
-		clock:                cfg.Clock,
-		externalURL:          cfg.ExternalURL,
-		doNotSaveNormalState: cfg.DoNotSaveNormalState,
+		cache:                   newCache(),
+		ResendDelay:             ResendDelay, // TODO: make this configurable
+		log:                     log.New("ngalert.state.manager"),
+		metrics:                 cfg.Metrics,
+		instanceStore:           cfg.InstanceStore,
+		images:                  cfg.Images,
+		historian:               cfg.Historian,
+		clock:                   cfg.Clock,
+		externalURL:             cfg.ExternalURL,
+		doNotSaveNormalState:    cfg.DoNotSaveNormalState,
+		maxStateSaveConcurrency: cfg.MaxStateSaveConcurrency,
 	}
 }
 
@@ -277,6 +282,27 @@ func (st *Manager) setNextState(ctx context.Context, alertRule *ngModels.AlertRu
 	// Add the instance to the log context to help correlate log lines for a state
 	logger = logger.New("instance", result.Instance)
 
+	// if the current state is Error but the result is different, then we need o clean up the extra labels
+	// that were added after the state key was calculated
+	// https://github.com/grafana/grafana/blob/1df4d332c982dc5e394201bb2ef35b442727ce63/pkg/services/ngalert/state/state.go#L298-L311
+	// Usually, it happens in the case of classic conditions when the evalResult does not have labels.
+	//
+	// This is temporary change to make sure that the labels are not persistent in the state after it was in Error state
+	// TODO yuri. Remove it in https://github.com/grafana/grafana/pull/68142
+	if currentState.State == eval.Error && result.State != eval.Error {
+		// This is possible because state was updated after the CacheID was calculated.
+		_, curOk := currentState.Labels["ref_id"]
+		_, resOk := result.Instance["ref_id"]
+		if curOk && !resOk {
+			delete(currentState.Labels, "ref_id")
+		}
+		_, curOk = currentState.Labels["datasource_uid"]
+		_, resOk = result.Instance["datasource_uid"]
+		if curOk && !resOk {
+			delete(currentState.Labels, "datasource_uid")
+		}
+	}
+
 	switch result.State {
 	case eval.Normal:
 		logger.Debug("Setting next state", "handler", "resultNormal")
@@ -350,21 +376,19 @@ func (st *Manager) saveAlertStates(ctx context.Context, logger log.Logger, state
 		return
 	}
 
-	logger.Debug("Saving alert states", "count", len(states))
-	instances := make([]ngModels.AlertInstance, 0, len(states))
-
-	for _, s := range states {
+	saveState := func(ctx context.Context, idx int) error {
+		s := states[idx]
 		// Do not save normal state to database and remove transition to Normal state but keep mapped states
 		if st.doNotSaveNormalState && IsNormalStateWithNoReason(s.State) && !s.Changed() {
-			continue
+			return nil
 		}
 
 		key, err := s.GetAlertInstanceKey()
 		if err != nil {
 			logger.Error("Failed to create a key for alert state to save it to database. The state will be ignored ", "cacheID", s.CacheID, "error", err, "labels", s.Labels.String())
-			continue
+			return nil
 		}
-		fields := ngModels.AlertInstance{
+		instance := ngModels.AlertInstance{
 			AlertInstanceKey:  key,
 			Labels:            ngModels.InstanceLabels(s.Labels),
 			CurrentState:      ngModels.InstanceStateType(s.State.State.String()),
@@ -373,24 +397,19 @@ func (st *Manager) saveAlertStates(ctx context.Context, logger log.Logger, state
 			CurrentStateSince: s.StartsAt,
 			CurrentStateEnd:   s.EndsAt,
 		}
-		instances = append(instances, fields)
+
+		err = st.instanceStore.SaveAlertInstance(ctx, instance)
+		if err != nil {
+			logger.Error("Failed to save alert state", "labels", s.Labels.String(), "state", s.State, "error", err)
+			return nil
+		}
+		return nil
 	}
 
-	if len(instances) == 0 {
-		return
-	}
-
-	if err := st.instanceStore.SaveAlertInstances(ctx, instances...); err != nil {
-		type debugInfo struct {
-			State  string
-			Labels string
-		}
-		debug := make([]debugInfo, 0)
-		for _, inst := range instances {
-			debug = append(debug, debugInfo{string(inst.CurrentState), data.Labels(inst.Labels).String()})
-		}
-		logger.Error("Failed to save alert states", "states", debug, "error", err)
-	}
+	start := time.Now()
+	logger.Debug("Saving alert states", "count", len(states), "max_state_save_concurrency", st.maxStateSaveConcurrency)
+	_ = concurrency.ForEachJob(ctx, len(states), st.maxStateSaveConcurrency, saveState)
+	logger.Debug("Saving alert states done", "count", len(states), "max_state_save_concurrency", st.maxStateSaveConcurrency, "duration", time.Since(start))
 }
 
 func (st *Manager) deleteAlertStates(ctx context.Context, logger log.Logger, states []StateTransition) {
@@ -436,8 +455,6 @@ func translateInstanceState(state ngModels.InstanceStateType) eval.State {
 func (st *Manager) deleteStaleStatesFromCache(ctx context.Context, logger log.Logger, evaluatedAt time.Time, alertRule *ngModels.AlertRule) []StateTransition {
 	// If we are removing two or more stale series it makes sense to share the resolved image as the alert rule is the same.
 	// TODO: We will need to change this when we support images without screenshots as each series will have a different image
-	var resolvedImage *ngModels.Image
-
 	staleStates := st.cache.deleteRuleStates(alertRule.GetKey(), func(s *State) bool {
 		return stateIsStale(evaluatedAt, s.LastEvaluationTime, alertRule.IntervalSeconds)
 	})
@@ -455,19 +472,15 @@ func (st *Manager) deleteStaleStatesFromCache(ctx context.Context, logger log.Lo
 
 		if oldState == eval.Alerting {
 			s.Resolved = true
-			// If there is no resolved image for this rule then take one
-			if resolvedImage == nil {
-				image, err := takeImage(ctx, st.images, alertRule)
-				if err != nil {
-					logger.Warn("Failed to take an image",
-						"dashboard", alertRule.GetDashboardUID(),
-						"panel", alertRule.GetPanelID(),
-						"error", err)
-				} else if image != nil {
-					resolvedImage = image
-				}
+			image, err := takeImage(ctx, st.images, alertRule)
+			if err != nil {
+				logger.Warn("Failed to take an image",
+					"dashboard", alertRule.GetDashboardUID(),
+					"panel", alertRule.GetPanelID(),
+					"error", err)
+			} else if image != nil {
+				s.Image = image
 			}
-			s.Image = resolvedImage
 		}
 
 		record := StateTransition{

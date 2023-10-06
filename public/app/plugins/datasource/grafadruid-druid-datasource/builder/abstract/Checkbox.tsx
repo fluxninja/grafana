@@ -1,7 +1,10 @@
-import React, { ChangeEvent } from 'react';
-import { Checkbox as CheckboxField } from '@grafana/ui';
 import { css, cx } from '@emotion/css';
+import React, { ChangeEvent } from 'react';
+
+import { Checkbox as CheckboxField } from '@grafana/ui';
+
 import { QueryBuilderFieldProps } from './types';
+
 import { onBuilderChange } from '.';
 
 export const Checkbox = (props: QueryBuilderFieldProps) => {

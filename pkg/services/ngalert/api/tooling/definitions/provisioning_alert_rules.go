@@ -213,13 +213,6 @@ type AlertRuleGroup struct {
 	Rules     []ProvisionedAlertRule `json:"rules"`
 }
 
-// AlertingFileExport is the full provisioned file export.
-// swagger:model
-type AlertingFileExport struct {
-	APIVersion int64                  `json:"apiVersion" yaml:"apiVersion"`
-	Groups     []AlertRuleGroupExport `json:"groups" yaml:"groups"`
-}
-
 // AlertRuleGroupExport is the provisioned file export of AlertRuleGroupV1.
 type AlertRuleGroupExport struct {
 	OrgID    int64             `json:"orgId" yaml:"orgId"`

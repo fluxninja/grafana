@@ -12,6 +12,7 @@ import (
 	"github.com/grafana/grafana/pkg/infra/log"
 	"github.com/grafana/grafana/pkg/services/org"
 	"github.com/grafana/grafana/pkg/setting"
+	"github.com/grafana/grafana/pkg/util"
 )
 
 const defaultTimeout = 10
@@ -144,14 +145,14 @@ func readConfig(configFile string) (*Config, error) {
 		}
 
 		if server.MinTLSVersion != "" {
-			server.minTLSVersion, err = tlsNameToVersion(server.MinTLSVersion)
+			server.minTLSVersion, err = util.TlsNameToVersion(server.MinTLSVersion)
 			if err != nil {
 				logger.Error("Failed to set min TLS version. Ignoring", "err", err)
 			}
 		}
 
 		if len(server.TLSCiphers) > 0 {
-			server.tlsCiphers, err = tlsCiphersToIDs(server.TLSCiphers)
+			server.tlsCiphers, err = util.TlsCiphersToIDs(server.TLSCiphers)
 			if err != nil {
 				logger.Error("Unrecognized TLS Cipher(s). Ignoring", "err", err)
 			}

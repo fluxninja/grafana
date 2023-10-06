@@ -18,6 +18,7 @@ import (
 	"github.com/grafana/grafana/packages/grafana-schema/src/common"
 )
 
+<<<<<<<< HEAD:public/app/plugins/panel/stat/panelcfg.cue
 composableKinds: PanelCfg: {
 	maturity: "experimental"
 
@@ -28,15 +29,53 @@ composableKinds: PanelCfg: {
 					{
 						PanelOptions: {
 							common.SingleStatBaseOptions
-							displayMode:  common.BarGaugeDisplayMode | *"gradient"
-							valueMode:    common.BarGaugeValueMode | *"color"
-							showUnfilled: bool | *true
-							minVizWidth:  uint32 | *0
-							minVizHeight: uint32 | *10
+							graphMode:   common.BigValueGraphMode | *"area"
+							colorMode:   common.BigValueColorMode | *"value"
+							justifyMode: common.BigValueJustifyMode | *"auto"
+							textMode:    common.BigValueTextMode | *"auto"
 						} @cuetsy(kind="interface")
 					},
 				]
 			},
 		]
 	}
+|||||||| 78f0340031:public/app/plugins/panel/stat/models.cue
+Panel: thema.#Lineage & {
+	name: "stat"
+	seqs: [
+		{
+			schemas: [
+				{
+					PanelOptions: {
+						ui.SingleStatBaseOptions
+						graphMode:   ui.BigValueGraphMode | *"area"
+						colorMode:   ui.BigValueColorMode | *"value"
+						justifyMode: ui.BigValueJustifyMode | *"auto"
+						textMode:    ui.BigValueTextMode | *"auto"
+					} @cuetsy(kind="interface")
+				},
+			]
+		},
+	]
+========
+composableKinds: PanelCfg: {
+	maturity: "experimental"
+
+	lineage: {
+		schemas: [{
+			version: [0, 0]
+			schema: {
+				Options: {
+					common.SingleStatBaseOptions
+					displayMode:  common.BarGaugeDisplayMode & (*"gradient" | _)
+					valueMode:    common.BarGaugeValueMode & (*"color" | _)
+					showUnfilled: bool | *true
+					minVizWidth:  uint32 | *0
+					minVizHeight: uint32 | *10
+				} @cuetsy(kind="interface")
+			}
+		}]
+		lenses: []
+	}
+>>>>>>>> v10.1.1:public/app/plugins/panel/bargauge/panelcfg.cue
 }

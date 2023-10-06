@@ -1,6 +1,7 @@
 import { DataSourcePlugin } from '@grafana/data';
-import { DruidDataSource } from './DruidDataSource';
+
 import { ConfigEditor } from './ConfigEditor';
+import { DruidDataSource } from './DruidDataSource';
 import { QueryEditor } from './QueryEditor';
 import { VariableQueryEditor } from './VariableQueryEditor';
 import { DruidQuery, DruidSettings } from './types';

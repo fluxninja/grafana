@@ -14,6 +14,7 @@ import (
 	"github.com/grafana/grafana-plugin-sdk-go/backend"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/datasource"
 	"github.com/grafana/grafana-plugin-sdk-go/backend/instancemgmt"
+	sdkproxy "github.com/grafana/grafana-plugin-sdk-go/backend/proxy"
 	"github.com/grafana/grafana-plugin-sdk-go/data"
 	"github.com/grafana/grafana-plugin-sdk-go/data/sqlutil"
 
@@ -21,6 +22,7 @@ import (
 	"github.com/grafana/grafana/pkg/services/featuremgmt"
 	"github.com/grafana/grafana/pkg/setting"
 	"github.com/grafana/grafana/pkg/tsdb/sqleng"
+	"github.com/grafana/grafana/pkg/tsdb/sqleng/proxyutil"
 	"github.com/grafana/grafana/pkg/util"
 )
 
@@ -36,8 +38,8 @@ func ProvideService(cfg *setting.Cfg) *Service {
 	}
 }
 
-func (s *Service) getDataSourceHandler(pluginCtx backend.PluginContext) (*sqleng.DataSourceHandler, error) {
-	i, err := s.im.Get(pluginCtx)
+func (s *Service) getDataSourceHandler(ctx context.Context, pluginCtx backend.PluginContext) (*sqleng.DataSourceHandler, error) {
+	i, err := s.im.Get(ctx, pluginCtx)
 	if err != nil {
 		return nil, err
 	}
@@ -46,7 +48,7 @@ func (s *Service) getDataSourceHandler(pluginCtx backend.PluginContext) (*sqleng
 }
 
 func (s *Service) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
-	dsHandler, err := s.getDataSourceHandler(req.PluginContext)
+	dsHandler, err := s.getDataSourceHandler(ctx, req.PluginContext)
 	if err != nil {
 		return nil, err
 	}
@@ -95,8 +97,9 @@ func newInstanceSettings(cfg *setting.Cfg) datasource.InstanceFactoryFunc {
 
 		driverName := "mssql"
 		// register a new proxy driver if the secure socks proxy is enabled
-		if cfg.IsFeatureToggleEnabled(featuremgmt.FlagSecureSocksDatasourceProxy) && cfg.SecureSocksDSProxy.Enabled && jsonData.SecureDSProxy {
-			driverName, err = createMSSQLProxyDriver(&cfg.SecureSocksDSProxy, cnnstr)
+		proxyOpts := proxyutil.GetSQLProxyOptions(dsInfo)
+		if sdkproxy.Cli.SecureSocksProxyEnabled(proxyOpts) {
+			driverName, err = createMSSQLProxyDriver(cnnstr, proxyOpts)
 			if err != nil {
 				return nil, err
 			}
@@ -110,9 +113,11 @@ func newInstanceSettings(cfg *setting.Cfg) datasource.InstanceFactoryFunc {
 			RowLimit:          cfg.DataProxyRowLimit,
 		}
 
-		queryResultTransformer := mssqlQueryResultTransformer{}
+		queryResultTransformer := mssqlQueryResultTransformer{
+			userError: cfg.UserFacingDefaultError,
+		}
 
-		return sqleng.NewQueryDataHandler(config, &queryResultTransformer, newMssqlMacroEngine(), logger)
+		return sqleng.NewQueryDataHandler(cfg, config, &queryResultTransformer, newMssqlMacroEngine(), logger)
 	}
 }
 
@@ -198,14 +203,16 @@ func generateConnectionString(dsInfo sqleng.DataSourceInfo) (string, error) {
 	return connStr, nil
 }
 
-type mssqlQueryResultTransformer struct{}
+type mssqlQueryResultTransformer struct {
+	userError string
+}
 
 func (t *mssqlQueryResultTransformer) TransformQueryError(logger log.Logger, err error) error {
 	// go-mssql overrides source error, so we currently match on string
 	// ref https://github.com/denisenkom/go-mssqldb/blob/045585d74f9069afe2e115b6235eb043c8047043/tds.go#L904
 	if strings.HasPrefix(strings.ToLower(err.Error()), "unable to open tcp connection with host") {
 		logger.Error("Query error", "error", err)
-		return sqleng.ErrConnectionFailed
+		return sqleng.ErrConnectionFailed.Errorf("failed to connect to server - %s", t.userError)
 	}
 
 	return err
@@ -213,7 +220,7 @@ func (t *mssqlQueryResultTransformer) TransformQueryError(logger log.Logger, err
 
 // CheckHealth pings the connected SQL database
 func (s *Service) CheckHealth(ctx context.Context, req *backend.CheckHealthRequest) (*backend.CheckHealthResult, error) {
-	dsHandler, err := s.getDataSourceHandler(req.PluginContext)
+	dsHandler, err := s.getDataSourceHandler(ctx, req.PluginContext)
 	if err != nil {
 		return nil, err
 	}

@@ -1,7 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Input, Row } from '../abstract';
 import { Dimension } from '../dimension';
+import { QueryBuilderProps } from '../types';
 
 export const RegexFiltered = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, RegexFiltered);

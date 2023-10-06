@@ -1,6 +1,7 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Input, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
 
 export const DimSelector = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, DimSelector);

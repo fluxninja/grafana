@@ -11,7 +11,7 @@ import LanguageProvider from './language_provider';
 import { getClientCacheDurationInMinutes, getPrometheusTime, getRangeSnapInterval } from './language_utils';
 import { PrometheusCacheLevel, PromQuery } from './types';
 
-const now = new Date().getTime();
+const now = new Date(1681300293392).getTime();
 const timeRangeDurationSeconds = 1;
 const toPrometheusTime = getPrometheusTime(dateTime(now), false);
 const fromPrometheusTime = getPrometheusTime(dateTime(now - timeRangeDurationSeconds * 1000), false);
@@ -269,6 +269,27 @@ describe('Language completion provider', () => {
         {
           end: toPrometheusTimeString,
           'match[]': `{${labelName}="${labelValue}"}`,
+          start: fromPrometheusTimeString,
+        },
+        undefined
+      );
+    });
+
+    it('should call old series endpoint and should use match[] parameter and interpolate the template variables', () => {
+      const languageProvider = new LanguageProvider({
+        ...defaultDatasource,
+        interpolateString: (string: string) => string.replace(/\$/, 'interpolated-'),
+      } as PrometheusDatasource);
+      const getSeriesValues = languageProvider.getSeriesValues;
+      const requestSpy = jest.spyOn(languageProvider, 'request');
+      getSeriesValues('job', '{instance="$instance", job="grafana"}');
+      expect(requestSpy).toHaveBeenCalled();
+      expect(requestSpy).toHaveBeenCalledWith(
+        '/api/v1/series',
+        [],
+        {
+          end: toPrometheusTimeString,
+          'match[]': '{instance="interpolated-instance", job="grafana"}',
           start: fromPrometheusTimeString,
         },
         undefined

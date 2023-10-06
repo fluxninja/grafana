@@ -50,6 +50,11 @@ export interface ThemeColorsBase<TColor> {
   action: {
     /** Used for selected menu item / select option */
     selected: string;
+    /**
+     * @alpha (Do not use from plugins)
+     * Used for selected items when background only change is not enough (Currently only used for FilterPill)
+     **/
+    selectedBorder: string;
     /** Used for hovered menu item / select option */
     hover: string;
     /** Used for button/colored background hover opacity */
@@ -89,9 +94,9 @@ class DarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   whiteBase = '219, 217, 215';
 
   border = {
-    weak: `rgba(${this.whiteBase}, 0.07)`,
-    medium: `rgba(${this.whiteBase}, 0.15)`,
-    strong: `rgba(${this.whiteBase}, 0.25)`,
+    weak: `rgba(${this.whiteBase}, 0.12)`,
+    medium: `rgba(${this.whiteBase}, 0.20)`,
+    strong: `rgba(${this.whiteBase}, 0.30)`,
   };
 
   text = {
@@ -113,7 +118,7 @@ class DarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
     shade: '#F0692955',
     text: this.text.primary,
     contrastText: `rgb(${this.whiteBase})`,
-    border: this.border.strong,
+    border: `rgba(${this.whiteBase}, 0.08)`,
   };
 
   info = this.primary;
@@ -142,6 +147,7 @@ class DarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   action = {
     hover: `rgba(${this.whiteBase}, 0.16)`,
     selected: `rgba(${this.whiteBase}, 0.12)`,
+    selectedBorder: palette.orangeDarkMain,
     focus: `rgba(${this.whiteBase}, 0.16)`,
     hoverOpacity: 0.08,
     disabledText: this.text.disabled,
@@ -189,7 +195,7 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
     shade: '#FC9A6990',
     contrastText: `rgba(${this.blackBase},  1)`,
     text: this.text.primary,
-    border: this.border.strong,
+    border: this.border.weak,
   };
 
   info = {
@@ -222,6 +228,7 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   action = {
     hover: `rgba(${this.blackBase}, 0.12)`,
     selected: `#F27A40`,
+    selectedBorder: palette.orangeLightMain,
     hoverOpacity: 0.08,
     focus: `rgba(${this.blackBase}, 0.12)`,
     disabledBackground: `rgba(${this.blackBase}, 0.04)`,
@@ -282,7 +289,7 @@ export function createColors(colors: ThemeColorsInput): ThemeColors {
       color.shade = base.mode === 'light' ? darken(color.main, tonalOffset) : lighten(color.main, tonalOffset);
     }
     if (!color.transparent) {
-      color.transparent = base.mode === 'light' ? alpha(color.main, 0.08) : alpha(color.main, 0.15);
+      color.transparent = alpha(color.main, 0.15);
     }
     if (!color.contrastText) {
       color.contrastText = getContrastText(color.main);

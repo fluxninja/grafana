@@ -18,6 +18,7 @@ import (
 	"github.com/grafana/grafana/pkg/services/contexthandler/ctxkey"
 	contextmodel "github.com/grafana/grafana/pkg/services/contexthandler/model"
 	"github.com/grafana/grafana/pkg/services/login/loginservice"
+	"github.com/grafana/grafana/pkg/services/login/logintest"
 	"github.com/grafana/grafana/pkg/services/org/orgtest"
 	"github.com/grafana/grafana/pkg/services/user/usertest"
 	"github.com/grafana/grafana/pkg/setting"
@@ -49,6 +50,7 @@ type scenarioContext struct {
 	userService          *usertest.FakeUserService
 	oauthTokenService    *authtest.FakeOAuthTokenService
 	orgService           *orgtest.FakeOrgService
+	authInfoService      *logintest.AuthInfoServiceFake
 
 	req *http.Request
 }
@@ -99,7 +101,10 @@ func (sc *scenarioContext) fakeReqWithParams(method, url string, queryParams map
 	for k, v := range queryParams {
 		q.Add(k, v)
 	}
+
 	req.URL.RawQuery = q.Encode()
+	req.RequestURI = req.URL.RequestURI()
+
 	require.NoError(sc.t, err)
 
 	reqCtx := &contextmodel.ReqContext{

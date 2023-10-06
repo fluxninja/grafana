@@ -1,8 +1,10 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, useScopedQueryBuilderProps, Input, Row } from '../abstract';
-import { Intervals } from '../querysegmentspec';
 import { ExtractionFn } from '../extractionfn';
+import { Intervals } from '../querysegmentspec';
+import { QueryBuilderProps } from '../types';
+
 import { FilterTuning } from '.';
 
 export const Interval = (props: QueryBuilderProps) => {

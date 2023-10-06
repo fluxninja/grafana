@@ -1,6 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { QueryBuilderComponentSelector } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { All, Contains, Fragment, InsensitiveContains, Regex } from './';
 
 export const SearchQuerySpec = (props: QueryBuilderProps) => (

@@ -95,7 +95,8 @@ func canPutGetAndDeleteCachedObjects(t *testing.T, client CacheStorage) {
 	assert.Equal(t, err, nil)
 
 	_, err = client.Get(context.Background(), "key1")
-	assert.Equal(t, err, ErrCacheItemNotFound)
+	// redis client returns redis.Nil error when key does not exist.
+	assert.Error(t, err)
 }
 
 func canNotFetchExpiredItems(t *testing.T, client CacheStorage) {
@@ -109,7 +110,83 @@ func canNotFetchExpiredItems(t *testing.T, client CacheStorage) {
 
 	// should not be able to read that value since its expired
 	_, err = client.Get(context.Background(), "key1")
-	assert.Equal(t, err, ErrCacheItemNotFound)
+	// redis client returns redis.Nil error when key does not exist.
+	assert.Error(t, err)
+}
+
+func TestCollectUsageStats(t *testing.T) {
+	wantMap := map[string]interface{}{
+		"stats.remote_cache.redis.count":           1,
+		"stats.remote_cache.encrypt_enabled.count": 1,
+	}
+	cfg := setting.NewCfg()
+	cfg.RemoteCacheOptions = &setting.RemoteCacheOptions{Name: redisCacheType, Encryption: true}
+
+	remoteCache := &RemoteCache{
+		Cfg: cfg,
+	}
+
+	stats, err := remoteCache.getUsageStats(context.Background())
+	require.NoError(t, err)
+
+	assert.EqualValues(t, wantMap, stats)
+}
+
+func TestCachePrefix(t *testing.T) {
+	cache := NewFakeCacheStorage()
+	prefixCache := &prefixCacheStorage{cache: cache, prefix: "test/"}
+
+	// Set a value (with a prefix)
+	err := prefixCache.Set(context.Background(), "foo", []byte("bar"), time.Hour)
+	require.NoError(t, err)
+	// Get a value (with a prefix)
+	v, err := prefixCache.Get(context.Background(), "foo")
+	require.NoError(t, err)
+	require.Equal(t, "bar", string(v))
+	// Get a value directly from the underlying cache, ensure the prefix is in the key
+	v, err = cache.Get(context.Background(), "test/foo")
+	require.NoError(t, err)
+	require.Equal(t, "bar", string(v))
+	// Get a value directly from the underlying cache without a prefix, should not be there
+	_, err = cache.Get(context.Background(), "foo")
+	require.Error(t, err)
+}
+
+func TestEncryptedCache(t *testing.T) {
+	cache := NewFakeCacheStorage()
+	encryptedCache := &encryptedCacheStorage{cache: cache, secretsService: &fakeSecretsService{}}
+
+	// Set a value in the encrypted cache
+	err := encryptedCache.Set(context.Background(), "foo", []byte("bar"), time.Hour)
+	require.NoError(t, err)
+
+	// make sure the stored value is not equal to input
+	v, err := cache.Get(context.Background(), "foo")
+	require.NoError(t, err)
+	require.NotEqual(t, "bar", string(v))
+
+	// make sure the returned value is the same as orignial
+	v, err = encryptedCache.Get(context.Background(), "foo")
+	require.NoError(t, err)
+	require.Equal(t, "bar", string(v))
+}
+
+type fakeSecretsService struct{}
+
+func (f fakeSecretsService) Encrypt(_ context.Context, payload []byte, _ secrets.EncryptionOptions) ([]byte, error) {
+	return f.reverse(payload), nil
+}
+
+func (f fakeSecretsService) Decrypt(_ context.Context, payload []byte) ([]byte, error) {
+	return f.reverse(payload), nil
+}
+
+func (f fakeSecretsService) reverse(input []byte) []byte {
+	r := []rune(string(input))
+	for i, j := 0, len(r)-1; i < len(r)/2; i, j = i+1, j-1 {
+		r[i], r[j] = r[j], r[i]
+	}
+	return []byte(string(r))
 }
 
 func TestCollectUsageStats(t *testing.T) {

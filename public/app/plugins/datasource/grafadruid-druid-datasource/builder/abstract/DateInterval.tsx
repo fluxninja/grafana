@@ -1,10 +1,14 @@
-import React, { ChangeEvent } from 'react';
-import { InlineLabel, stylesFactory, useTheme } from '@grafana/ui';
-import { GrafanaTheme } from '@grafana/data';
-import { QueryBuilderFieldProps } from './types';
-import { onBuilderChange } from '.';
 import { css, cx, injectGlobal } from '@emotion/css';
+import React, { ChangeEvent } from 'react';
 import DatePicker from 'react-datepicker';
+
+import { GrafanaTheme } from '@grafana/data';
+import { InlineLabel, stylesFactory, useTheme } from '@grafana/ui';
+
+import { QueryBuilderFieldProps } from './types';
+
+import { onBuilderChange } from '.';
+
 import 'react-datepicker/dist/react-datepicker.css';
 
 injectGlobal(`
@@ -28,8 +32,8 @@ const ISO8601DURATIONPATTERN = new RegExp(
 
 const useInterval = (interval = ''): any => {
   const intervalPartToDate = (part: string): any => {
-    var date: Date | undefined = undefined;
-    var datePlaceholder: string | undefined = undefined;
+    let date: Date | undefined = undefined;
+    let datePlaceholder: string | undefined = undefined;
     const d = new Date(part);
     if (d instanceof Date && !isNaN(d.getFullYear())) {
       date = d;

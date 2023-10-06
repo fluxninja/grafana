@@ -1,48 +1,31 @@
-import { css, cx } from '@emotion/css';
-import { isEmpty, noop } from 'lodash';
+import { cx } from '@emotion/css';
 import React, { PureComponent } from 'react';
-import DropZone, { FileRejection, DropEvent, ErrorCode } from 'react-dropzone';
-import { connect, ConnectedProps, MapDispatchToProps, MapStateToProps } from 'react-redux';
+import { connect, ConnectedProps } from 'react-redux';
 
-import {
-  NavModel,
-  NavModelItem,
-  TimeRange,
-  PageLayoutType,
-  locationUtil,
-  dataFrameToJSON,
-  DataFrameJSON,
-  GrafanaTheme2,
-  getValueFormat,
-  formattedValueToString,
-} from '@grafana/data';
+import { NavModel, NavModelItem, TimeRange, PageLayoutType, locationUtil } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { config, locationService } from '@grafana/runtime';
-import { Icon, Themeable2, withTheme2 } from '@grafana/ui';
+import { Themeable2, withTheme2 } from '@grafana/ui';
 import { notifyApp } from 'app/core/actions';
-import ErrorPage from 'app/core/components/ErrorPage/ErrorPage';
 import { Page } from 'app/core/components/Page/Page';
+import { EntityNotFound } from 'app/core/components/PageNotFound/EntityNotFound';
 import { GrafanaContext, GrafanaContextType } from 'app/core/context/GrafanaContext';
 import { createErrorNotification } from 'app/core/copy/appNotification';
 import { getKioskMode } from 'app/core/navigation/kiosk';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
-import { FnGlobalState } from 'app/core/reducers/fn-slice';
 import { getNavModel } from 'app/core/selectors/navModel';
 import { PanelModel } from 'app/features/dashboard/state';
-import * as DFImport from 'app/features/dataframe-import';
 import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
 import { getPageNavFromSlug, getRootContentNavModel } from 'app/features/storage/StorageFolderPage';
-import { FNDashboardProps } from 'app/fn-app/types';
-import { RenderPortal } from 'app/fn-app/utils';
-import { GrafanaQueryType } from 'app/plugins/datasource/grafana/types';
-import { DashboardRoutes, DashboardState, KioskMode, StoreState } from 'app/types';
+import { DashboardRoutes, KioskMode, StoreState } from 'app/types';
 import { PanelEditEnteredEvent, PanelEditExitedEvent } from 'app/types/events';
 
 import { cancelVariables, templateVarsChangedInUrl } from '../../variables/state/actions';
 import { findTemplateVarChanges } from '../../variables/utils';
+import { AddWidgetModal } from '../components/AddWidgetModal/AddWidgetModal';
 import { DashNav } from '../components/DashNav';
 import { DashboardFailed } from '../components/DashboardLoading/DashboardFailed';
-import { FnLoader } from '../components/DashboardLoading/FnLoader';
+import { DashboardLoading } from '../components/DashboardLoading/DashboardLoading';
 import { DashboardPrompt } from '../components/DashboardPrompt/DashboardPrompt';
 import { DashboardSettings } from '../components/DashboardSettings';
 import { PanelInspector } from '../components/Inspector/PanelInspector';
@@ -68,7 +51,7 @@ export type DashboardPageRouteSearchParams = {
   editPanel?: string;
   viewPanel?: string;
   editview?: string;
-  shareView?: string;
+  addWidget?: boolean;
   panelType?: string;
   inspect?: string;
   from?: string;
@@ -77,34 +60,14 @@ export type DashboardPageRouteSearchParams = {
   kiosk?: string | true;
 };
 
-export type MapStateToDashboardPageProps = MapStateToProps<
-  Pick<DashboardState, 'initPhase' | 'initError'> & { dashboard: ReturnType<DashboardState['getModel']> } & Pick<
-      FnGlobalState,
-      'FNDashboard'
-    >,
-  OwnProps,
-  StoreState
->;
-
-export type MapDispatchToDashboardPageProps = MapDispatchToProps<MappedDispatch, OwnProps>;
-
-export type MappedDispatch = {
-  initDashboard: typeof initDashboard;
-  cleanUpDashboardAndVariables: typeof cleanUpDashboardAndVariables;
-  notifyApp: typeof notifyApp;
-  cancelVariables: typeof cancelVariables;
-  templateVarsChangedInUrl: typeof templateVarsChangedInUrl;
-};
-
-export const mapStateToProps: MapStateToDashboardPageProps = (state) => ({
+export const mapStateToProps = (state: StoreState) => ({
   initPhase: state.dashboard.initPhase,
   initError: state.dashboard.initError,
   dashboard: state.dashboard.getModel(),
   navIndex: state.navIndex,
-  FNDashboard: state.fnGlobalState.FNDashboard,
 });
 
-const mapDispatchToProps: MapDispatchToDashboardPageProps = {
+const mapDispatchToProps = {
   initDashboard,
   cleanUpDashboardAndVariables,
   notifyApp,
@@ -114,18 +77,7 @@ const mapDispatchToProps: MapDispatchToDashboardPageProps = {
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
-type OwnProps = {
-  isPublic?: boolean;
-  controlsContainer?: string | null;
-  version?: FNDashboardProps['version'];
-  isLoading?: FNDashboardProps['isLoading'];
-};
-
-export type DashboardPageProps = OwnProps &
-  GrafanaRouteComponentProps<DashboardPageRouteParams, DashboardPageRouteSearchParams>;
-
-export type Props = OwnProps &
-  Themeable2 &
+export type Props = Themeable2 &
   GrafanaRouteComponentProps<DashboardPageRouteParams, DashboardPageRouteSearchParams> &
   ConnectedProps<typeof connector>;
 
@@ -149,61 +101,6 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   private forceRouteReloadCounter = 0;
   state: State = this.getCleanState();
 
-  pageNav?: NavModelItem;
-  onFileDrop = (acceptedFiles: File[], fileRejections: FileRejection[], event: DropEvent) => {
-    const grafanaDS = {
-      type: 'grafana',
-      uid: 'grafana',
-    };
-    DFImport.filesToDataframes(acceptedFiles).subscribe((next) => {
-      const snapshot: DataFrameJSON[] = [];
-      next.dataFrames.forEach((df) => {
-        const dataframeJson = dataFrameToJSON(df);
-        snapshot.push(dataframeJson);
-      });
-      this.props.dashboard?.addPanel({
-        type: 'table',
-        gridPos: { x: 0, y: 0, w: 12, h: 8 },
-        title: next.file.name,
-        datasource: grafanaDS,
-        targets: [
-          {
-            queryType: GrafanaQueryType.Snapshot,
-            snapshot,
-            file: { name: next.file.name, size: next.file.size },
-            datasource: grafanaDS,
-          },
-        ],
-      });
-    });
-
-    fileRejections.forEach((fileRejection) => {
-      const errors = fileRejection.errors.map((error) => {
-        switch (error.code) {
-          case ErrorCode.FileTooLarge:
-            const formattedSize = getValueFormat('decbytes')(DFImport.maxFileSize);
-            return `File size must be less than ${formattedValueToString(formattedSize)}.`;
-          case ErrorCode.FileInvalidType:
-            return `File type must be one of the following types ${DFImport.formatFileTypes(DFImport.acceptedFiles)}.`;
-          default:
-            return error.message;
-        }
-      });
-      this.props.notifyApp(
-        createErrorNotification(
-          `Failed to load ${fileRejection.file.name}`,
-          undefined,
-          undefined,
-          <ul>
-            {errors.map((err) => {
-              return <li key={err}>{err}</li>;
-            })}
-          </ul>
-        )
-      );
-    });
-  };
-
   getCleanState(): State {
     return {
       editPanel: null,
@@ -216,12 +113,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
   componentDidMount() {
     this.initDashboard();
-
-    const { isPublic, FNDashboard } = this.props;
-
-    if (!isPublic && !FNDashboard) {
-      this.forceRouteReloadCounter = (this.props.history.location?.state as any)?.routeReloadCounter || 0;
-    }
+    this.forceRouteReloadCounter = (this.props.history.location.state as any)?.routeReloadCounter || 0;
   }
 
   componentWillUnmount() {
@@ -234,7 +126,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   initDashboard() {
-    const { dashboard, isPublic, match, queryParams, FNDashboard } = this.props;
+    const { dashboard, match, queryParams } = this.props;
 
     if (dashboard) {
       this.closeDashboard();
@@ -245,10 +137,9 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       urlUid: match.params.uid,
       urlType: match.params.type,
       urlFolderUid: queryParams.folderUid,
-      version: match.params.version,
       panelType: queryParams.panelType,
       routeName: this.props.route.routeName,
-      fixUrl: !isPublic && !FNDashboard,
+      fixUrl: true,
       accessToken: match.params.accessToken,
       keybindingSrv: this.context.keybindings,
     });
@@ -258,24 +149,20 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    const { dashboard, match, templateVarsChangedInUrl, isPublic, FNDashboard } = this.props;
+    const { dashboard, match, templateVarsChangedInUrl } = this.props;
+    const routeReloadCounter = (this.props.history.location.state as any)?.routeReloadCounter;
 
     if (!dashboard) {
       return;
     }
 
-    if (!isPublic && !FNDashboard) {
-      const routeReloadCounter = (this.props.history.location?.state as any)?.routeReloadCounter;
-
-      if (
-        prevProps.match.params.uid !== match.params.uid ||
-        prevProps.match.params.version !== match.params.version ||
-        (routeReloadCounter !== undefined && this.forceRouteReloadCounter !== routeReloadCounter)
-      ) {
-        this.initDashboard();
-        this.forceRouteReloadCounter = routeReloadCounter;
-        return;
-      }
+    if (
+      prevProps.match.params.uid !== match.params.uid ||
+      (routeReloadCounter !== undefined && this.forceRouteReloadCounter !== routeReloadCounter)
+    ) {
+      this.initDashboard();
+      this.forceRouteReloadCounter = routeReloadCounter;
+      return;
     }
 
     if (prevProps.location.search !== this.props.location.search) {
@@ -397,6 +284,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
     return updateStatePageNavFromProps(props, updatedState);
   }
 
+  // Todo: Remove this when we remove the emptyDashboardPage toggle
   onAddPanel = () => {
     const { dashboard } = this.props;
 
@@ -443,41 +331,31 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   render() {
-    const { dashboard, initError, queryParams, isPublic, FNDashboard, isLoading = noop } = this.props;
+    const { dashboard, initError, queryParams } = this.props;
     const { editPanel, viewPanel, updateScrollTop, pageNav, sectionNav } = this.state;
-    const kioskMode = FNDashboard ? KioskMode.FN : !isPublic ? getKioskMode(this.props.queryParams) : KioskMode.Full;
+    const kioskMode = getKioskMode(this.props.queryParams);
 
-    if (!dashboard || isEmpty(queryParams)) {
-      isLoading(true);
-
-      // return isUndefined(fnLoader) ? <DashboardLoading initPhase={this.props.initPhase} />: <>{fnLoader}</>;
-      return <FnLoader />;
+    if (!dashboard || !pageNav || !sectionNav) {
+      return <DashboardLoading initPhase={this.props.initPhase} />;
     }
 
-    isLoading(false);
-
     const inspectPanel = this.getInspectPanel();
-    const showSubMenu = !editPanel && !this.props.queryParams.editview;
+    const showSubMenu = !editPanel && !kioskMode && !this.props.queryParams.editview;
 
-    const toolbar = kioskMode !== KioskMode.Full && !queryParams.editview && (
-      <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
-        <DashNav
-          dashboard={dashboard}
-          title={!FNDashboard ? dashboard.title : ''}
-          folderTitle={dashboard.meta.folderTitle}
-          isFullscreen={!!viewPanel}
-          onAddPanel={this.onAddPanel}
-          kioskMode={kioskMode}
-          hideTimePicker={dashboard.timepicker.hidden}
-          shareModalActiveTab={this.props.queryParams.shareView}
-        />
-      </header>
-    );
+    const showToolbar = kioskMode !== KioskMode.Full && !queryParams.editview;
 
     const pageClassName = cx({
       'panel-in-fullscreen': Boolean(viewPanel),
       'page-hidden': Boolean(queryParams.editview || editPanel),
     });
+
+    if (dashboard.meta.dashboardNotFound) {
+      return (
+        <Page navId="dashboards/browse" layout={PageLayoutType.Canvas} pageNav={{ text: 'Not found' }}>
+          <EntityNotFound entity="Dashboard" />
+        </Page>
+      );
+    }
 
     return (
       <>
@@ -485,67 +363,38 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           navModel={sectionNav}
           pageNav={pageNav}
           layout={PageLayoutType.Canvas}
-          toolbar={
-            this.props.controlsContainer ? (
-              <RenderPortal ID={this.props.controlsContainer}>{toolbar}</RenderPortal>
-            ) : (
-              toolbar
-            )
-          }
           className={pageClassName}
           scrollRef={this.setScrollRef}
           scrollTop={updateScrollTop}
         >
-          {!FNDashboard && <DashboardPrompt dashboard={dashboard} />}
-
-          {initError && <DashboardFailed />}
-          {dashboard.meta.dashboardNotFound ? (
-            <ErrorPage />
-          ) : (
-            <>
-              {showSubMenu && (
-                <section aria-label={selectors.pages.Dashboard.SubMenu.submenu}>
-                  <SubMenu dashboard={dashboard} annotations={dashboard.annotations.list} links={dashboard.links} />
-                </section>
-              )}
-              {config.featureToggles.editPanelCSVDragAndDrop ? (
-                <DropZone
-                  onDrop={this.onFileDrop}
-                  accept={DFImport.acceptedFiles}
-                  maxSize={DFImport.maxFileSize}
-                  noClick={true}
-                >
-                  {({ getRootProps, isDragActive }) => {
-                    const styles = getStyles(this.props.theme, isDragActive);
-                    return (
-                      <div {...getRootProps({ className: styles.dropZone })}>
-                        <div className={styles.dropOverlay}>
-                          <div className={styles.dropHint}>
-                            <Icon name="upload" size="xxxl"></Icon>
-                            <h3>Create tables from spreadsheets</h3>
-                          </div>
-                        </div>
-                        <DashboardGrid
-                          dashboard={dashboard}
-                          isEditable={!!dashboard.meta.canEdit}
-                          viewPanel={viewPanel}
-                          editPanel={editPanel}
-                        />
-                      </div>
-                    );
-                  }}
-                </DropZone>
-              ) : (
-                <DashboardGrid
-                  dashboard={dashboard}
-                  isEditable={!!dashboard.meta.canEdit}
-                  viewPanel={viewPanel}
-                  editPanel={editPanel}
-                />
-              )}
-              {inspectPanel && <PanelInspector dashboard={dashboard} panel={inspectPanel} />}
-            </>
+          {showToolbar && (
+            <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
+              <DashNav
+                dashboard={dashboard}
+                title={dashboard.title}
+                folderTitle={dashboard.meta.folderTitle}
+                isFullscreen={!!viewPanel}
+                onAddPanel={this.onAddPanel}
+                kioskMode={kioskMode}
+                hideTimePicker={dashboard.timepicker.hidden}
+              />
+            </header>
           )}
+          <DashboardPrompt dashboard={dashboard} />
+          {initError && <DashboardFailed />}
+          {showSubMenu && (
+            <section aria-label={selectors.pages.Dashboard.SubMenu.submenu}>
+              <SubMenu dashboard={dashboard} annotations={dashboard.annotations.list} links={dashboard.links} />
+            </section>
+          )}
+          <DashboardGrid
+            dashboard={dashboard}
+            isEditable={!!dashboard.meta.canEdit}
+            viewPanel={viewPanel}
+            editPanel={editPanel}
+          />
+
+          {inspectPanel && <PanelInspector dashboard={dashboard} panel={inspectPanel} />}
         </Page>
         {editPanel && (
           <PanelEditor
@@ -564,22 +413,23 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
             sectionNav={sectionNav}
           />
         )}
+        {queryParams.addWidget && config.featureToggles.vizAndWidgetSplit && <AddWidgetModal />}
       </>
     );
   }
 }
 
 function updateStatePageNavFromProps(props: Props, state: State): State {
-  const { dashboard, FNDashboard } = props;
+  const { dashboard, navIndex } = props;
 
-  if (!dashboard || FNDashboard) {
+  if (!dashboard) {
     return state;
   }
 
   let pageNav = state.pageNav;
   let sectionNav = state.sectionNav;
 
-  if (!pageNav || dashboard.title !== pageNav.text) {
+  if (!pageNav || dashboard.title !== pageNav.text || dashboard.meta.folderUrl !== pageNav.parentItem?.url) {
     pageNav = {
       text: dashboard.title,
       url: locationUtil.getUrlForPartial(props.history.location, {
@@ -590,16 +440,26 @@ function updateStatePageNavFromProps(props: Props, state: State): State {
     };
   }
 
-  // Check if folder changed
   const { folderTitle, folderUid } = dashboard.meta;
-  if (folderTitle && folderUid && pageNav && pageNav.parentItem?.text !== folderTitle) {
-    pageNav = {
-      ...pageNav,
-      parentItem: {
-        text: folderTitle,
-        url: `/dashboards/f/${dashboard.meta.folderUid}`,
-      },
-    };
+  if (folderUid && pageNav) {
+    if (config.featureToggles.nestedFolders) {
+      const folderNavModel = getNavModel(navIndex, `folder-dashboards-${folderUid}`).main;
+      pageNav = {
+        ...pageNav,
+        parentItem: folderNavModel,
+      };
+    } else {
+      // Check if folder changed
+      if (folderTitle && pageNav.parentItem?.text !== folderTitle) {
+        pageNav = {
+          ...pageNav,
+          parentItem: {
+            text: folderTitle,
+            url: `/dashboards/f/${dashboard.meta.folderUid}`,
+          },
+        };
+      }
+    }
   }
 
   if (props.route.routeName === DashboardRoutes.Path) {
@@ -609,7 +469,7 @@ function updateStatePageNavFromProps(props: Props, state: State): State {
       pageNav.parentItem = pageNav.parentItem;
     }
   } else {
-    sectionNav = getNavModel(props.navIndex, config.featureToggles.topnav ? 'dashboards/browse' : 'dashboards');
+    sectionNav = getNavModel(props.navIndex, 'dashboards/browse');
   }
 
   if (state.editPanel || state.viewPanel) {
@@ -629,32 +489,6 @@ function updateStatePageNavFromProps(props: Props, state: State): State {
     ...state,
     pageNav,
     sectionNav,
-  };
-}
-
-function getStyles(theme: GrafanaTheme2, isDragActive: boolean) {
-  return {
-    dropZone: css`
-      height: 100%;
-    `,
-    dropOverlay: css`
-      background-color: ${isDragActive ? theme.colors.action.hover : `inherit`};
-      border: ${isDragActive ? `2px dashed ${theme.colors.border.medium}` : 0};
-      position: absolute;
-      display: ${isDragActive ? 'flex' : 'none'};
-      z-index: ${theme.zIndex.modal};
-      top: 0px;
-      left: 0px;
-      height: 100%;
-      width: 100%;
-      align-items: center;
-      justify-content: center;
-    `,
-    dropHint: css`
-      align-items: center;
-      display: flex;
-      flex-direction: column;
-    `,
   };
 }
 

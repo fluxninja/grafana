@@ -1,7 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Input, Select, Row } from '../abstract';
 import { ExtractionFn } from '../extractionfn';
+import { QueryBuilderProps } from '../types';
 
 export const Extraction = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Extraction);

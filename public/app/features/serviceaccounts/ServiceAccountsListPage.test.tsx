@@ -138,7 +138,7 @@ describe('ServiceAccountsListPage tests', () => {
 
     const user = userEvent.setup();
     await user.click(screen.getByRole('button', { name: /Disable/ }));
-    await user.click(screen.getByLabelText(/Confirm Modal Danger Button/));
+    await user.click(screen.getByRole('button', { name: 'Disable service account' }));
 
     expect(updateServiceAccountMock).toHaveBeenCalledWith({
       ...getDefaultServiceAccount(),
@@ -155,7 +155,7 @@ describe('ServiceAccountsListPage tests', () => {
 
     const user = userEvent.setup();
     await user.click(screen.getByLabelText(/Delete service account/));
-    await user.click(screen.getByLabelText(/Confirm Modal Danger Button/));
+    await user.click(screen.getByRole('button', { name: 'Delete' }));
 
     expect(deleteServiceAccountMock).toHaveBeenCalledWith(42);
   });

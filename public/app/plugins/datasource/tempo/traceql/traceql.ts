@@ -26,13 +26,15 @@ export const operators = ['=', '!=', '>', '<', '>=', '<=', '=~'];
 export const stringOperators = ['=', '!=', '=~'];
 export const numberOperators = ['=', '!=', '>', '<', '>=', '<='];
 
-const intrinsics = ['duration', 'name', 'status', 'parent'];
+export const intrinsics = ['duration', 'kind', 'name', 'status'];
 
-const scopes: string[] = ['resource', 'span'];
+export const scopes: string[] = ['resource', 'span'];
 
 const booleans = ['false', 'true'];
 
 const keywords = intrinsics.concat(scopes).concat(booleans);
+
+const statusValues = ['ok', 'unset', 'error', 'false', 'true'];
 
 const statusValues = ['ok', 'unset', 'error', 'false', 'true'];
 

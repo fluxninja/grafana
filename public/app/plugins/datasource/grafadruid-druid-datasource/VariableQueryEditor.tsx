@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
-import { ToolbarButtonRow, ToolbarButton, Drawer } from '@grafana/ui';
 import { css, cx } from '@emotion/css';
-import { DruidQuery } from './types';
-import { DruidQuerySettings } from './configuration/QuerySettings';
-import { QuerySettingsOptions } from './configuration/QuerySettings/types';
+import React, { useState } from 'react';
+
+import { ToolbarButtonRow, ToolbarButton, Drawer } from '@grafana/ui';
+
 import { DruidQueryBuilder } from './builder/';
 import { QueryBuilderOptions } from './builder/types';
+import { DruidQuerySettings } from './configuration/QuerySettings';
+import { QuerySettingsOptions } from './configuration/QuerySettings/types';
+import { DruidQuery } from './types';
 
 interface Props {
   query: DruidQuery;

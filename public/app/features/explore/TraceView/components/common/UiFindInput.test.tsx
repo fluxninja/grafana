@@ -15,22 +15,20 @@
 import { render, screen } from '@testing-library/react';
 import React from 'react';
 
+import SearchBarInput from './SearchBarInput';
 import UiFindInput from './UiFindInput';
 
-describe('UiFindInput', () => {
+describe('SearchBarInput', () => {
   describe('rendering', () => {
     it('renders as expected with no value', () => {
-      render(<UiFindInput />);
-      const uiFindInput = screen.queryByPlaceholderText('Find...');
-      expect(uiFindInput).toBeInTheDocument();
-      expect(uiFindInput?.getAttribute('value')).toEqual('');
-    });
-
-    it('renders as expected with value', () => {
       render(<UiFindInput value="value" />);
       const uiFindInput = screen.queryByPlaceholderText('Find...');
       expect(uiFindInput).toBeInTheDocument();
-      expect(uiFindInput?.getAttribute('value')).toEqual('value');
+
+      render(<SearchBarInput />);
+      const searchBarInput = screen.queryByPlaceholderText('Find...');
+      expect(searchBarInput).toBeInTheDocument();
+      expect(searchBarInput?.getAttribute('value')).toEqual('');
     });
   });
 });

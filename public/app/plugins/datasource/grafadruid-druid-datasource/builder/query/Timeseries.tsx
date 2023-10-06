@@ -1,5 +1,5 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import {
   useScopedQueryBuilderProps,
   useScopedQueryBuilderFieldProps,
@@ -8,13 +8,14 @@ import {
   Checkbox,
   Row,
 } from '../abstract';
-import { DataSource } from '../datasource';
-import { Granularity } from '../granularity';
-import { Filter } from '../filter';
 import { Aggregation } from '../aggregation';
+import { DataSource } from '../datasource';
+import { Filter } from '../filter';
+import { Granularity } from '../granularity';
 import { PostAggregation } from '../postaggregation';
-import { VirtualColumn } from '../virtualcolumn';
 import { Intervals } from '../querysegmentspec';
+import { QueryBuilderProps } from '../types';
+import { VirtualColumn } from '../virtualcolumn';
 
 export const Timeseries = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Timeseries);
