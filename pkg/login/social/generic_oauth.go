@@ -11,8 +11,6 @@ import (
 	"strconv"
 
 	"golang.org/x/oauth2"
-
-	"github.com/grafana/grafana/pkg/services/featuremgmt"
 )
 
 type SocialGenericOAuth struct {
