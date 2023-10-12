@@ -14,48 +14,6 @@
 
 package grafanaplugin
 
-<<<<<<<< HEAD:public/app/plugins/panel/alertGroups/panelcfg.cue
-composableKinds: PanelCfg: {
-	lineage: {
-		seqs: [
-			{
-				schemas: [
-					{
-						PanelOptions: {
-							// Comma-separated list of values used to filter alert results
-							labels: string
-							// Name of the alertmanager used as a source for alerts
-							alertmanager: string
-							// Expand all alert groups by default
-							expandAll: bool
-						} @cuetsy(kind="interface")
-					},
-				]
-			},
-		]
-	}
-|||||||| 78f0340031:public/app/plugins/panel/heatmap/models.cue
-import "github.com/grafana/thema"
-
-Panel: thema.#Lineage & {
-	name: "heatmap"
-	seqs: [
-		{
-			schemas: [
-				{
-					PanelOptions: {
-						// anything for now
-						...
-					} @cuetsy(kind="interface")
-					PanelFieldConfig: {
-						// anything for now
-						...
-					} @cuetsy(kind="interface")
-				},
-			]
-		},
-	]
-========
 composableKinds: PanelCfg: {
 	maturity: "experimental"
 
@@ -79,5 +37,4 @@ composableKinds: PanelCfg: {
 		}]
 		lenses: []
 	}
->>>>>>>> v10.1.1:public/app/plugins/panel/debug/panelcfg.cue
 }

@@ -14,40 +14,6 @@
 
 package grafanaplugin
 
-<<<<<<<< HEAD:public/app/plugins/panel/canvas/panelcfg.cue
-composableKinds: PanelCfg: {
-	lineage: {
-		seqs: [
-			{
-				schemas: [
-					{
-						PanelOptions: {
-							// anything for now
-							...
-						} @cuetsy(kind="interface")
-					},
-				]
-			},
-		]
-	}
-|||||||| 78f0340031:public/app/plugins/panel/canvas/models.cue
-import "github.com/grafana/thema"
-
-Panel: thema.#Lineage & {
-	name: "canvas"
-	seqs: [
-		{
-			schemas: [
-				{
-					PanelOptions: {
-						// anything for now
-						...
-					} @cuetsy(kind="interface")
-				},
-			]
-		},
-	]
-========
 composableKinds: PanelCfg: {
 	maturity: "experimental"
 
@@ -62,5 +28,4 @@ composableKinds: PanelCfg: {
 		}]
 		lenses: []
 	}
->>>>>>>> v10.1.1:public/app/plugins/panel/datagrid/panelcfg.cue
 }

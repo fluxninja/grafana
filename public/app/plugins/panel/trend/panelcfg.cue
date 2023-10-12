@@ -18,47 +18,6 @@ import (
 	"github.com/grafana/grafana/packages/grafana-schema/src/common"
 )
 
-<<<<<<<< HEAD:public/app/plugins/panel/bargauge/panelcfg.cue
-composableKinds: PanelCfg: {
-	maturity: "experimental"
-
-	lineage: {
-		seqs: [
-			{
-				schemas: [
-					{
-						PanelOptions: {
-							common.SingleStatBaseOptions
-							displayMode:  common.BarGaugeDisplayMode | *"gradient"
-							valueMode:    common.BarGaugeValueMode | *"color"
-							showUnfilled: bool | *true
-							minVizWidth:  uint32 | *0
-							minVizHeight: uint32 | *10
-						} @cuetsy(kind="interface")
-					},
-				]
-			},
-		]
-	}
-|||||||| 78f0340031:public/app/plugins/panel/bargauge/models.cue
-Panel: thema.#Lineage & {
-	name: "bargauge"
-	seqs: [
-		{
-			schemas: [
-				{
-					PanelOptions: {
-						ui.SingleStatBaseOptions
-						displayMode:  ui.BarGaugeDisplayMode | *"gradient"
-						showUnfilled: bool | *true
-						minVizWidth:  uint32 | *0
-						minVizHeight: uint32 | *10
-					} @cuetsy(kind="interface")
-				},
-			]
-		},
-	]
-========
 composableKinds: PanelCfg: lineage: {
 	schemas: [{
 		version: [0, 0]
@@ -76,5 +35,4 @@ composableKinds: PanelCfg: lineage: {
 		}
 	}]
 	lenses: []
->>>>>>>> v10.1.1:public/app/plugins/panel/trend/panelcfg.cue
 }

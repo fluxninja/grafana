@@ -14,45 +14,6 @@
 
 package grafanaplugin
 
-<<<<<<<< HEAD:public/app/plugins/panel/candlestick/panelcfg.cue
-composableKinds: PanelCfg: {
-	lineage: {
-		seqs: [
-			{
-				schemas: [
-					{
-						PanelOptions: {
-							// anything for now
-							...
-						} @cuetsy(kind="interface")
-						PanelFieldConfig: {
-							// anything for now
-							...
-						} @cuetsy(kind="interface")
-					},
-				]
-			},
-		]
-	}
-|||||||| 78f0340031:public/app/plugins/panel/news/models.cue
-import "github.com/grafana/thema"
-
-Panel: thema.#Lineage & {
-	name: "news"
-	seqs: [
-		{
-			schemas: [
-				{
-					PanelOptions: {
-						// empty/missing will default to grafana blog
-						feedUrl?:   string
-						showImage?: bool | *true
-					} @cuetsy(kind="interface")
-				},
-			]
-		},
-	]
-========
 composableKinds: PanelCfg: {
 	maturity: "experimental"
 
@@ -69,5 +30,4 @@ composableKinds: PanelCfg: {
 		}]
 		lenses: []
 	}
->>>>>>>> v10.1.1:public/app/plugins/panel/news/panelcfg.cue
 }
