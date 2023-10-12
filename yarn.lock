@@ -16441,6 +16441,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"diff-match-patch@npm:^1.0.5":
+  version: 1.0.5
+  resolution: "diff-match-patch@npm:1.0.5"
+  checksum: 841522d01b09cccbc4e4402cf61514a81b906349a7d97b67222390f2d35cf5df277cb23959eeed212d5e46afb5629cebab41b87918672c5a05c11c73688630e3
+  languageName: node
+  linkType: hard
+
 "diff-sequences@npm:^26.6.2":
   version: 26.6.2
   resolution: "diff-sequences@npm:26.6.2"
@@ -19749,6 +19756,7 @@ __metadata:
     rc-tree: 5.7.2
     re-resizable: 6.9.9
     react: 18.2.0
+    react-ace: ^10.1.0
     react-awesome-query-builder: 5.4.0
     react-beautiful-dnd: 13.1.1
     react-datepicker: ^4.7.0
@@ -23066,7 +23074,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lodash.isequal@npm:^4.0.0":
+"lodash.isequal@npm:^4.0.0, lodash.isequal@npm:^4.5.0":
   version: 4.5.0
   resolution: "lodash.isequal@npm:4.5.0"
   checksum: da27515dc5230eb1140ba65ff8de3613649620e8656b19a6270afe4866b7bd461d9ba2ac8a48dcc57f7adac4ee80e1de9f965d89d4d81a0ad52bb3eec2609644
@@ -26987,6 +26995,22 @@ __metadata:
     react: ^16.13.1 || ^17.0.0 || ^18.0.0
     react-dom: ^16.13.1 || ^17.0.0 || ^18.0.0
   checksum: a2c8bfe86646fb02d5c9c624b1da26f9e6a5e2f552cd96ce4db690588bee6b21177065ce8e98646c6ca0b1a9c4ce233824b75eb346800d8248ac8a87b40f1b28
+  languageName: node
+  linkType: hard
+
+"react-ace@npm:^10.1.0":
+  version: 10.1.0
+  resolution: "react-ace@npm:10.1.0"
+  dependencies:
+    ace-builds: ^1.4.14
+    diff-match-patch: ^1.0.5
+    lodash.get: ^4.4.2
+    lodash.isequal: ^4.5.0
+    prop-types: ^15.7.2
+  peerDependencies:
+    react: ^0.13.0 || ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^0.13.0 || ^0.14.0 || ^15.0.1 || ^16.0.0 || ^17.0.0 || ^18.0.0
+  checksum: 8fc67e02f911dcc31cf474df97c06f2ba5b5f402d9ed425895e479e2daddf4894a2cd0e81744b37b7f2b07109cfe4470fc5ebeed305d648c596e3442142e4823
   languageName: node
   linkType: hard
 
