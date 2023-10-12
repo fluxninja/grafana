@@ -196,19 +196,6 @@ export const AlertRuleForm = ({ existing, prefill }: Props) => {
 
   const cancelRuleCreation = () => {
     logInfo(LogMessages.cancelSavingAlertRule);
-    if (!existing) {
-      trackNewAlerRuleFormCancelled({
-        grafana_version: config.buildInfo.version,
-        org_id: contextSrv.user.orgId,
-        user_id: contextSrv.user.id,
-      });
-    }
-  };
-  const evaluateEveryInForm = watch('evaluateEvery');
-  useEffect(() => setEvaluateEvery(evaluateEveryInForm), [evaluateEveryInForm]);
-
-  const cancelRuleCreation = () => {
-    logInfo(LogMessages.cancelSavingAlertRule);
   };
   const evaluateEveryInForm = watch('evaluateEvery');
   useEffect(() => setEvaluateEvery(evaluateEveryInForm), [evaluateEveryInForm]);

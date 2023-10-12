@@ -36,8 +36,6 @@ const keywords = intrinsics.concat(scopes).concat(booleans);
 
 const statusValues = ['ok', 'unset', 'error', 'false', 'true'];
 
-const statusValues = ['ok', 'unset', 'error', 'false', 'true'];
-
 export const language = {
   ignoreCase: false,
   defaultToken: '',

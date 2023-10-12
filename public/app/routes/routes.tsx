@@ -516,7 +516,7 @@ export function getAppRoutes(): RouteDescriptor[] {
       path: '/*',
       component: PageNotFound,
     },
-  ].filter(isTruthy);
+  ].filter(isTruthy) as unknown as RouteDescriptor[];
 }
 
 export function getSupportBundleRoutes(cfg = config): RouteDescriptor[] {
