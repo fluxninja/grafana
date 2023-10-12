@@ -99,9 +99,9 @@ $height-lg: 48;
 // Typography
 // -------------------------
 /* stylelint-disable-next-line string-quotes */
-$font-family-sans-serif: Nunito, Roboto, Arial;
+$font-family-sans-serif: "Source Sans Pro", Nunito, Roboto, Arial;
 /* stylelint-disable-next-line string-quotes */
-$font-family-monospace: 'Nunito Mono', monospace;
+$font-family-monospace: 'Nunito Mono', 'Roboto Mono', monospace;
 
 $font-file-path: '../fonts' !default;
 
