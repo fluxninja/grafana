@@ -38,10 +38,6 @@ export function AsyncVirtualizedSelect<T, Rest = {}>(props: VirtualizedSelectAsy
   return <SelectBase virtualized {...props} />;
 }
 
-export function AsyncVirtualizedSelect<T>(props: VirtualizedSelectAsyncProps<T>) {
-  return <SelectBase virtualized {...props} />;
-}
-
 interface AsyncMultiSelectProps<T> extends Omit<MultiSelectCommonProps<T>, 'options'>, SelectAsyncProps<T> {
   // AsyncSelect has options stored internally. We cannot enable plain values as we don't have access to the fetched options
   value?: Array<SelectableValue<T>>;

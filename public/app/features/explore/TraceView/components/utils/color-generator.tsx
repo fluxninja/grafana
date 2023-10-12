@@ -138,10 +138,7 @@ export function getFilteredColors(colorsHex: string[], theme: GrafanaTheme2) {
   if (redIndex > -1) {
     filtered.splice(redIndex, 1);
   }
-  const redIndex2 = colorsHex.indexOf('#BF1B00');
-  if (redIndex2 > -1) {
-    filtered.splice(redIndex2, 1);
-  }
+
   const redIndex2 = colorsHex.indexOf('#BF1B00');
   if (redIndex2 > -1) {
     colorsHex.splice(redIndex2, 1);
