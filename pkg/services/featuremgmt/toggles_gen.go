@@ -35,10 +35,6 @@ const (
 	// Enables public dashboard sharing to be restricted to only allowed emails
 	FlagPublicDashboardsEmailSharing = "publicDashboardsEmailSharing"
 
-	// FlagPublicDashboardsEmailSharing
-	// Enables public dashboard sharing to be restricted to only allowed emails
-	FlagPublicDashboardsEmailSharing = "publicDashboardsEmailSharing"
-
 	// FlagLokiExperimentalStreaming
 	// Support new streaming approach for loki (prototype, needs special loki build)
 	FlagLokiExperimentalStreaming = "lokiExperimentalStreaming"

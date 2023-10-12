@@ -429,21 +429,6 @@ func calculatePeriodBasedOnTimeRange(startTime, endTime time.Time) int {
 	return period
 }
 
-func calculatePeriodBasedOnTimeRange(startTime, endTime time.Time) int {
-	deltaInSeconds := endTime.Sub(startTime).Seconds()
-	periods := getRetainedPeriods(time.Since(startTime))
-	datapoints := int(math.Ceil(deltaInSeconds / 2000))
-	period := periods[len(periods)-1]
-	for _, value := range periods {
-		if datapoints <= value {
-			period = value
-			break
-		}
-	}
-
-	return period
-}
-
 func getPeriod(query metricsDataQuery, startTime, endTime time.Time) (int, error) {
 	periodString := ""
 	if query.Period != nil {

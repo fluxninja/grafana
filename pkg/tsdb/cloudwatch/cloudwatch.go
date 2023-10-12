@@ -168,9 +168,16 @@ func (e *cloudWatchExecutor) QueryData(ctx context.Context, req *backend.QueryDa
 		return executeSyncLogQuery(ctx, e, req)
 	}
 
-func (e *cloudWatchExecutor) checkHealthLogs(pluginCtx backend.PluginContext) error {
-	parameters := url.Values{
-		"limit": []string{"1"},
+	var result *backend.QueryDataResponse
+	switch model.Type {
+	case annotationQuery:
+		result, err = e.executeAnnotationQuery(ctx, req.PluginContext, model, q)
+	case logAction:
+		result, err = e.executeLogActions(ctx, logger, req)
+	case timeSeriesQuery:
+		fallthrough
+	default:
+		result, err = e.executeTimeSeriesQuery(ctx, logger, req)
 	}
 
 	return result, err
@@ -197,70 +204,6 @@ func (e *cloudWatchExecutor) CheckHealth(ctx context.Context, req *backend.Check
 		Status:  status,
 		Message: fmt.Sprintf("1. %s\n2. %s", metricsTest, logsTest),
 	}, nil
-}
-
-func (e *cloudWatchExecutor) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
-	logger := logger.FromContext(ctx)
-	/*
-		Unlike many other data sources, with Cloudwatch Logs query requests don't receive the results as the response
-		to the query, but rather an ID is first returned. Following this, a client is expected to send requests along
-		with the ID until the status of the query is complete, receiving (possibly partial) results each time. For
-		queries made via dashboards and Explore, the logic of making these repeated queries is handled on the
-		frontend, but because alerts and expressions are executed on the backend the logic needs to be reimplemented here.
-	*/
-	q := req.Queries[0]
-	var model DataQueryJson
-	err := json.Unmarshal(q.JSON, &model)
-	if err != nil {
-		return nil, err
-	}
-
-	_, fromAlert := req.Headers[ngalertmodels.FromAlertHeaderName]
-	fromExpression := req.GetHTTPHeader(query.HeaderFromExpression) != ""
-	isSyncLogQuery := (fromAlert || fromExpression) && model.QueryMode == logsQueryMode
-	if isSyncLogQuery {
-		return executeSyncLogQuery(ctx, e, req)
-	}
-
-	var result *backend.QueryDataResponse
-	switch model.Type {
-	case annotationQuery:
-		result, err = e.executeAnnotationQuery(ctx, req.PluginContext, model, q)
-	case logAction:
-		result, err = e.executeLogActions(ctx, logger, req)
-	case timeSeriesQuery:
-		fallthrough
-	default:
-		result, err = e.executeTimeSeriesQuery(ctx, logger, req)
-	}
-
-	return result, err
-}
-
-func (e *cloudWatchExecutor) checkHealthMetrics(ctx context.Context, pluginCtx backend.PluginContext) error {
-	namespace := "AWS/Billing"
-	metric := "EstimatedCharges"
-	params := &cloudwatch.ListMetricsInput{
-		Namespace:  &namespace,
-		MetricName: &metric,
-	}
-
-	err := e.checkHealthMetrics(ctx, req.PluginContext)
-	if err != nil {
-		return err
-	}
-	metricClient := clients.NewMetricsClient(NewMetricsAPI(session), e.cfg)
-	_, err = metricClient.ListMetricsWithPageLimit(params)
-	return err
-}
-
-	err = e.checkHealthLogs(ctx, req.PluginContext)
-	if err != nil {
-		return err
-	}
-	logsClient := NewLogsAPI(session)
-	_, err = logsClient.DescribeLogGroups(&cloudwatchlogs.DescribeLogGroupsInput{Limit: aws.Int64(1)})
-	return err
 }
 
 func (e *cloudWatchExecutor) checkHealthMetrics(ctx context.Context, pluginCtx backend.PluginContext) error {

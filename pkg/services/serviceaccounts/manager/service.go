@@ -60,7 +60,7 @@ func ProvideServiceAccountsService(
 	)
 	s := &ServiceAccountsService{
 		store:         serviceAccountsStore,
-		log:           log,
+		log:           log.New("serviceaccounts"),
 		backgroundLog: log.New("serviceaccounts.background"),
 	}
 

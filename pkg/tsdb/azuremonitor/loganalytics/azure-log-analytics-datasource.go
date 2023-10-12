@@ -227,12 +227,6 @@ func (e *AzureLogAnalyticsDatasource) buildQueries(ctx context.Context, logger l
 			return nil, err
 		}
 
-		resources := []string{}
-		if len(azureLogAnalyticsTarget.Resources) > 0 {
-			resources = azureLogAnalyticsTarget.Resources
-		} else if azureLogAnalyticsTarget.Resource != "" {
-			resources = []string{azureLogAnalyticsTarget.Resource}
-		}
 		azureLogAnalyticsQueries = append(azureLogAnalyticsQueries, &AzureLogAnalyticsQuery{
 			RefID:                   query.RefID,
 			ResultFormat:            string(resultFormat),

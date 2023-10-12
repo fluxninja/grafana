@@ -171,6 +171,8 @@ func TestEncryptedCache(t *testing.T) {
 	require.Equal(t, "bar", string(v))
 }
 
+type fakeSecretsService struct{}
+
 func (f fakeSecretsService) Encrypt(_ context.Context, payload []byte, _ secrets.EncryptionOptions) ([]byte, error) {
 	return f.reverse(payload), nil
 }
@@ -186,32 +188,3 @@ func (f fakeSecretsService) reverse(input []byte) []byte {
 	}
 	return []byte(string(r))
 }
-
-type fakeCacheStorage struct {
-	storage map[string][]byte
-}
-
-func (fcs fakeCacheStorage) Set(_ context.Context, key string, value []byte, exp time.Duration) error {
-	fcs.storage[key] = value
-	return nil
-}
-
-func (fcs fakeCacheStorage) Get(_ context.Context, key string) ([]byte, error) {
-	value, exist := fcs.storage[key]
-	if !exist {
-		return nil, ErrCacheItemNotFound
-	}
-
-	return value, nil
-}
-
-func (fcs fakeCacheStorage) Delete(_ context.Context, key string) error {
-	delete(fcs.storage, key)
-	return nil
-}
-
-func (fcs fakeCacheStorage) Count(_ context.Context, prefix string) (int64, error) {
-	return int64(len(fcs.storage)), nil
-}
-
-type fakeSecretsService struct{}

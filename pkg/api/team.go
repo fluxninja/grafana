@@ -40,12 +40,6 @@ func (hs *HTTPServer) CreateTeam(c *contextmodel.ReqContext) response.Response {
 
 	// Clear permission cache for the user who's created the team, so that new permissions are fetched for their next call
 	// Required for cases when caller wants to immediately interact with the newly created object
-	if !hs.AccessControl.IsDisabled() {
-		hs.accesscontrolService.ClearUserPermissionCache(c.SignedInUser)
-	}
-
-	// Clear permission cache for the user who's created the team, so that new permissions are fetched for their next call
-	// Required for cases when caller wants to immediately interact with the newly created object
 	hs.accesscontrolService.ClearUserPermissionCache(c.SignedInUser)
 
 	// if the request is authenticated using API tokens

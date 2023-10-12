@@ -265,13 +265,6 @@ type AppDTO struct {
 	AngularDetected bool   `json:"angularDetected"`
 }
 
-type AppDTO struct {
-	ID      string `json:"id"`
-	Path    string `json:"path"`
-	Version string `json:"version"`
-	Preload bool   `json:"preload"`
-}
-
 const (
 	errorCodeSignatureMissing  ErrorCode = "signatureMissing"
 	errorCodeSignatureModified ErrorCode = "signatureModified"

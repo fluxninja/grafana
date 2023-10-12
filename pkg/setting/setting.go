@@ -1645,11 +1645,6 @@ func readAuthSettings(iniFile *ini.File, cfg *Cfg) (err error) {
 
 	cfg.AuthProxyHeadersEncoded = authProxy.Key("headers_encoded").MustBool(false)
 
-	// GrafanaCom
-	readAuthGrafanaComSettings(iniFile, cfg)
-
-	// Github
-	readAuthGithubSettings(iniFile, cfg)
 	return nil
 }
 

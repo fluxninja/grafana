@@ -334,7 +334,7 @@ func (am *Alertmanager) applyConfig(cfg *apimodels.PostableUserConfig, rawConfig
 func (am *Alertmanager) applyAndMarkConfig(ctx context.Context, hash string, cfg *apimodels.PostableUserConfig, rawConfig []byte) error {
 	configChanged, err := am.applyConfig(cfg, rawConfig)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	if configChanged {

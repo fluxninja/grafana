@@ -190,21 +190,6 @@ type AlertRuleGroupMetadata struct {
 	Interval int64 `json:"interval"`
 }
 
-// swagger:parameters RouteGetAlertRuleGroupExport RouteGetAlertRuleExport RouteGetAlertRulesExport
-type ExportQueryParams struct {
-	// Whether to initiate a download of the file or not.
-	// in: query
-	// required: false
-	// default: false
-	Download bool `json:"download"`
-
-	// Format of the downloaded file, either yaml or json. Accept header can also be used, but the query parameter will take precedence.
-	// in: query
-	// required: false
-	// default: yaml
-	Format string `json:"format"`
-}
-
 // swagger:model
 type AlertRuleGroup struct {
 	Title     string                 `json:"title"`
