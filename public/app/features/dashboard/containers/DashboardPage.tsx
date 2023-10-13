@@ -1,11 +1,12 @@
 import { cx } from '@emotion/css';
+import { Box } from '@mui/material';
 import React, { PureComponent } from 'react';
 import { connect, ConnectedProps, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
 import { NavModel, NavModelItem, TimeRange, PageLayoutType, locationUtil } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { config, locationService } from '@grafana/runtime';
-import { Themeable2, withTheme2 } from '@grafana/ui';
+import { Themeable2, withTheme2, ToolbarButtonRow } from '@grafana/ui';
 import { notifyApp } from 'app/core/actions';
 import { Page } from 'app/core/components/Page/Page';
 import { EntityNotFound } from 'app/core/components/PageNotFound/EntityNotFound';
@@ -17,6 +18,7 @@ import { FnGlobalState } from 'app/core/reducers/fn-slice';
 import { getNavModel } from 'app/core/selectors/navModel';
 import { PanelModel } from 'app/features/dashboard/state';
 import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
+import { updateTimeZoneForSession } from 'app/features/profile/state/reducers';
 import { getPageNavFromSlug, getRootContentNavModel } from 'app/features/storage/StorageFolderPage';
 import { FNDashboardProps } from 'app/fn-app/types';
 import { DashboardRoutes, DashboardState, KioskMode, StoreState } from 'app/types';
@@ -25,7 +27,7 @@ import { PanelEditEnteredEvent, PanelEditExitedEvent } from 'app/types/events';
 import { cancelVariables, templateVarsChangedInUrl } from '../../variables/state/actions';
 import { findTemplateVarChanges } from '../../variables/utils';
 import { AddWidgetModal } from '../components/AddWidgetModal/AddWidgetModal';
-import { DashNav } from '../components/DashNav';
+import { DashNavTimeControls } from '../components/DashNav/DashNavTimeControls';
 import { DashboardFailed } from '../components/DashboardLoading/DashboardFailed';
 import { DashboardLoading } from '../components/DashboardLoading/DashboardLoading';
 import { FnLoader } from '../components/DashboardLoading/FnLoader';
@@ -409,9 +411,18 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           scrollRef={this.setScrollRef}
           scrollTop={updateScrollTop}
         >
-          {showToolbar && (
-            <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
-              <DashNav
+          {/* {showToolbar && ( */}
+          <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
+            <Box mb={4}>
+              <ToolbarButtonRow alignment="right">
+                <DashNavTimeControls
+                  dashboard={dashboard}
+                  onChangeTimeZone={updateTimeZoneForSession}
+                  key="time-controls"
+                />
+              </ToolbarButtonRow>
+            </Box>
+            {/* <DashNav
                 dashboard={dashboard}
                 title={dashboard.title}
                 folderTitle={dashboard.meta.folderTitle}
@@ -419,9 +430,9 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
                 onAddPanel={this.onAddPanel}
                 kioskMode={kioskMode}
                 hideTimePicker={dashboard.timepicker.hidden}
-              />
-            </header>
-          )}
+              /> */}
+          </header>
+          {/* )} */}
           {!FNDashboard && <DashboardPrompt dashboard={dashboard} />}
           {initError && <DashboardFailed />}
           {showSubMenu && !FNDashboard && (
