@@ -411,18 +411,18 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           scrollRef={this.setScrollRef}
           scrollTop={updateScrollTop}
         >
-          {/* {showToolbar && ( */}
-          <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
-            <Box mb={4}>
-              <ToolbarButtonRow alignment="right">
-                <DashNavTimeControls
-                  dashboard={dashboard}
-                  onChangeTimeZone={updateTimeZoneForSession}
-                  key="time-controls"
-                />
-              </ToolbarButtonRow>
-            </Box>
-            {/* <DashNav
+          {showToolbar && (
+            <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
+              <Box mb={4}>
+                <ToolbarButtonRow alignment="right">
+                  <DashNavTimeControls
+                    dashboard={dashboard}
+                    onChangeTimeZone={updateTimeZoneForSession}
+                    key="time-controls"
+                  />
+                </ToolbarButtonRow>
+              </Box>
+              {/* <DashNav
                 dashboard={dashboard}
                 title={dashboard.title}
                 folderTitle={dashboard.meta.folderTitle}
@@ -431,11 +431,11 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
                 kioskMode={kioskMode}
                 hideTimePicker={dashboard.timepicker.hidden}
               /> */}
-          </header>
-          {/* )} */}
+            </header>
+          )}
           {!FNDashboard && <DashboardPrompt dashboard={dashboard} />}
           {initError && <DashboardFailed />}
-          {showSubMenu && !FNDashboard && (
+          {showSubMenu && (
             <section aria-label={selectors.pages.Dashboard.SubMenu.submenu}>
               <SubMenu dashboard={dashboard} annotations={dashboard.annotations.list} links={dashboard.links} />
             </section>
