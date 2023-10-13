@@ -7,7 +7,6 @@ import { QueryBuilderProps } from '../types';
 
 import { FilterTuning } from '.';
 
-
 export const Spatial = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Spatial);
   return (

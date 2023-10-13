@@ -7,7 +7,6 @@ import { QuerySettingsProps } from './types';
 
 import { DruidQueryRequestSettings, DruidQueryResponseSettings } from './';
 
-
 export const DruidQueryDefaultSettings = (props: QuerySettingsProps) => {
   return (
     <>

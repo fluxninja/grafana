@@ -59,15 +59,15 @@ import { Echo } from './core/services/echo/Echo';
 import { reportPerformance } from './core/services/echo/EchoSrv';
 import { PerformanceBackend } from './core/services/echo/backends/PerformanceBackend';
 import { ApplicationInsightsBackend } from './core/services/echo/backends/analytics/ApplicationInsightsBackend';
-import { GA4EchoBackend } from './core/services/echo/backends/analytics/GA4Backend';
-import { GAEchoBackend } from './core/services/echo/backends/analytics/GABackend';
+// import { GA4EchoBackend } from './core/services/echo/backends/analytics/GA4Backend';
+// import { GAEchoBackend } from './core/services/echo/backends/analytics/GABackend';
 import { RudderstackBackend } from './core/services/echo/backends/analytics/RudderstackBackend';
 import { GrafanaJavascriptAgentBackend } from './core/services/echo/backends/grafana-javascript-agent/GrafanaJavascriptAgentBackend';
 import { KeybindingSrv } from './core/services/keybindingSrv';
 import { startMeasure, stopMeasure } from './core/utils/metrics';
 import { initDevFeatures } from './dev';
 import { getTimeSrv } from './features/dashboard/services/TimeSrv';
-import { initGrafanaLive } from './features/live';
+// import { initGrafanaLive } from './features/live';
 import { PanelDataErrorView } from './features/panel/components/PanelDataErrorView';
 import { PanelRenderer } from './features/panel/components/PanelRenderer';
 import { DatasourceSrv } from './features/plugins/datasource_srv';
@@ -135,7 +135,7 @@ export class GrafanaApp {
       setPanelDataErrorView(PanelDataErrorView);
       setLocationSrv(locationService);
       setTimeZoneResolver(() => config.bootData.user.timezone);
-      initGrafanaLive();
+      // initGrafanaLive();
 
       // Expose the app-wide eventbus
       setAppEvents(appEvents);
@@ -285,22 +285,22 @@ function initEchoSrv() {
     );
   }
 
-  if (config.googleAnalyticsId) {
-    registerEchoBackend(
-      new GAEchoBackend({
-        googleAnalyticsId: config.googleAnalyticsId,
-      })
-    );
-  }
+  // if (config.googleAnalyticsId) {
+  //   registerEchoBackend(
+  //     new GAEchoBackend({
+  //       googleAnalyticsId: config.googleAnalyticsId,
+  //     })
+  //   );
+  // }
 
-  if (config.googleAnalytics4Id) {
-    registerEchoBackend(
-      new GA4EchoBackend({
-        googleAnalyticsId: config.googleAnalytics4Id,
-        googleAnalytics4SendManualPageViews: config.googleAnalytics4SendManualPageViews,
-      })
-    );
-  }
+  // if (config.googleAnalytics4Id) {
+  //   registerEchoBackend(
+  //     new GA4EchoBackend({
+  //       googleAnalyticsId: config.googleAnalytics4Id,
+  //       googleAnalytics4SendManualPageViews: config.googleAnalytics4SendManualPageViews,
+  //     })
+  //   );
+  // }
 
   if (config.rudderstackWriteKey && config.rudderstackDataPlaneUrl) {
     registerEchoBackend(

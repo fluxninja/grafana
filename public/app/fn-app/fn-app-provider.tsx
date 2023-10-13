@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC } from 'react';
+import React, { useState, useEffect, FC, PropsWithChildren } from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -15,7 +15,7 @@ import { FNDashboardProps } from './types';
 
 type FnAppProviderProps = Pick<FNDashboardProps, 'fnError'>;
 
-export const FnAppProvider: FC<FnAppProviderProps> = (props) => {
+export const FnAppProvider: FC<PropsWithChildren<FnAppProviderProps>> = (props) => {
   const { children, fnError = null } = props;
 
   const [ready, setReady] = useState(false);

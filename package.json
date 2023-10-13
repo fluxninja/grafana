@@ -212,6 +212,7 @@
     "jest-fail-on-console": "3.1.1",
     "jest-junit": "16.0.0",
     "jest-matcher-utils": "29.3.1",
+    "lefthook": "^1.5.2",
     "lerna": "5.5.4",
     "lint-staged": "13.2.3",
     "mini-css-extract-plugin": "2.7.2",

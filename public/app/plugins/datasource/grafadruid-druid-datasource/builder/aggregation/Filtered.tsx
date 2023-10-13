@@ -6,7 +6,6 @@ import { QueryBuilderProps } from '../types';
 
 import { Aggregation } from './';
 
-
 export const Filtered = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Filtered);
   return (
