@@ -5578,6 +5578,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@mui/icons-material@npm:^5.14.13":
+  version: 5.14.13
+  resolution: "@mui/icons-material@npm:5.14.13"
+  dependencies:
+    "@babel/runtime": ^7.23.1
+  peerDependencies:
+    "@mui/material": ^5.0.0
+    "@types/react": ^17.0.0 || ^18.0.0
+    react: ^17.0.0 || ^18.0.0
+  peerDependenciesMeta:
+    "@types/react":
+      optional: true
+  checksum: a25db309d02654d1f2d51887986e11b26fc7aea864a398fdc55ca2f4ffd80bbc7402e7686f6a0aeab04a440993e0733aa52f752db50e083dae03e04c558f7bfd
+  languageName: node
+  linkType: hard
+
 "@mui/material@npm:^5.14.13":
   version: 5.14.13
   resolution: "@mui/material@npm:5.14.13"
@@ -19750,6 +19766,7 @@ __metadata:
     "@locker/near-membrane-dom": ^0.12.15
     "@locker/near-membrane-shared": ^0.12.15
     "@locker/near-membrane-shared-dom": ^0.12.15
+    "@mui/icons-material": ^5.14.13
     "@mui/material": ^5.14.13
     "@opentelemetry/api": 1.4.0
     "@opentelemetry/exporter-collector": 0.25.0

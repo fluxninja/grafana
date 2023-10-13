@@ -1,4 +1,5 @@
 import { css, cx } from '@emotion/css';
+import { Box } from '@mui/material';
 import React from 'react';
 
 import { DataLink, GrafanaTheme2, PanelData } from '@grafana/data';
@@ -12,7 +13,6 @@ import { getPanelLinksSupplier } from 'app/features/panel/panellinks/linkSupplie
 import PanelHeaderCorner from './PanelHeaderCorner';
 import { PanelHeaderLoadingIndicator } from './PanelHeaderLoadingIndicator';
 import { PanelHeaderMenuTrigger } from './PanelHeaderMenuTrigger';
-import { PanelHeaderMenuWrapper } from './PanelHeaderMenuWrapper';
 import { PanelHeaderNotices } from './PanelHeaderNotices';
 
 export interface Props {
@@ -49,7 +49,7 @@ export function PanelHeader({ panel, error, isViewing, isEditing, data, alertSta
         links={getPanelLinksSupplier(panel)}
         error={error}
       />
-      <div className={className}>
+      <Box className={className} sx={{ '&:hover': { backgroundColor: 'transparent !important' } }}>
         <PanelHeaderMenuTrigger data-testid={selectors.components.Panels.Panel.title(title)} onOpenMenu={onOpenMenu}>
           {({ closeMenu, panelMenuOpen }) => {
             return (
@@ -67,8 +67,8 @@ export function PanelHeader({ panel, error, isViewing, isEditing, data, alertSta
                   <h2 className={styles.titleText}>{title}</h2>
                   {!dashboard.meta.publicDashboardAccessToken && (
                     <div data-testid="panel-dropdown">
-                      <Icon name="angle-down" className="panel-menu-toggle" />
-                      {panelMenuOpen ? <PanelHeaderMenuWrapper panel={panel} dashboard={dashboard} /> : null}
+                      {/* <Icon name="angle-down" className="panel-menu-toggle" />
+                      {panelMenuOpen ? <PanelHeaderMenuWrapper panel={panel} dashboard={dashboard} /> : null} */}
                     </div>
                   )}
                   {data.request && data.request.timeInfo && (
@@ -81,7 +81,7 @@ export function PanelHeader({ panel, error, isViewing, isEditing, data, alertSta
             );
           }}
         </PanelHeaderMenuTrigger>
-      </div>
+      </Box>
     </>
   );
 }
@@ -93,7 +93,6 @@ const panelStyles = (theme: GrafanaTheme2) => {
       overflow: hidden;
       white-space: nowrap;
       max-width: calc(100% - 38px);
-      cursor: pointer;
       font-weight: ${theme.typography.fontWeightMedium};
       font-size: ${theme.typography.body.fontSize};
       margin: 0;

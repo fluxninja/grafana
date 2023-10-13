@@ -188,7 +188,7 @@ const getStyles = (theme: GrafanaTheme2) => {
     }),
     default: css({
       color: theme.colors.text.secondary,
-      background: 'transparent',
+      background: theme.colors.background.primary,
       border: `1px solid transparent`,
 
       '&:hover': {
