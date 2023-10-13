@@ -152,17 +152,11 @@ export const TimeRangeContent = (props: Props) => {
         </Field>
         {fyTooltip}
       </div>
-      <Button
-        data-testid={selectors.components.TimePicker.applyTimeRange}
-        onClick={onApply}
-        style={{
-          width: '100%',
-          textAlign: 'center',
-          paddingLeft: '55px',
-        }}
-      >
-        <Trans i18nKey="time-picker.range-content.apply-button">Apply time range</Trans>
-      </Button>
+      <div style={{ display: 'flex', alignItems: 'flex-start', width: '250px' }}>
+        <Button data-testid={selectors.components.TimePicker.applyTimeRange} onClick={onApply}>
+          <Trans i18nKey="time-picker.range-content.apply-button">Apply time range</Trans>
+        </Button>
+      </div>
 
       <TimePickerCalendar
         isFullscreen={isFullscreen}

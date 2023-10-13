@@ -94,7 +94,7 @@ export class DashNavTimeControls extends Component<Props> {
     }
 
     return (
-      <>
+      <React.Fragment>
         <TimePickerWithHistory
           value={timePickerValue}
           onChange={this.onChangeTimePicker}
@@ -118,7 +118,7 @@ export class DashNavTimeControls extends Component<Props> {
           showAutoInterval={true}
           text={text}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

@@ -1,5 +1,4 @@
 import { cx } from '@emotion/css';
-import { Box } from '@mui/material';
 import React, { PureComponent } from 'react';
 import { connect, ConnectedProps, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
@@ -27,6 +26,7 @@ import { PanelEditEnteredEvent, PanelEditExitedEvent } from 'app/types/events';
 import { cancelVariables, templateVarsChangedInUrl } from '../../variables/state/actions';
 import { findTemplateVarChanges } from '../../variables/utils';
 import { AddWidgetModal } from '../components/AddWidgetModal/AddWidgetModal';
+import { DashNav } from '../components/DashNav';
 import { DashNavTimeControls } from '../components/DashNav/DashNavTimeControls';
 import { DashboardFailed } from '../components/DashboardLoading/DashboardFailed';
 import { DashboardLoading } from '../components/DashboardLoading/DashboardLoading';
@@ -402,7 +402,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
     }
 
     return (
-      <>
+      <React.Fragment>
         <Page
           navModel={sectionNav}
           pageNav={pageNav}
@@ -410,27 +410,29 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           className={pageClassName}
           scrollRef={this.setScrollRef}
           scrollTop={updateScrollTop}
+          style={{ minHeight: 550 }}
         >
           {showToolbar && (
             <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
-              <Box mb={4}>
-                <ToolbarButtonRow alignment="right">
+              {FNDashboard ? (
+                <ToolbarButtonRow alignment="right" style={{ marginBottom: '16px' }}>
                   <DashNavTimeControls
                     dashboard={dashboard}
                     onChangeTimeZone={updateTimeZoneForSession}
                     key="time-controls"
                   />
                 </ToolbarButtonRow>
-              </Box>
-              {/* <DashNav
-                dashboard={dashboard}
-                title={dashboard.title}
-                folderTitle={dashboard.meta.folderTitle}
-                isFullscreen={!!viewPanel}
-                onAddPanel={this.onAddPanel}
-                kioskMode={kioskMode}
-                hideTimePicker={dashboard.timepicker.hidden}
-              /> */}
+              ) : (
+                <DashNav
+                  dashboard={dashboard}
+                  title={dashboard.title}
+                  folderTitle={dashboard.meta.folderTitle}
+                  isFullscreen={!!viewPanel}
+                  onAddPanel={this.onAddPanel}
+                  kioskMode={kioskMode}
+                  hideTimePicker={dashboard.timepicker.hidden}
+                />
+              )}
             </header>
           )}
           {!FNDashboard && <DashboardPrompt dashboard={dashboard} />}
@@ -467,7 +469,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           />
         )}
         {!FNDashboard && queryParams.addWidget && config.featureToggles.vizAndWidgetSplit && <AddWidgetModal />}
-      </>
+      </React.Fragment>
     );
   }
 }
