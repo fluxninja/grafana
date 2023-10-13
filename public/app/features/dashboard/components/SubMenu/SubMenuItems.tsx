@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 
 import { selectors } from '@grafana/e2e-selectors';
+import { useSelector } from 'app/types';
 
 import { PickerRenderer } from '../../../variables/pickers/PickerRenderer';
 import { VariableHide, VariableModel } from '../../../variables/types';
@@ -13,6 +14,8 @@ interface Props {
 export const SubMenuItems = ({ variables, readOnly }: Props) => {
   const [visibleVariables, setVisibleVariables] = useState<VariableModel[]>([]);
 
+  const hiddenVariables = useSelector((state) => state.fnGlobalState.hiddenVariables);
+
   useEffect(() => {
     setVisibleVariables(variables.filter((state) => state.hide !== VariableHide.hideVariable));
   }, [variables]);
@@ -24,6 +27,10 @@ export const SubMenuItems = ({ variables, readOnly }: Props) => {
   return (
     <>
       {visibleVariables.map((variable) => {
+        if (hiddenVariables?.includes(variable.id)) {
+          return null;
+        }
+
         return (
           <div
             key={variable.id}
