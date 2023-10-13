@@ -10,9 +10,9 @@ import { StoreState, useSelector } from 'app/types';
 export function DataSourcesListPage() {
   const dataSourcesCount = useSelector(({ dataSources }: StoreState) => getDataSourcesCount(dataSources));
 
-  const actions = config.featureToggles.topnav && dataSourcesCount > 0 ? <DataSourceAddButton /> : undefined;
+  const actions = dataSourcesCount > 0 ? <DataSourceAddButton /> : undefined;
   return (
-    <Page navId={'connections-your-connections-datasources'} actions={actions}>
+    <Page navId={'connections-datasources'} actions={actions}>
       <Page.Contents>
         <DataSourcesList />
       </Page.Contents>

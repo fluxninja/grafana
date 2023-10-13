@@ -1,7 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderProps, useScopedQueryBuilderFieldProps, Input, Checkbox, Row } from '../abstract';
 import { Granularity } from '../granularity';
+import { QueryBuilderProps } from '../types';
 
 export const TimeFormat = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, TimeFormat);

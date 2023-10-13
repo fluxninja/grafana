@@ -95,7 +95,7 @@ describe('situation', () => {
       type: 'AFTER_SELECTOR',
       afterPipe: true,
       hasSpace: false,
-      logQuery: '{place="luna"}| logfmt |',
+      logQuery: '{place="luna"} | logfmt |',
     });
   });
 
@@ -114,6 +114,13 @@ describe('situation', () => {
     assertSituation('sum({^})', {
       type: 'IN_LABEL_SELECTOR_NO_LABEL_NAME',
       otherLabels: [],
+    });
+
+    ['sum({label="value",^})', '{label="value",^}', '{label="value", ^}'].forEach((query) => {
+      assertSituation(query, {
+        type: 'IN_LABEL_SELECTOR_NO_LABEL_NAME',
+        otherLabels: [{ name: 'label', value: 'value', op: '=' }],
+      });
     });
   });
 
@@ -172,7 +179,7 @@ describe('situation', () => {
       'quantile_over_time(0.99, {cluster="ops-tools1",container="ingress-nginx"} | json | __error__ = "" | unwrap ^',
       {
         type: 'AFTER_UNWRAP',
-        logQuery: '{cluster="ops-tools1",container="ingress-nginx"}| json | __error__ = ""',
+        logQuery: '{cluster="ops-tools1",container="ingress-nginx"} | json | __error__ = ""',
       }
     );
 

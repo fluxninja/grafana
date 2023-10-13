@@ -41,14 +41,12 @@ function mapStateToProps(): MapStateToProps<
 export const DashboardPortalComponent: FC<FNDashboardComponentProps & FnPropsMappedFromState> = (props) => {
   const content = useMemo(() => {
     if (!props.FNDashboard) {
-      // TODO Use no data
       return null;
     }
 
     const { uid, slug, queryParams = {} } = props;
 
     if (!uid || !slug) {
-      // TODO Use no data
       return null;
     }
 

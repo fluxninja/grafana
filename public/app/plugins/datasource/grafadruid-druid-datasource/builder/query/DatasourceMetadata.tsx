@@ -1,7 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderProps, Row } from '../abstract';
 import { DataSource } from '../datasource';
+import { QueryBuilderProps } from '../types';
 
 export const DatasourceMetadata = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderProps(props, DatasourceMetadata);

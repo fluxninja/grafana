@@ -1,3 +1,5 @@
+import _ from 'lodash';
+import { isEqual } from 'lodash';
 import defaults from 'lodash/defaults';
 
 import {
@@ -11,6 +13,8 @@ import {
   ScopedVars,
   TimeRange,
 } from '@grafana/data';
+import { dateTime, MutableDataFrame, FieldType, DataFrame } from '@grafana/data';
+import { getTemplateSrv } from '@grafana/runtime';
 
 import {
   MyQuery,
@@ -20,10 +24,6 @@ import {
   MultiValueVariable,
   TextValuePair,
 } from './types';
-import { dateTime, MutableDataFrame, FieldType, DataFrame } from '@grafana/data';
-import { getTemplateSrv } from '@grafana/runtime';
-import _ from 'lodash';
-import { isEqual } from 'lodash';
 import { flatten, isRFC3339_ISO6801 } from './util';
 
 const supportedVariableTypes = ['constant', 'custom', 'query', 'textbox'];
@@ -33,7 +33,10 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
   withCredentials: boolean | undefined;
   url: string | undefined;
 
-  constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>, private backendSrv: any) {
+  constructor(
+    instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>,
+    private backendSrv: any
+  ) {
     super(instanceSettings);
     this.basicAuth = instanceSettings.basicAuth;
     this.withCredentials = instanceSettings.withCredentials;

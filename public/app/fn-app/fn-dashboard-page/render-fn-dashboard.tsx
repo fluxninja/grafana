@@ -1,4 +1,4 @@
-import { merge,  isFunction } from 'lodash';
+import { merge, isFunction } from 'lodash';
 import React, { useEffect, FC, useMemo } from 'react';
 
 import { locationService as locationSrv, HistoryWrapper } from '@grafana/runtime';
@@ -22,6 +22,7 @@ const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'history' | 'route'
     routeName: DashboardRoutes.Normal,
     path: '/d/:uid/:slug?',
     pageClass: 'page-dashboard',
+    // @ts-ignore
     component: DashboardPage,
   },
 };
@@ -66,10 +67,11 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
         queryParams,
         hiddenVariables,
         controlsContainer,
-        isLoading
+        isLoading,
       }),
     [controlsContainer, hiddenVariables, isLoading, props, queryParams]
   );
 
+  // @ts-ignore
   return <DashboardPage {...dashboardPageProps} />;
 };

@@ -158,11 +158,8 @@ func (hs *HTTPServer) GetDashboard(c *contextmodel.ReqContext) response.Response
 	}
 
 	annotationPermissions := &dtos.AnnotationPermission{}
-
-	if !hs.AccessControl.IsDisabled() {
-		hs.getAnnotationPermissionsByScope(c, &annotationPermissions.Dashboard, accesscontrol.ScopeAnnotationsTypeDashboard)
-		hs.getAnnotationPermissionsByScope(c, &annotationPermissions.Organization, accesscontrol.ScopeAnnotationsTypeOrganization)
-	}
+	hs.getAnnotationPermissionsByScope(c, &annotationPermissions.Dashboard, accesscontrol.ScopeAnnotationsTypeDashboard)
+	hs.getAnnotationPermissionsByScope(c, &annotationPermissions.Organization, accesscontrol.ScopeAnnotationsTypeOrganization)
 
 	meta := dtos.DashboardMeta{
 		IsStarred:              isStarred,
@@ -488,7 +485,7 @@ func (hs *HTTPServer) postDashboard(c *contextmodel.ReqContext, cmd dashboards.S
 
 	// Clear permission cache for the user who's created the dashboard, so that new permissions are fetched for their next call
 	// Required for cases when caller wants to immediately interact with the newly created object
-	if newDashboard && !hs.accesscontrolService.IsDisabled() {
+	if newDashboard {
 		hs.accesscontrolService.ClearUserPermissionCache(c.SignedInUser)
 	}
 
@@ -738,42 +735,31 @@ func (hs *HTTPServer) GetDashboardVersions(c *contextmodel.ReqContext) response.
 // 500: internalServerError
 func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.Response {
 	var dashID int64
-	var err error
-	var dash *dashboards.Dashboard
 
+	var err error
 	dashUID := web.Params(c.Req)[":uid"]
+
+	var dash *dashboards.Dashboard
 	if dashUID == "" {
 		dashID, err = strconv.ParseInt(web.Params(c.Req)[":dashboardId"], 10, 64)
 		if err != nil {
 			return response.Error(http.StatusBadRequest, "dashboardId is invalid", err)
 		}
-	} else {
-		q := dashboards.GetDashboardQuery{
-			OrgID: c.SignedInUser.OrgID,
-			UID:   dashUID,
-		}
-		queryResult, err := hs.DashboardService.GetDashboard(c.Req.Context(), &q)
-		if err != nil {
-			return response.Error(http.StatusBadRequest, "failed to get dashboard by UID", err)
-		}
-		dashID = queryResult.ID
-		dash = queryResult
 	}
 
-	guardian, err := guardian.New(c.Req.Context(), dashID, c.OrgID, c.SignedInUser)
+	dash, rsp := hs.getDashboardHelper(c.Req.Context(), c.OrgID, dashID, dashUID)
+	if rsp != nil {
+		return rsp
+	}
+
+	guardian, err := guardian.NewByDashboard(c.Req.Context(), dash, c.OrgID, c.SignedInUser)
 	if err != nil {
 		return response.Err(err)
 	}
-	canSave := true
-	if canSave, err = guardian.CanSave(); err != nil || !canSave {
+
+	if canSave, err := guardian.CanSave(); err != nil || !canSave {
 		return dashboardGuardianResponse(err)
 	}
-	if canView, err := guardian.CanView(); err != nil || !canView {
-		return dashboardGuardianResponse(err)
-	}
-	canEdit, _ := guardian.CanEdit()
-	canAdmin, _ := guardian.CanAdmin()
-	canDelete, _ := guardian.CanDelete()
 
 	version, _ := strconv.ParseInt(web.Params(c.Req)[":id"], 10, 32)
 	query := dashver.GetDashboardVersionQuery{
@@ -793,67 +779,20 @@ func (hs *HTTPServer) GetDashboardVersion(c *contextmodel.ReqContext) response.R
 		creator = hs.getUserLogin(c.Req.Context(), res.CreatedBy)
 	}
 
-	annotationPermissions := &dtos.AnnotationPermission{}
-	if !hs.AccessControl.IsDisabled() {
-		hs.getAnnotationPermissionsByScope(c, &annotationPermissions.Dashboard, accesscontrol.ScopeAnnotationsTypeDashboard)
-		hs.getAnnotationPermissionsByScope(c, &annotationPermissions.Organization, accesscontrol.ScopeAnnotationsTypeOrganization)
+	dashVersionMeta := &dashver.DashboardVersionMeta{
+		ID:            res.ID,
+		DashboardID:   res.DashboardID,
+		DashboardUID:  dash.UID,
+		Data:          res.Data,
+		ParentVersion: res.ParentVersion,
+		RestoredFrom:  res.RestoredFrom,
+		Version:       res.Version,
+		Created:       res.Created,
+		Message:       res.Message,
+		CreatedBy:     creator,
 	}
 
-	publicDashboardEnabled := false
-	// If public dashboards is enabled and we have a public dashboard, update meta values
-	if hs.Features.IsEnabled(featuremgmt.FlagPublicDashboards) {
-		publicDashboard, err := hs.PublicDashboardsApi.PublicDashboardService.FindByDashboardUid(c.Req.Context(), c.OrgID, dash.UID)
-		if err != nil && !errors.Is(err, publicdashboardModels.ErrPublicDashboardNotFound) {
-			return response.Error(500, "Error while retrieving public dashboards", err)
-		}
-		if publicDashboard != nil {
-			publicDashboardEnabled = publicDashboard.IsEnabled
-		}
-	}
-
-	meta := dtos.DashboardMeta{
-		Slug:                   dash.Slug,
-		Type:                   dashboards.DashTypeDB,
-		CanStar:                c.IsSignedIn,
-		CanSave:                canSave,
-		CanEdit:                canEdit,
-		CanAdmin:               canAdmin,
-		CanDelete:              canDelete,
-		Created:                dash.Created,
-		Updated:                dash.Updated,
-		UpdatedBy:              "Someone",
-		CreatedBy:              creator,
-		Version:                dash.Version,
-		HasACL:                 dash.HasACL,
-		IsFolder:               dash.IsFolder,
-		FolderId:               dash.FolderID,
-		Url:                    dash.GetURL(),
-		FolderTitle:            "General",
-		AnnotationsPermissions: annotationPermissions,
-		PublicDashboardEnabled: publicDashboardEnabled,
-	}
-
-	// lookup folder title
-	if dash.FolderID > 0 {
-		query := dashboards.GetDashboardQuery{ID: dash.FolderID, OrgID: c.OrgID}
-		queryResult, err := hs.DashboardService.GetDashboard(c.Req.Context(), &query)
-		if err != nil {
-			if errors.Is(err, dashboards.ErrFolderNotFound) {
-				return response.Error(404, "Folder not found", err)
-			}
-			return response.Error(500, "Dashboard folder could not be read", err)
-		}
-		meta.FolderUid = queryResult.UID
-		meta.FolderTitle = queryResult.Title
-		meta.FolderUrl = queryResult.GetURL()
-	}
-
-	dto := dtos.DashboardFullWithMeta{
-		Dashboard: res.Data,
-		Meta:      meta,
-	}
-
-	return response.JSON(http.StatusOK, dto)
+	return response.JSON(http.StatusOK, dashVersionMeta)
 }
 
 // swagger:route POST /dashboards/validate dashboards alpha validateDashboard
@@ -898,7 +837,10 @@ func (hs *HTTPServer) ValidateDashboard(c *contextmodel.ReqContext) response.Res
 	// work), or if schemaVersion is absent (which will happen once the Thema
 	// schema becomes canonical).
 	if err != nil || schemaVersion >= dashboard.HandoffSchemaVersion {
-		_, _, validationErr := dk.JSONValueMux(dashboardBytes)
+		// Schemas expect the dashboard to live in the spec field
+		k8sResource := `{"spec": ` + cmd.Dashboard + "}"
+
+		_, _, validationErr := dk.JSONValueMux([]byte(k8sResource))
 
 		if validationErr == nil {
 			isValid = true

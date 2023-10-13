@@ -1,7 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Multiple, Row } from '../abstract';
 import { Dimension } from '../dimension';
+import { QueryBuilderProps } from '../types';
 
 export const ColumnComparison = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, ColumnComparison);

@@ -1,12 +1,7 @@
-import {
-  configureStore as reduxConfigureStore,
-  EnhancedStore,
-  MiddlewareArray,
-  PreloadedState,
-} from '@reduxjs/toolkit';
-import { AnyAction, CombinedState } from 'redux';
-import { ThunkMiddleware } from 'redux-thunk';
+import { configureStore as reduxConfigureStore, createListenerMiddleware } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/query';
 
+import { browseDashboardsAPI } from 'app/features/browse-dashboards/api/browseDashboardsAPI';
 import { publicDashboardApi } from 'app/features/dashboard/api/publicDashboardApi';
 import { StoreState } from 'app/types/store';
 
@@ -16,12 +11,6 @@ import { alertingApi } from '../features/alerting/unified/api/alertingApi';
 
 import { setStore } from './store';
 
-export type ConfiguredStore = EnhancedStore<
-  CombinedState<StoreState>,
-  AnyAction,
-  MiddlewareArray<[ThunkMiddleware<CombinedState<StoreState>, AnyAction>]>
->;
-
 export function addRootReducer(reducers: any) {
   // this is ok now because we add reducers before configureStore is called
   // in the future if we want to add reducers during runtime
@@ -29,13 +18,17 @@ export function addRootReducer(reducers: any) {
   addReducer(reducers);
 }
 
-export function configureStore<I extends Partial<PreloadedState<StoreState>>>(initialState?: I | Promise<I>) {
+const listenerMiddleware = createListenerMiddleware();
+
+export function configureStore(initialState?: Partial<StoreState>) {
   const store = reduxConfigureStore({
     reducer: createRootReducer(),
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({ thunk: true, serializableCheck: false, immutableCheck: false }).concat(
+        listenerMiddleware.middleware,
         alertingApi.middleware,
-        publicDashboardApi.middleware
+        publicDashboardApi.middleware,
+        browseDashboardsAPI.middleware
       ),
     devTools: process.env.NODE_ENV !== 'production',
     preloadedState: {
@@ -43,6 +36,9 @@ export function configureStore<I extends Partial<PreloadedState<StoreState>>>(in
       ...initialState,
     },
   });
+
+  // this enables "refetchOnFocus" and "refetchOnReconnect" for RTK Query
+  setupListeners(store.dispatch);
 
   setStore(store);
   return store;

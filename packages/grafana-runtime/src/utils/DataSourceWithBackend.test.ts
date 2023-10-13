@@ -8,7 +8,7 @@ import {
   DataSourceInstanceSettings,
   DataSourceJsonData,
   DataSourceRef,
-  MutableDataFrame,
+  createDataFrame,
 } from '@grafana/data';
 
 import {
@@ -98,7 +98,7 @@ describe('DataSourceWithBackend', () => {
         "hideFromInspector": false,
         "method": "POST",
         "requestId": undefined,
-        "url": "/api/ds/query",
+        "url": "/api/ds/query?ds_type=dummy",
       }
     `);
   });
@@ -153,7 +153,7 @@ describe('DataSourceWithBackend', () => {
         "hideFromInspector": false,
         "method": "POST",
         "requestId": undefined,
-        "url": "/api/ds/query?expression=true",
+        "url": "/api/ds/query?ds_type=dummy&expression=true",
       }
     `);
   });
@@ -222,7 +222,7 @@ describe('DataSourceWithBackend', () => {
         "hideFromInspector": true,
         "method": "POST",
         "requestId": undefined,
-        "url": "/api/ds/query",
+        "url": "/api/ds/query?ds_type=dummy",
       }
     `);
   });
@@ -240,10 +240,12 @@ describe('DataSourceWithBackend', () => {
     let obs = toStreamingDataResponse(rsp, request, standardStreamOptionsProvider);
     expect(obs).toBeDefined();
 
-    let frame = new MutableDataFrame();
-    frame.meta = {
-      channel: 'a/b/c',
-    };
+    let frame = createDataFrame({
+      meta: {
+        channel: 'a/b/c',
+      },
+      fields: [],
+    });
     rsp.data = [frame];
     obs = toStreamingDataResponse(rsp, request, standardStreamOptionsProvider);
     expect(obs).toBeDefined();

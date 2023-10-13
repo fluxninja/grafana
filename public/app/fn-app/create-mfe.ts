@@ -309,6 +309,7 @@ class createMfe {
     const container = createMfe.getContainer(props);
 
     ReactDOM.render(
+      // @ts-ignore
       React.createElement(createMfe.Component, omit(props, 'hiddenVariables', 'FNDashboard')),
       container,
       () => {

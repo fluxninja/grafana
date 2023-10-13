@@ -1,7 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Row } from '../abstract';
 import { Filter as FilterField } from '../filter';
+import { QueryBuilderProps } from '../types';
 
 export const Filter = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Filter);

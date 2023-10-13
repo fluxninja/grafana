@@ -1,6 +1,7 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Input, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
 
 export const FloatFirst = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, FloatFirst);

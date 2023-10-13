@@ -1,6 +1,8 @@
 import React from 'react';
-import { DataSourceHttpSettings } from '@grafana/ui';
+
 import { DataSourcePluginOptionsEditorProps } from '@grafana/data';
+import { DataSourceHttpSettings } from '@grafana/ui';
+
 import { MyDataSourceOptions } from './types';
 
 export type Props = DataSourcePluginOptionsEditorProps<MyDataSourceOptions>;

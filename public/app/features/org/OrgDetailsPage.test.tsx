@@ -24,19 +24,6 @@ jest.mock('app/core/core', () => {
   };
 });
 
-jest.mock('@grafana/runtime', () => {
-  const originalModule = jest.requireActual('@grafana/runtime');
-  return {
-    ...originalModule,
-    config: {
-      ...originalModule.config,
-      featureToggles: {
-        internationalization: true,
-      },
-    },
-  };
-});
-
 const setup = (propOverrides?: object) => {
   const store = configureStore();
   jest.clearAllMocks();

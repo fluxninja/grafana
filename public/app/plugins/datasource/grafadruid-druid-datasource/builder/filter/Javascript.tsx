@@ -1,7 +1,9 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Input, Code, Row } from '../abstract';
 import { ExtractionFn } from '../extractionfn';
+import { QueryBuilderProps } from '../types';
+
 import { FilterTuning } from '.';
 
 export const Javascript = (props: QueryBuilderProps) => {

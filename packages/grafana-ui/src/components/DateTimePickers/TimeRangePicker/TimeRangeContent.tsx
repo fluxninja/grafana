@@ -152,17 +152,11 @@ export const TimeRangeContent = (props: Props) => {
         </Field>
         {fyTooltip}
       </div>
-      <Button
-        data-testid={selectors.components.TimePicker.applyTimeRange}
-        onClick={onApply}
-        style={{
-          width: '100%',
-          textAlign: 'center',
-          paddingLeft: '55px',
-        }}
-      >
-        <Trans i18nKey="time-picker.range-content.apply-button">Apply time range</Trans>
-      </Button>
+      <div style={{ display: 'flex', alignItems: 'flex-start', width: '250px' }}>
+        <Button data-testid={selectors.components.TimePicker.applyTimeRange} onClick={onApply}>
+          <Trans i18nKey="time-picker.range-content.apply-button">Apply time range</Trans>
+        </Button>
+      </div>
 
       <TimePickerCalendar
         isFullscreen={isFullscreen}
@@ -231,12 +225,12 @@ function isValid(value: string, roundUp?: boolean, timeZone?: TimeZone): boolean
 
 function getStyles(theme: GrafanaTheme2) {
   return {
-    fieldContainer: css`
-      display: flex;
-    `,
-    tooltip: css`
-      padding-left: ${theme.spacing(1)};
-      padding-top: ${theme.spacing(3)};
-    `,
+    fieldContainer: css({
+      display: 'flex',
+    }),
+    tooltip: css({
+      paddingLeft: theme.spacing(1),
+      paddingTop: theme.spacing(3),
+    }),
   };
 }

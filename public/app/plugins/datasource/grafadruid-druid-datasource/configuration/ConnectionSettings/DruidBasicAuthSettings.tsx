@@ -1,5 +1,7 @@
 import React, { ChangeEvent } from 'react';
+
 import { LegacyForms, FieldSet } from '@grafana/ui';
+
 import { ConnectionSettingsProps } from './types';
 
 const { FormField, SecretFormField } = LegacyForms;

@@ -1,7 +1,11 @@
 import React, { ComponentType } from 'react';
+
 import { InlineLabel, Button, Icon } from '@grafana/ui';
-import { QueryBuilderFieldProps } from './types';
+
 import { QueryBuilderOptions } from '../types';
+
+import { QueryBuilderFieldProps } from './types';
+
 import { onBuilderChange, Row } from '.';
 
 interface Props extends QueryBuilderFieldProps {

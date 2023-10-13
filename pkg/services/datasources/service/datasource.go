@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -12,6 +13,7 @@ import (
 	"time"
 
 	sdkhttpclient "github.com/grafana/grafana-plugin-sdk-go/backend/httpclient"
+	sdkproxy "github.com/grafana/grafana-plugin-sdk-go/backend/proxy"
 
 	"github.com/grafana/grafana/pkg/components/simplejson"
 	"github.com/grafana/grafana/pkg/infra/db"
@@ -24,6 +26,11 @@ import (
 	"github.com/grafana/grafana/pkg/services/secrets"
 	"github.com/grafana/grafana/pkg/services/secrets/kvstore"
 	"github.com/grafana/grafana/pkg/setting"
+)
+
+const (
+	maxDatasourceNameLen = 190
+	maxDatasourceUrlLen  = 255
 )
 
 type Service struct {
@@ -172,6 +179,10 @@ func (s *Service) GetDataSourcesByType(ctx context.Context, query *datasources.G
 func (s *Service) AddDataSource(ctx context.Context, cmd *datasources.AddDataSourceCommand) (*datasources.DataSource, error) {
 	var dataSource *datasources.DataSource
 
+	if err := validateFields(cmd.Name, cmd.URL); err != nil {
+		return dataSource, err
+	}
+
 	return dataSource, s.db.InTransaction(ctx, func(ctx context.Context) error {
 		var err error
 
@@ -231,6 +242,11 @@ func (s *Service) DeleteDataSource(ctx context.Context, cmd *datasources.DeleteD
 
 func (s *Service) UpdateDataSource(ctx context.Context, cmd *datasources.UpdateDataSourceCommand) (*datasources.DataSource, error) {
 	var dataSource *datasources.DataSource
+
+	if err := validateFields(cmd.Name, cmd.URL); err != nil {
+		return dataSource, err
+	}
+
 	return dataSource, s.db.InTransaction(ctx, func(ctx context.Context) error {
 		var err error
 
@@ -241,6 +257,21 @@ func (s *Service) UpdateDataSource(ctx context.Context, cmd *datasources.UpdateD
 		dataSource, err = s.SQLStore.GetDataSource(ctx, query)
 		if err != nil {
 			return err
+		}
+
+		if cmd.Name != "" && cmd.Name != dataSource.Name {
+			query := &datasources.GetDataSourceQuery{
+				Name:  cmd.Name,
+				OrgID: cmd.OrgID,
+			}
+			exist, err := s.SQLStore.GetDataSource(ctx, query)
+			if exist != nil {
+				return datasources.ErrDataSourceNameExists
+			}
+
+			if err != nil && !errors.Is(err, datasources.ErrDataSourceNotFound) {
+				return err
+			}
 		}
 
 		err = s.fillWithSecureJSONData(ctx, cmd, dataSource)
@@ -452,6 +483,28 @@ func (s *Service) httpClientOptions(ctx context.Context, ds *datasources.DataSou
 		}
 	}
 
+	if ds.JsonData != nil && ds.JsonData.Get("enableSecureSocksProxy").MustBool(false) {
+		proxyOpts := &sdkproxy.Options{
+			Enabled: true,
+			Auth: &sdkproxy.AuthOptions{
+				Username: ds.JsonData.Get("secureSocksProxyUsername").MustString(ds.UID),
+			},
+			Timeouts: &sdkproxy.DefaultTimeoutOptions,
+		}
+
+		if val, exists, err := s.DecryptedValue(ctx, ds, "secureSocksProxyPassword"); err == nil && exists {
+			proxyOpts.Auth.Password = val
+		}
+		if val, err := ds.JsonData.Get("timeout").Float64(); err == nil {
+			proxyOpts.Timeouts.Timeout = time.Duration(val) * time.Second
+		}
+		if val, err := ds.JsonData.Get("keepAlive").Float64(); err == nil {
+			proxyOpts.Timeouts.KeepAlive = time.Duration(val) * time.Second
+		}
+
+		opts.ProxyOptions = proxyOpts
+	}
+
 	if ds.JsonData != nil && ds.JsonData.Get("sigV4Auth").MustBool(false) && setting.SigV4AuthEnabled {
 		opts.SigV4 = &sdkhttpclient.SigV4Config{
 			Service:       awsServiceNamespace(ds.Type, ds.JsonData),
@@ -561,8 +614,8 @@ func (s *Service) getCustomHeaders(jsonData *simplejson.Json, decryptedValues ma
 	index := 0
 	for {
 		index++
-		headerNameSuffix := fmt.Sprintf("httpHeaderName%d", index)
-		headerValueSuffix := fmt.Sprintf("httpHeaderValue%d", index)
+		headerNameSuffix := fmt.Sprintf("%s%d", datasources.CustomHeaderName, index)
+		headerValueSuffix := fmt.Sprintf("%s%d", datasources.CustomHeaderValue, index)
 
 		key := jsonData.Get(headerNameSuffix).MustString()
 		if key == "" {
@@ -614,9 +667,11 @@ func (s *Service) fillWithSecureJSONData(ctx context.Context, cmd *datasources.U
 		cmd.SecureJsonData = make(map[string]string)
 	}
 
-	for k, v := range decrypted {
-		if _, ok := cmd.SecureJsonData[k]; !ok {
-			cmd.SecureJsonData[k] = v
+	if !cmd.IgnoreOldSecureJsonData {
+		for k, v := range decrypted {
+			if _, ok := cmd.SecureJsonData[k]; !ok {
+				cmd.SecureJsonData[k] = v
+			}
 		}
 	}
 
@@ -626,6 +681,18 @@ func (s *Service) fillWithSecureJSONData(ctx context.Context, cmd *datasources.U
 		if err != nil {
 			return err
 		}
+	}
+
+	return nil
+}
+
+func validateFields(name, url string) error {
+	if len(name) > maxDatasourceNameLen {
+		return datasources.ErrDataSourceNameInvalid.Errorf("max length is %d", maxDatasourceNameLen)
+	}
+
+	if len(url) > maxDatasourceUrlLen {
+		return datasources.ErrDataSourceURLInvalid.Errorf("max length is %d", maxDatasourceUrlLen)
 	}
 
 	return nil
@@ -650,4 +717,13 @@ func readQuotaConfig(cfg *setting.Cfg) (*quota.Map, error) {
 	limits.Set(globalQuotaTag, cfg.Quota.Global.DataSource)
 	limits.Set(orgQuotaTag, cfg.Quota.Org.DataSource)
 	return limits, nil
+}
+
+// CustomerHeaders returns the custom headers specified in the datasource. The context is used for the decryption operation that might use the store, so consider setting an acceptable timeout for your use case.
+func (s *Service) CustomHeaders(ctx context.Context, ds *datasources.DataSource) (map[string]string, error) {
+	values, err := s.SecretsService.DecryptJsonData(ctx, ds.SecureJsonData)
+	if err != nil {
+		return nil, fmt.Errorf("failed to get custom headers: %w", err)
+	}
+	return s.getCustomHeaders(ds.JsonData, values), nil
 }

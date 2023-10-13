@@ -13,10 +13,16 @@ const { merge } = require('webpack-merge');
 const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
 const esbuildTargets = resolveToEsbuildTarget(browserslist(), { printUnknownTargets: false });
+// esbuild-loader 3.0.0+ requires format to be set to prevent it
+// from defaulting to 'iife' which breaks monaco/loader once minified.
+const esbuildOptions = {
+  target: esbuildTargets,
+  format: undefined,
+};
 
-module.exports = (env = {}) =>
-  merge(common, {
-    devtool: 'inline-source-map',
+module.exports = (env = {}) => {
+  return merge(common, {
+    devtool: 'eval-source-map',
     mode: 'development',
 
     entry: {
@@ -36,14 +42,11 @@ module.exports = (env = {}) =>
       rules: [
         {
           test: /\.tsx?$/,
+          exclude: /node_modules/,
           use: {
             loader: 'esbuild-loader',
-            options: {
-              loader: 'tsx',
-              target: esbuildTargets,
-            },
+            options: esbuildOptions,
           },
-          exclude: /node_modules/,
         },
         require('./sass.rule.js')({
           sourceMap: false,
@@ -126,3 +129,4 @@ module.exports = (env = {}) =>
       }),
     ],
   });
+};

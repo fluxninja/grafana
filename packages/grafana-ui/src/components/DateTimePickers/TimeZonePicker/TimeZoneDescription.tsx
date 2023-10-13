@@ -33,6 +33,11 @@ const useDescription = (info?: TimeZoneInfo): string => {
       return '';
     }
 
+    if (info.name === 'Europe/Simferopol') {
+      // See https://github.com/grafana/grafana/issues/72031
+      return 'Ukraine, EEST';
+    }
+
     if (info.countries.length > 0) {
       const country = info.countries[0];
       parts.push(country.name);
@@ -48,12 +53,12 @@ const useDescription = (info?: TimeZoneInfo): string => {
 
 const getStyles = (theme: GrafanaTheme2) => {
   return {
-    description: css`
-      font-weight: normal;
-      font-size: ${theme.typography.size.sm};
-      color: ${theme.colors.text.secondary};
-      white-space: normal;
-      text-overflow: ellipsis;
-    `,
+    description: css({
+      fontWeight: 'normal',
+      fontSize: theme.typography.size.sm,
+      color: theme.colors.text.secondary,
+      whiteSpace: 'normal',
+      textOverflow: 'ellipsis',
+    }),
   };
 };

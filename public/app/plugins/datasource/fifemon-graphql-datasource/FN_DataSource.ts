@@ -1,6 +1,4 @@
-import _ from 'lodash';
-import { isEqual } from 'lodash';
-import defaults from 'lodash/defaults';
+import { isEqual, defaults, isNumber } from 'lodash';
 
 import {
   AnnotationEvent,
@@ -11,8 +9,11 @@ import {
   DataSourceInstanceSettings,
   ScopedVars,
   TimeRange,
+  MutableDataFrame,
+  dateTime,
+  DataFrame,
+  FieldType,
 } from '@grafana/data';
-import { dateTime, MutableDataFrame, FieldType, DataFrame } from '@grafana/data';
 import { getTemplateSrv, DataSourceWithBackend } from '@grafana/runtime';
 import { BackendSrv, getBackendSrv } from 'app/core/services/backend_srv';
 
@@ -41,8 +42,9 @@ export class FN_DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOp
     this.basicAuth = instanceSettings.basicAuth;
     this.withCredentials = instanceSettings.withCredentials;
 
-    console.log({instanceSettings})
-    const url = instanceSettings.jsonData["connection.url"]
+    console.log({ instanceSettings });
+    // @ts-ignore
+    const url = instanceSettings.jsonData['connection.url'];
     // const url = "http://localhost:8081/api/query"
     this.url = url;
 
@@ -147,6 +149,7 @@ export class FN_DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOp
     return dataPathArray;
   }
 
+  // @ts-ignore
   async query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
     return Promise.all(
       options.targets.map((target) => {
@@ -190,7 +193,7 @@ export class FN_DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOp
                 let t: FieldType = FieldType.string;
                 if (fieldName === timePath || isRFC3339_ISO6801(String(doc[fieldName]))) {
                   t = FieldType.time;
-                } else if (_.isNumber(doc[fieldName])) {
+                } else if (isNumber(doc[fieldName])) {
                   t = FieldType.number;
                 }
                 let title;
@@ -215,6 +218,7 @@ export class FN_DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOp
                   name: fieldName,
                   type: t,
                   config: { displayName: title },
+                  // @ts-ignore
                 }).parse = (v: any) => {
                   return v || '';
                 };
@@ -234,6 +238,7 @@ export class FN_DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOp
   }
   annotationQuery(options: AnnotationQueryRequest<MyQuery>): Promise<AnnotationEvent[]> {
     const query = defaults(options.annotation, defaultQuery);
+    // @ts-ignore
     return Promise.all([this.createQuery(query, options.range)]).then((results: any) => {
       const r: AnnotationEvent[] = [];
       for (const res of results) {
@@ -257,15 +262,15 @@ export class FN_DataSource extends DataSourceWithBackend<MyQuery, MyDataSourceOp
               const fieldValue = doc[fieldName];
               const replaceKey = 'field_' + fieldName;
               const regex = new RegExp('\\$' + replaceKey, 'g');
-              title = title.replace(regex, fieldValue);
-              text = text.replace(regex, fieldValue);
-              tags = tags.replace(regex, fieldValue);
+              title = title?.replace(regex, fieldValue);
+              text = text?.replace(regex, fieldValue);
+              tags = tags?.replace(regex, fieldValue);
             }
 
             annotation.title = title;
             annotation.text = text;
             const tagsList: string[] = [];
-            for (const element of tags.split(',')) {
+            for (const element of (tags || '').split(',')) {
               const trimmed = element.trim();
               if (trimmed) {
                 tagsList.push(trimmed);

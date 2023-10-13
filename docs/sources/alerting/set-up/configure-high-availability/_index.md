@@ -2,6 +2,7 @@
 aliases:
   - ../high-availability/enable-alerting-ha/
   - ../unified-alerting/high-availability/
+canonical: https://grafana.com/docs/grafana/latest/alerting/set-up/configure-high-availability/
 description: Enable alerting high availability
 keywords:
   - grafana
@@ -9,8 +10,12 @@ keywords:
   - tutorials
   - ha
   - high availability
+labels:
+  products:
+    - enterprise
+    - oss
 title: Enable alerting high availability
-weight: 300
+weight: 400
 ---
 
 # Enable alerting high availability
@@ -31,17 +36,18 @@ Since gossiping of notifications and silences uses both TCP and UDP port `9094`,
    You must have at least one (1) Grafana instance added to the [`[ha_peer]` section.
 3. Set `[ha_listen_address]` to the instance IP address using a format of `host:port` (or the [Pod's](https://kubernetes.io/docs/concepts/workloads/pods/) IP in the case of using Kubernetes).
    By default, it is set to listen to all interfaces (`0.0.0.0`).
+4. Set `[ha_peer_timeout]` in the `[unified_alerting]` section of the custom.ini to specify the time to wait for an instance to send a notification via the Alertmanager. The default value is 15s, but it may increase if Grafana servers are located in different geographic regions or if the network latency between them is high
 
 ## Enable alerting high availability using Kubernetes
 
 If you are using Kubernetes, you can expose the pod IP [through an environment variable](https://kubernetes.io/docs/tasks/inject-data-application/environment-variable-expose-pod-information/) via the container definition.
 
-```bash
+```yaml
 env:
-- name: POD_IP
-  valueFrom:
-    fieldRef:
-      fieldPath: status.podIP
+  - name: POD_IP
+    valueFrom:
+      fieldRef:
+        fieldPath: status.podIP
 ```
 
 1. Add the port 9094 to the Grafana deployment:
@@ -96,4 +102,5 @@ enabled = true
 ha_listen_address = "${POD_IP}:9094"
 ha_peers = "grafana-alerting.grafana:9094"
 ha_advertise_address = "${POD_IP}:9094"
+ha_peer_timeout = 15s
 ```

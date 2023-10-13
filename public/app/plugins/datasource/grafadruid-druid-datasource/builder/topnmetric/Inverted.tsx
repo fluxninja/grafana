@@ -1,6 +1,8 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderProps, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { TopNMetric } from './';
 
 export const Inverted = (props: QueryBuilderProps) => {

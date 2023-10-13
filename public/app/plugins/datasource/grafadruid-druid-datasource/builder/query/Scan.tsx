@@ -1,10 +1,11 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderProps, useScopedQueryBuilderFieldProps, Multiple, Input, Select, Row } from '../abstract';
 import { DataSource } from '../datasource';
 import { Filter } from '../filter';
-import { VirtualColumn } from '../virtualcolumn';
 import { Intervals } from '../querysegmentspec';
+import { QueryBuilderProps } from '../types';
+import { VirtualColumn } from '../virtualcolumn';
 
 export const Scan = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Scan);

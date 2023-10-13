@@ -1,6 +1,7 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Multiple, DateInterval } from '../abstract';
+import { QueryBuilderProps } from '../types';
 
 export const Intervals = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Intervals);

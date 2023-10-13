@@ -1,26 +1,26 @@
 import classNames from 'classnames';
 import React from 'react';
+import { connect } from 'react-redux';
 import { Unsubscribable } from 'rxjs';
-import {connect} from "react-redux"
 
 import { selectors } from '@grafana/e2e-selectors';
 import { getTemplateSrv, RefreshEvent } from '@grafana/runtime';
 import { Icon } from '@grafana/ui';
 import appEvents from 'app/core/app_events';
+import { StoreState } from 'app/types';
 
 import { ShowConfirmModalEvent } from '../../../../types/events';
 import { DashboardModel } from '../../state/DashboardModel';
 import { PanelModel } from '../../state/PanelModel';
 import { RowOptionsButton } from '../RowOptions/RowOptionsButton';
-import { StoreState } from 'app/types';
 
 export interface DashboardRowProps {
   panel: PanelModel;
   dashboard: DashboardModel;
-  isFnDashboard: boolean
+  isFnDashboard: boolean;
 }
 
- class Component extends React.Component<DashboardRowProps> {
+class Component extends React.Component<DashboardRowProps> {
   sub?: Unsubscribable;
 
   componentDidMount() {
@@ -72,13 +72,12 @@ export interface DashboardRowProps {
       'dashboard-row--collapsed': this.props.panel.collapsed,
     });
 
-    const {isFnDashboard} = this.props
+    const { isFnDashboard } = this.props;
 
     const title = getTemplateSrv().replace(this.props.panel.title, this.props.panel.scopedVars, 'text');
     const count = this.props.panel.panels ? this.props.panel.panels.length : 0;
     const panels = count === 1 ? 'panel' : 'panels';
     const canEdit = this.props.dashboard.meta.canEdit === true && !isFnDashboard;
-
 
     return (
       <div className={classes} data-testid="dashboard-row-container">
@@ -120,12 +119,10 @@ export interface DashboardRowProps {
   }
 }
 
-
-function mapStateToProps () {
-  return (state: StoreState) =>  ({
-    isFnDashboard: state.fnGlobalState.FNDashboard
+function mapStateToProps() {
+  return (state: StoreState) => ({
+    isFnDashboard: state.fnGlobalState.FNDashboard,
   });
 }
-
 
 export const DashboardRow = connect(mapStateToProps)(Component);

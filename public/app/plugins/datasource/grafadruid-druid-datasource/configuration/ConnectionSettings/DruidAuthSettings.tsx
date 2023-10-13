@@ -1,7 +1,10 @@
-import React, { ChangeEvent } from 'react';
 import { css } from '@emotion/css';
+import React, { ChangeEvent } from 'react';
+
 import { FieldSet, Field, Switch } from '@grafana/ui';
+
 import { ConnectionSettingsProps } from './types';
+
 import { DruidBasicAuthSettings } from './';
 
 export const DruidAuthSettings = (props: ConnectionSettingsProps) => {

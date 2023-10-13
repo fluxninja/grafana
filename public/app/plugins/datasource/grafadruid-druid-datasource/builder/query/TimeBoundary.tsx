@@ -1,9 +1,10 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderProps, useScopedQueryBuilderFieldProps, Select, Row } from '../abstract';
 import { DataSource } from '../datasource';
 import { Filter } from '../filter';
 import { Intervals } from '../querysegmentspec';
+import { QueryBuilderProps } from '../types';
 
 export const TimeBoundary = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, TimeBoundary);

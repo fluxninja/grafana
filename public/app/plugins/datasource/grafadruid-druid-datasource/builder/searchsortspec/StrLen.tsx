@@ -1,6 +1,7 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useQueryBuilderAutoSubmit, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
 
 export const StrLen = (props: QueryBuilderProps) => {
   useQueryBuilderAutoSubmit(props, StrLen);

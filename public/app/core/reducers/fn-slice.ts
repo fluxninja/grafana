@@ -21,7 +21,10 @@ export type UpdateFNGlobalStateAction = PayloadAction<Partial<FnGlobalState>>;
 
 export type SetFnStateAction = PayloadAction<Omit<FnGlobalState, 'hiddenVariables'>>;
 
-export type FnPropMappedFromState = Extract<keyof FnGlobalState, 'FNDashboard' | 'hiddenVariables' | 'mode' | 'uid' | 'queryParams' | 'slug' | 'version'>;
+export type FnPropMappedFromState = Extract<
+  keyof FnGlobalState,
+  'FNDashboard' | 'hiddenVariables' | 'mode' | 'uid' | 'queryParams' | 'slug' | 'version'
+>;
 export type FnStateProp = keyof FnGlobalState;
 
 export type FnPropsMappedFromState = Pick<FnGlobalState, FnPropMappedFromState>;

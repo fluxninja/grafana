@@ -1,6 +1,8 @@
-import { QueryBuilderProps, QueryBuilderOptions } from '../types';
-import { QueryBuilderFieldProps, QueryBuilderComponent, QueryComponent, Component } from './types';
 import { cloneDeep } from 'lodash';
+
+import { QueryBuilderProps, QueryBuilderOptions } from '../types';
+
+import { QueryBuilderFieldProps, QueryBuilderComponent, QueryComponent, Component } from './types';
 
 export const enum ScopeType {
   Builder,

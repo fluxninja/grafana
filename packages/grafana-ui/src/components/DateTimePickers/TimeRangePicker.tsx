@@ -2,7 +2,7 @@ import { css, cx } from '@emotion/css';
 import { useDialog } from '@react-aria/dialog';
 import { FocusScope } from '@react-aria/focus';
 import { useOverlay } from '@react-aria/overlays';
-import React, { memo, FormEvent, createRef, useState, ReactElement, ReactNode } from 'react';
+import React, { memo, FormEvent, createRef, useState, ReactNode } from 'react';
 
 import {
   isDateTime,
@@ -230,11 +230,11 @@ const formattedRange = (value: TimeRange, timeZone?: TimeZone) => {
 
 const getStyles = (theme: GrafanaTheme2) => {
   return {
-    container: css`
-      position: relative;
-      display: flex;
-      vertical-align: middle;
-    `,
+    container: css({
+      position: 'relative',
+      display: 'flex',
+      verticalAlign: 'middle',
+    }),
     backdrop: css({
       display: 'none',
       [theme.breakpoints.down('sm')]: {
@@ -260,18 +260,18 @@ const getStyles = (theme: GrafanaTheme2) => {
 
 const getLabelStyles = (theme: GrafanaTheme2) => {
   return {
-    container: css`
-      display: flex;
-      align-items: center;
-      white-space: nowrap;
-    `,
-    utc: css`
-      color: ${theme.v1.palette.orange};
-      font-size: ${theme.typography.size.sm};
-      padding-left: 6px;
-      line-height: 28px;
-      vertical-align: bottom;
-      font-weight: ${theme.typography.fontWeightMedium};
-    `,
+    container: css({
+      display: 'flex',
+      alignItems: 'center',
+      whiteSpace: 'nowrap',
+    }),
+    utc: css({
+      color: theme.v1.palette.orange,
+      fontSize: theme.typography.size.sm,
+      paddingLeft: '6px',
+      lineHeight: '28px',
+      verticalAlign: 'bottom',
+      fontWeight: theme.typography.fontWeightMedium,
+    }),
   };
 };

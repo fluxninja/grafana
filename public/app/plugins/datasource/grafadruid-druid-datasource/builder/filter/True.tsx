@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
+
 import { InfoBox } from '@grafana/ui';
-import { QueryBuilderProps } from '../types';
+
 import { useQueryBuilderAutoSubmit, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
 
 export const True = (props: QueryBuilderProps) => {
   useQueryBuilderAutoSubmit(props, True);

@@ -13,6 +13,20 @@ export function onCreateNewPanel(dashboard: DashboardModel, datasource?: string)
     title: 'Panel Title',
     gridPos: calculateNewPanelGridPos(dashboard),
     datasource: datasource ? { uid: datasource } : null,
+    isNew: true,
+  };
+
+  dashboard.addPanel(newPanel);
+  return newPanel.id;
+}
+
+export function onCreateNewWidgetPanel(dashboard: DashboardModel, widgetType: string): number | undefined {
+  const newPanel: Partial<PanelModel> = {
+    type: widgetType,
+    title: 'Widget title',
+    gridPos: calculateNewPanelGridPos(dashboard),
+    datasource: null,
+    isNew: true,
   };
 
   dashboard.addPanel(newPanel);

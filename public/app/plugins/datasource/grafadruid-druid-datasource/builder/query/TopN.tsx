@@ -1,14 +1,15 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderProps, useScopedQueryBuilderFieldProps, Multiple, Input, Row } from '../abstract';
-import { DataSource } from '../datasource';
-import { Intervals } from '../querysegmentspec';
-import { Granularity } from '../granularity';
-import { Filter } from '../filter';
 import { Aggregation } from '../aggregation';
-import { PostAggregation } from '../postaggregation';
+import { DataSource } from '../datasource';
 import { Dimension } from '../dimension';
+import { Filter } from '../filter';
+import { Granularity } from '../granularity';
+import { PostAggregation } from '../postaggregation';
+import { Intervals } from '../querysegmentspec';
 import { TopNMetric } from '../topnmetric';
+import { QueryBuilderProps } from '../types';
 import { VirtualColumn } from '../virtualcolumn';
 
 export const TopN = (props: QueryBuilderProps) => {

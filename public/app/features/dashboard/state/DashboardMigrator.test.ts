@@ -88,6 +88,7 @@ describe('DashboardModel', () => {
           },
           {
             type: 'singlestat',
+            // @ts-expect-error
             legend: true,
             // @ts-expect-error
             thresholds: '10,20,30',
@@ -665,6 +666,7 @@ describe('DashboardModel', () => {
       model = new DashboardModel({
         templating: {
           list: [
+            // @ts-expect-error
             {
               // @ts-expect-error
               multi: false,
@@ -673,6 +675,7 @@ describe('DashboardModel', () => {
                 text: ['text'],
               },
             },
+            // @ts-expect-error
             {
               // @ts-expect-error
               multi: true,
@@ -726,6 +729,7 @@ describe('DashboardModel', () => {
               type: 'query',
               // @ts-expect-error
               current: {
+                // @ts-expect-error
                 tags: [
                   {
                     selected: true,
@@ -888,6 +892,7 @@ describe('DashboardModel', () => {
       model = new DashboardModel({
         templating: {
           list: [
+            // @ts-expect-error
             {
               type: 'query',
               hide: VariableHide.dontHide,
@@ -895,6 +900,7 @@ describe('DashboardModel', () => {
               // @ts-expect-error
               allFormat: '',
             },
+            // @ts-expect-error
             {
               type: 'query',
               hide: VariableHide.hideLabel,
@@ -902,6 +908,7 @@ describe('DashboardModel', () => {
               // @ts-expect-error
               allFormat: '',
             },
+            // @ts-expect-error
             {
               type: 'query',
               hide: VariableHide.hideVariable,
@@ -909,6 +916,7 @@ describe('DashboardModel', () => {
               // @ts-expect-error
               allFormat: '',
             },
+            // @ts-expect-error
             {
               type: 'constant',
               hide: VariableHide.dontHide,
@@ -919,6 +927,7 @@ describe('DashboardModel', () => {
               datasource: null,
               allFormat: '',
             },
+            // @ts-expect-error
             {
               type: 'constant',
               hide: VariableHide.hideLabel,
@@ -929,6 +938,7 @@ describe('DashboardModel', () => {
               datasource: null,
               allFormat: '',
             },
+            // @ts-expect-error
             {
               type: 'constant',
               hide: VariableHide.hideVariable,
@@ -995,6 +1005,7 @@ describe('DashboardModel', () => {
       model = new DashboardModel({
         templating: {
           list: [
+            // @ts-expect-error
             {
               type: 'query',
               name: 'variable_with_never_refresh_with_options',
@@ -1002,6 +1013,7 @@ describe('DashboardModel', () => {
               options: [{ text: 'A', value: 'A' }],
               refresh: 0,
             },
+            // @ts-expect-error
             {
               type: 'query',
               name: 'variable_with_never_refresh_without_options',
@@ -1009,6 +1021,7 @@ describe('DashboardModel', () => {
               options: [],
               refresh: 0,
             },
+            // @ts-expect-error
             {
               type: 'query',
               name: 'variable_with_dashboard_refresh_with_options',
@@ -1016,6 +1029,7 @@ describe('DashboardModel', () => {
               options: [{ text: 'A', value: 'A' }],
               refresh: 1,
             },
+            // @ts-expect-error
             {
               type: 'query',
               name: 'variable_with_dashboard_refresh_without_options',
@@ -1023,6 +1037,7 @@ describe('DashboardModel', () => {
               options: [],
               refresh: 1,
             },
+            // @ts-expect-error
             {
               type: 'query',
               name: 'variable_with_timerange_refresh_with_options',
@@ -1030,6 +1045,7 @@ describe('DashboardModel', () => {
               options: [{ text: 'A', value: 'A' }],
               refresh: 2,
             },
+            // @ts-expect-error
             {
               type: 'query',
               name: 'variable_with_timerange_refresh_without_options',
@@ -1037,18 +1053,21 @@ describe('DashboardModel', () => {
               options: [],
               refresh: 2,
             },
+            // @ts-expect-error
             {
               type: 'query',
               name: 'variable_with_no_refresh_with_options',
               // @ts-expect-error
               options: [{ text: 'A', value: 'A' }],
             },
+            // @ts-expect-error
             {
               type: 'query',
               name: 'variable_with_no_refresh_without_options',
               // @ts-expect-error
               options: [],
             },
+            // @ts-expect-error
             {
               type: 'query',
               name: 'variable_with_unknown_refresh_with_options',
@@ -1056,6 +1075,7 @@ describe('DashboardModel', () => {
               options: [{ text: 'A', value: 'A' }],
               refresh: 2001,
             },
+            // @ts-expect-error
             {
               type: 'query',
               name: 'variable_with_unknown_refresh_without_options',
@@ -1063,24 +1083,28 @@ describe('DashboardModel', () => {
               options: [],
               refresh: 2001,
             },
+            // @ts-expect-error
             {
               type: 'custom',
               name: 'custom',
               // @ts-expect-error
               options: [{ text: 'custom', value: 'custom' }],
             },
+            // @ts-expect-error
             {
               type: 'textbox',
               name: 'textbox',
               // @ts-expect-error
               options: [{ text: 'Hello', value: 'World' }],
             },
+            // @ts-expect-error
             {
               type: 'datasource',
               name: 'datasource',
               // @ts-expect-error
               options: [{ text: 'ds', value: 'ds' }], // fake example doesn't exist
             },
+            // @ts-expect-error
             {
               type: 'interval',
               name: 'interval',
@@ -1334,6 +1358,7 @@ describe('DashboardModel', () => {
         panels: [
           {
             type: 'singlestat',
+            // @ts-expect-error
             legend: true,
             // @ts-expect-error
             thresholds: '10,20,30',
@@ -1396,6 +1421,7 @@ describe('DashboardModel', () => {
         panels: [
           {
             type: 'singlestat',
+            // @ts-expect-error
             legend: true,
             // @ts-expect-error
             thresholds: '10,20,30',
@@ -2004,6 +2030,7 @@ describe('DashboardModel', () => {
       model = new DashboardModel({
         templating: {
           list: [
+            // @ts-expect-error
             {
               type: 'query',
               name: 'var',
@@ -2016,6 +2043,7 @@ describe('DashboardModel', () => {
         },
         annotations: {
           list: [
+            // @ts-expect-error
             {
               // @ts-expect-error
               datasource: null,

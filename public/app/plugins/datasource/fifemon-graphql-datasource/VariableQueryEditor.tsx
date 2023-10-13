@@ -1,5 +1,7 @@
-import { QueryField } from '@grafana/ui';
 import React, { useState } from 'react';
+
+import { QueryField } from '@grafana/ui';
+
 import { MyQuery } from './types';
 
 interface VariableQueryProps {

@@ -3,8 +3,8 @@ import { BehaviorSubject } from 'rxjs';
 
 import { dateMath, dateTime, TimeRange } from '@grafana/data';
 
-import { PanelStateWrapper } from './PanelStateWrapper';
 import { Props } from './PanelChrome';
+import { PanelStateWrapper } from './PanelStateWrapper';
 
 // target is 20hz (50ms), but we poll at 100ms to smooth out jitter
 const interval = 100;

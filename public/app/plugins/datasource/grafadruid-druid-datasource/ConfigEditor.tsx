@@ -1,12 +1,14 @@
 import React, { PureComponent } from 'react';
+
 //import '@emotion/react';
-import { TabsBar, Tab, TabContent, IconName } from '@grafana/ui';
 import { DataSourcePluginOptionsEditorProps, SelectableValue, KeyValue } from '@grafana/data';
-import { DruidSettings, DruidSecureSettings } from './types';
+import { TabsBar, Tab, TabContent, IconName } from '@grafana/ui';
+
 import { DruidConnectionSettings } from './configuration/ConnectionSettings';
 import { ConnectionSettingsOptions } from './configuration/ConnectionSettings/types';
 import { DruidQueryDefaultSettings } from './configuration/QuerySettings';
 import { QuerySettingsOptions } from './configuration/QuerySettings/types';
+import { DruidSettings, DruidSecureSettings } from './types';
 
 enum Tabs {
   Connection,

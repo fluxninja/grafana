@@ -612,7 +612,7 @@ func TestExecuteElasticsearchDataQuery(t *testing.T) {
 						"id": "3",
 						"type": "geohash_grid",
 						"field": "@location",
-						"settings": { "precision": 3 }
+						"settings": { "precision": "6" }
 					}
 				],
 				"metrics": [{"type": "count", "id": "1" }]
@@ -625,6 +625,56 @@ func TestExecuteElasticsearchDataQuery(t *testing.T) {
 			require.Equal(t, firstLevel.Aggregation.Type, "geohash_grid")
 			ghGridAgg := firstLevel.Aggregation.Aggregation.(*es.GeoHashGridAggregation)
 			require.Equal(t, ghGridAgg.Field, "@location")
+			require.Equal(t, ghGridAgg.Precision, 6)
+		})
+
+		t.Run("With geo hash grid agg with invalid int precision", func(t *testing.T) {
+			c := newFakeClient()
+			_, err := executeElasticsearchDataQuery(c, `{
+				"bucketAggs": [
+					{
+						"id": "3",
+						"type": "geohash_grid",
+						"field": "@location",
+						"settings": { "precision": 7 }
+					}
+				],
+				"metrics": [{"type": "count", "id": "1" }]
+			}`, from, to)
+			require.NoError(t, err)
+			sr := c.multisearchRequests[0].Requests[0]
+
+			firstLevel := sr.Aggs[0]
+			require.Equal(t, firstLevel.Key, "3")
+			require.Equal(t, firstLevel.Aggregation.Type, "geohash_grid")
+			ghGridAgg := firstLevel.Aggregation.Aggregation.(*es.GeoHashGridAggregation)
+			require.Equal(t, ghGridAgg.Field, "@location")
+			// It should default to 3
+			require.Equal(t, ghGridAgg.Precision, 3)
+		})
+
+		t.Run("With geo hash grid agg with no precision", func(t *testing.T) {
+			c := newFakeClient()
+			_, err := executeElasticsearchDataQuery(c, `{
+				"bucketAggs": [
+					{
+						"id": "3",
+						"type": "geohash_grid",
+						"field": "@location",
+						"settings": {}
+					}
+				],
+				"metrics": [{"type": "count", "id": "1" }]
+			}`, from, to)
+			require.NoError(t, err)
+			sr := c.multisearchRequests[0].Requests[0]
+
+			firstLevel := sr.Aggs[0]
+			require.Equal(t, firstLevel.Key, "3")
+			require.Equal(t, firstLevel.Aggregation.Type, "geohash_grid")
+			ghGridAgg := firstLevel.Aggregation.Aggregation.(*es.GeoHashGridAggregation)
+			require.Equal(t, ghGridAgg.Field, "@location")
+			// It should default to 3
 			require.Equal(t, ghGridAgg.Precision, 3)
 		})
 
@@ -1352,6 +1402,25 @@ func TestExecuteElasticsearchDataQuery(t *testing.T) {
 				"post_tags":     []string{"@/HIGHLIGHT@"},
 				"pre_tags":      []string{"@HIGHLIGHT@"},
 			})
+		})
+
+		t.Run("With log context query with sortDirection and searchAfter should return correct query", func(t *testing.T) {
+			c := newFakeClient()
+			_, err := executeElasticsearchDataQuery(c, `{
+			"metrics": [{ "type": "logs", "id": "1", "settings": { "limit": "1000", "sortDirection": "asc", "searchAfter": [1, "2"] }}]
+		}`, from, to)
+			require.NoError(t, err)
+			sr := c.multisearchRequests[0].Requests[0]
+			require.Equal(t, sr.Sort["@timestamp"], map[string]string{"order": "asc", "unmapped_type": "boolean"})
+			require.Equal(t, sr.Sort["_doc"], map[string]string{"order": "asc"})
+
+			searchAfter := sr.CustomProps["search_after"].([]interface{})
+			firstSearchAfter, err := searchAfter[0].(json.Number).Int64()
+			require.NoError(t, err)
+			require.Equal(t, firstSearchAfter, int64(1))
+			secondSearchAfter := searchAfter[1].(string)
+			require.NoError(t, err)
+			require.Equal(t, secondSearchAfter, "2")
 		})
 
 		t.Run("With invalid query should return error", (func(t *testing.T) {

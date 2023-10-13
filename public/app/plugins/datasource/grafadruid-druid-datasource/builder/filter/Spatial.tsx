@@ -1,9 +1,11 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Input, Row } from '../abstract';
-import { ExtractionFn } from '../extractionfn';
-import { FilterTuning } from '.';
 import { Bound } from '../bound';
+import { ExtractionFn } from '../extractionfn';
+import { QueryBuilderProps } from '../types';
+
+import { FilterTuning } from '.';
 
 export const Spatial = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Spatial);

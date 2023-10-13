@@ -1,5 +1,5 @@
 import classNames from 'classnames';
-import React, { PureComponent, CSSProperties } from 'react';
+import React, { PureComponent } from 'react';
 import { Subscription } from 'rxjs';
 
 import {
@@ -8,6 +8,7 @@ import {
   AnnotationEventUIModel,
   CoreApp,
   DashboardCursorSync,
+  DataFrame,
   EventFilterOptions,
   FieldConfigSource,
   getDataSourceRef,
@@ -26,7 +27,7 @@ import { config, locationService, RefreshEvent } from '@grafana/runtime';
 import { VizLegendOptions } from '@grafana/schema';
 import {
   ErrorBoundary,
-  PanelChrome as Panel,
+  PanelChrome,
   PanelContext,
   PanelContextProvider,
   SeriesVisibilityChangeMode,
@@ -37,6 +38,7 @@ import { profiler } from 'app/core/profiler';
 import { applyPanelTimeOverrides } from 'app/features/dashboard/utils/panel';
 import { getDatasourceSrv } from 'app/features/plugins/datasource_srv';
 import { applyFilterFromTable } from 'app/features/variables/adhoc/actions';
+import { onUpdatePanelSnapshotData } from 'app/plugins/datasource/grafana/utils';
 import { changeSeriesColorConfigFactory } from 'app/plugins/panel/timeseries/overrides/colorSeriesConfigFactory';
 import { dispatch } from 'app/store/store';
 import { RenderEvent } from 'app/types/events';
@@ -50,7 +52,6 @@ import { getPanelChromeProps } from '../utils/getPanelChromeProps';
 import { loadSnapshotData } from '../utils/loadSnapshotData';
 
 import { PanelHeader } from './PanelHeader/PanelHeader';
-import { PanelHeaderLoadingIndicator } from './PanelHeader/PanelHeaderLoadingIndicator';
 import { PanelHeaderMenuWrapperNew } from './PanelHeader/PanelHeaderMenuWrapper';
 import { seriesVisibilityConfigFactory } from './SeriesVisibilityConfigFactory';
 import { liveTimer } from './liveTimer';
@@ -64,12 +65,11 @@ export interface Props {
   isViewing: boolean;
   isEditing: boolean;
   isInView: boolean;
+  isDraggable?: boolean;
   width: number;
   height: number;
   onInstanceStateChange: (value: any) => void;
   timezone?: string;
-  FNDashboard?: boolean;
-  mode?: 'light' | 'dark';
   hideMenu?: boolean;
 }
 
@@ -82,12 +82,6 @@ export interface State {
   data: PanelData;
   liveTime?: TimeRange;
 }
-
-const FN_TITLE_STYLE: CSSProperties = {
-  textAlign: 'center',
-  padding: 3,
-  textTransform: 'capitalize',
-};
 
 export class PanelStateWrapper extends PureComponent<Props, State> {
   private readonly timeSrv: TimeSrv = getTimeSrv();
@@ -105,6 +99,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
       renderCounter: 0,
       refreshWhenInView: false,
       context: {
+        eventsScope: '__global_',
         eventBus,
         app: this.getPanelContextApp(),
         sync: this.getSync,
@@ -119,6 +114,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
         canEditAnnotations: props.dashboard.canEditAnnotations.bind(props.dashboard),
         canDeleteAnnotations: props.dashboard.canDeleteAnnotations.bind(props.dashboard),
         onAddAdHocFilter: this.onAddAdHocFilter,
+        onUpdateData: this.onUpdateData,
       },
       data: this.getInitialPanelDataState(),
     };
@@ -148,6 +144,10 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
 
     return CoreApp.Dashboard;
   }
+
+  onUpdateData = (frames: DataFrame[]): Promise<boolean> => {
+    return onUpdatePanelSnapshotData(this.props.panel, frames);
+  };
 
   onSeriesColorChange = (label: string, color: string) => {
     this.onFieldConfigChange(changeSeriesColorConfigFactory(label, color, this.props.panel.fieldConfig));
@@ -351,7 +351,6 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
         this.setState({ refreshWhenInView: false });
       }
       panel.runAllPanelQueries({
-        dashboardId: dashboard.id,
         dashboardUID: dashboard.uid,
         dashboardTimezone: dashboard.getTimezone(),
         publicDashboardAccessToken: dashboard.meta.publicDashboardAccessToken,
@@ -603,7 +602,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
   }
 
   render() {
-    const { dashboard, panel, isViewing, isEditing, width, height, plugin, FNDashboard } = this.props;
+    const { dashboard, panel, isViewing, isEditing, width, height, plugin } = this.props;
     const { errorMessage, data } = this.state;
     const { transparent } = panel;
 
@@ -618,14 +617,6 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
       [`panel-alert-state--${alertState}`]: alertState !== undefined,
     });
 
-    // for new panel header design
-    const onCancelQuery = () => panel.getQueryRunner().cancelQuery();
-    const title = panel.getDisplayTitle();
-    const noPadding: PanelPadding = plugin.noPadding ? 'none' : 'md';
-    const leftItems = [
-      <PanelHeaderLoadingIndicator state={data.state} onClick={onCancelQuery} key="loading-indicator" />,
-    ];
-
     const panelChromeProps = getPanelChromeProps({ ...this.props, data });
 
     if (config.featureToggles.newPanelChromeUI) {
@@ -639,7 +630,25 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
       );
 
       return (
-        <Panel width={width} height={height} title={title} leftItems={leftItems} padding={noPadding}>
+        <PanelChrome
+          width={width}
+          height={height}
+          title={panelChromeProps.title}
+          loadingState={data.state}
+          statusMessage={errorMessage}
+          statusMessageOnClick={panelChromeProps.onOpenErrorInspect}
+          description={panelChromeProps.description}
+          titleItems={panelChromeProps.titleItems}
+          menu={this.props.hideMenu ? undefined : menu}
+          dragClass={panelChromeProps.dragClass}
+          dragClassCancel="grid-drag-cancel"
+          padding={panelChromeProps.padding}
+          hoverHeaderOffset={hoverHeaderOffset}
+          hoverHeader={panelChromeProps.hasOverlayHeader()}
+          displayMode={transparent ? 'transparent' : 'default'}
+          onCancelQuery={panelChromeProps.onCancelQuery}
+          onOpenMenu={panelChromeProps.onOpenMenu}
+        >
           {(innerWidth, innerHeight) => (
             <>
               <ErrorBoundary
@@ -656,7 +665,7 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
               </ErrorBoundary>
             </>
           )}
-        </Panel>
+        </PanelChrome>
       );
     } else {
       return (
@@ -664,20 +673,18 @@ export class PanelStateWrapper extends PureComponent<Props, State> {
           className={containerClassNames}
           aria-label={selectors.components.Panels.Panel.containerByTitle(panel.title)}
         >
-          <div style={FNDashboard ? FN_TITLE_STYLE : {}}>
-            <PanelHeader
-              panel={panel}
-              dashboard={dashboard}
-              title={panel.title}
-              description={panel.description}
-              links={panel.links}
-              error={errorMessage}
-              isEditing={isEditing}
-              isViewing={isViewing}
-              alertState={alertState}
-              data={data}
-            />
-          </div>
+          <PanelHeader
+            panel={panel}
+            dashboard={dashboard}
+            title={panel.title}
+            description={panel.description}
+            links={panel.links}
+            error={errorMessage}
+            isEditing={isEditing}
+            isViewing={isViewing}
+            alertState={alertState}
+            data={data}
+          />
           <ErrorBoundary
             dependencies={[data, plugin, panel.getOptions()]}
             onError={this.onPanelError}

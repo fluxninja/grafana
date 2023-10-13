@@ -7,6 +7,7 @@ import { defaultIntervals, RefreshPicker } from '@grafana/ui';
 import { TimePickerWithHistory } from 'app/core/components/TimePicker/TimePickerWithHistory';
 import { appEvents } from 'app/core/core';
 import { t } from 'app/core/internationalization';
+import { AutoRefreshInterval } from 'app/core/services/context_srv';
 import { getTimeSrv } from 'app/features/dashboard/services/TimeSrv';
 
 import { ShiftTimeEvent, ShiftTimeEventDirection, ZoomOutEvent } from '../../../../types/events';
@@ -87,8 +88,13 @@ export class DashNavTimeControls extends Component<Props> {
     const fiscalYearStartMonth = dashboard.fiscalYearStartMonth;
     const hideIntervalPicker = dashboard.panelInEdit?.isEditing;
 
+    let text: string | undefined = undefined;
+    if (dashboard.refresh === AutoRefreshInterval) {
+      text = getTimeSrv().getAutoRefreshInteval().interval;
+    }
+
     return (
-      <>
+      <React.Fragment>
         <TimePickerWithHistory
           value={timePickerValue}
           onChange={this.onChangeTimePicker}
@@ -109,8 +115,10 @@ export class DashNavTimeControls extends Component<Props> {
           isOnCanvas={isOnCanvas}
           tooltip={t('dashboard.toolbar.refresh', 'Refresh dashboard')}
           noIntervalPicker={hideIntervalPicker}
+          showAutoInterval={true}
+          text={text}
         />
-      </>
+      </React.Fragment>
     );
   }
 }

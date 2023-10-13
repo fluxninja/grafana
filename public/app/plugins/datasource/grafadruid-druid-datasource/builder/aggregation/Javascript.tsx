@@ -1,6 +1,7 @@
 import React from 'react';
-import { QueryBuilderProps } from '../types';
+
 import { useScopedQueryBuilderFieldProps, Input, Multiple, Code, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
 
 export const Javascript = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, Javascript);
