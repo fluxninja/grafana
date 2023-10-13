@@ -423,6 +423,7 @@ require (
 	github.com/RoaringBitmap/roaring v0.9.4 // indirect
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/axiomhq/hyperloglog v0.0.0-20191112132149-a4c4c47bc57f // indirect
+	github.com/bitly/go-simplejson v0.5.1
 	github.com/bits-and-blooms/bitset v1.2.0 // indirect
 	github.com/blevesearch/go-porterstemmer v1.0.3 // indirect
 	github.com/blevesearch/mmap-go v1.0.4 // indirect
@@ -443,6 +444,7 @@ require (
 	github.com/go-logr/logr v1.2.4 // @grafana/grafana-app-platform-squad
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-github v17.0.0+incompatible // @grafana/grafana-app-platform-squad
+	github.com/grafadruid/go-druid v0.0.6
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0 // indirect
 	github.com/hmarr/codeowners v1.1.2 // @grafana/grafana-as-code
 	github.com/imdario/mergo v0.3.13 // indirect

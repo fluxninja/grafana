@@ -40,6 +40,7 @@ import (
 	"github.com/grafana/grafana/pkg/tsdb/azuremonitor"
 	cloudmonitoring "github.com/grafana/grafana/pkg/tsdb/cloud-monitoring"
 	"github.com/grafana/grafana/pkg/tsdb/cloudwatch"
+	"github.com/grafana/grafana/pkg/tsdb/druid"
 	"github.com/grafana/grafana/pkg/tsdb/elasticsearch"
 	pyroscope "github.com/grafana/grafana/pkg/tsdb/grafana-pyroscope-datasource"
 	"github.com/grafana/grafana/pkg/tsdb/grafanads"
@@ -111,8 +112,9 @@ func TestIntegrationPluginManager(t *testing.T) {
 	graf := grafanads.ProvideService(sv2, nil)
 	phlare := pyroscope.ProvideService(hcp, acimpl.ProvideAccessControl(cfg))
 	parca := parca.ProvideService(hcp)
+	druid := druid.ProvideService(hcp)
 
-	coreRegistry := coreplugin.ProvideCoreRegistry(am, cw, cm, es, grap, idb, lk, otsdb, pr, tmpo, td, pg, my, ms, graf, phlare, parca)
+	coreRegistry := coreplugin.ProvideCoreRegistry(am, cw, cm, es, grap, idb, lk, otsdb, pr, tmpo, td, pg, my, ms, graf, phlare, parca, druid)
 
 	pCfg, err := config.ProvideConfig(setting.ProvideProvider(cfg), cfg, featuremgmt.WithFeatures())
 	require.NoError(t, err)
@@ -224,6 +226,7 @@ func verifyCorePluginCatalogue(t *testing.T, ctx context.Context, ps *store.Serv
 		"zipkin":                           {},
 		"grafana-pyroscope-datasource":     {},
 		"parca":                            {},
+		"druid":                            {},
 	}
 
 	expApps := map[string]struct{}{
