@@ -1,26 +1,26 @@
-import { css } from '@emotion/css';
-import { useEffect, useState, FC } from 'react';
+import React, { useEffect, useState } from 'react';
 
-import { GrafanaTheme2, TypedVariableModel, VariableHide } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
-import { useStyles2 } from '@grafana/ui';
-import { FnGlobalState } from 'app/core/reducers/fn-slice';
+import { useSelector } from 'app/types';
 
 import { PickerRenderer } from '../../../variables/pickers/PickerRenderer';
+import { VariableHide, VariableModel } from '../../../variables/types';
 
 interface Props {
-  variables: TypedVariableModel[];
+  variables: VariableModel[];
   readOnly?: boolean;
-  hiddenVariables?: FnGlobalState['hiddenVariables'];
 }
 
-export const SubMenuItems: FC<Props> = ({ variables, readOnly, hiddenVariables }) => {
-  const [visibleVariables, setVisibleVariables] = useState<TypedVariableModel[]>([]);
-  const styles = useStyles2(getStyles);
+export const SubMenuItems = ({ variables, readOnly }: Props) => {
+  const [visibleVariables, setVisibleVariables] = useState<VariableModel[]>([]);
+
+  const hiddenVariables = useSelector((state) => state.fnGlobalState.hiddenVariables);
 
   useEffect(() => {
-    setVisibleVariables(variables.filter((state) => state.hide !== VariableHide.hideVariable));
-  }, [variables]);
+    setVisibleVariables(
+      variables.filter((state) => state.hide !== VariableHide.hideVariable && !hiddenVariables?.includes(state.id))
+    );
+  }, [variables, hiddenVariables]);
 
   if (visibleVariables.length === 0) {
     return null;
@@ -29,14 +29,10 @@ export const SubMenuItems: FC<Props> = ({ variables, readOnly, hiddenVariables }
   return (
     <>
       {visibleVariables.map((variable) => {
-        if (hiddenVariables?.includes(variable.id)) {
-          return null;
-        }
-
         return (
           <div
             key={variable.id}
-             className={styles.submenuItem}
+            className="submenu-item gf-form-inline"
             data-testid={selectors.pages.Dashboard.SubMenu.submenuItem}
           >
             <PickerRenderer variable={variable} readOnly={readOnly} />
@@ -46,18 +42,3 @@ export const SubMenuItems: FC<Props> = ({ variables, readOnly, hiddenVariables }
     </>
   );
 };
-
-const getStyles = (theme: GrafanaTheme2) => ({
-  submenuItem: css({
-    display: 'inline-block',
-
-    '.fa-caret-down': {
-      fontSize: '75%',
-      paddingLeft: theme.spacing(1),
-    },
-
-    '.gf-form': {
-      marginBottom: 0,
-    },
-  }),
-});
