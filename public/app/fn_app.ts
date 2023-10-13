@@ -39,7 +39,7 @@ import { setPanelDataErrorView } from '@grafana/runtime/src/components/PanelData
 import { setPanelRenderer } from '@grafana/runtime/src/components/PanelRenderer';
 import { setPluginPage } from '@grafana/runtime/src/components/PluginPage';
 import { getScrollbarWidth } from '@grafana/ui';
-import config from 'app/core/config';
+import config, { Settings } from 'app/core/config';
 import { arrayMove } from 'app/core/utils/arrayMove';
 import { getStandardTransformers } from 'app/features/transformers/standardTransformers';
 
@@ -116,7 +116,14 @@ export class GrafanaApp {
 
       const initI18nPromise = initializeI18n(config.bootData.user.language);
 
+      backendSrv.setGrafanaPrefix(true);
       setBackendSrv(backendSrv);
+      const settings: Settings = await backendSrv.get('/api/frontend/settings');
+
+      config.panels = settings.panels;
+      config.datasources = settings.datasources;
+      config.defaultDatasource = settings.defaultDatasource;
+
       initEchoSrv();
       // This needs to be done after the `initEchoSrv` since it is being used under the hood.
       startMeasure('frontend_app_init');

@@ -11,8 +11,10 @@
     "incremental": true,
     "tsBuildInfoFile": "./tsconfig.tsbuildinfo",
     "preserveSymlinks": true,
+    "esModuleInterop": true,
     "paths": {
-      "@grafana/schema/dist/esm/*": ["../packages/grafana-schema/src/*"]
+      "@grafana/schema/dist/esm/*": ["../packages/grafana-schema/src/*"],
+      "react": ["./node_modules/@types/react"]
     }
   },
   "extends": "@grafana/tsconfig/base.json",

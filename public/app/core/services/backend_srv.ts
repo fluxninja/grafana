@@ -61,6 +61,7 @@ export class BackendSrv implements BackendService {
   private readonly fetchQueue: FetchQueue;
   private readonly responseQueue: ResponseQueue;
   private _tokenRotationInProgress?: Observable<FetchResponse> | null = null;
+  private grafanaPrefix: boolean;
 
   private dependencies: BackendSrvDependencies = {
     fromFetch: fromFetch,

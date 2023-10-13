@@ -10,7 +10,6 @@ export function getElementStyles(theme: GrafanaTheme2) {
       MsOverflowStyle: 'scrollbar',
       WebkitTapHighlightColor: 'rgba(0, 0, 0, 0)',
       height: '100%',
-      fontSize: `${theme.typography.htmlFontSize}px`,
       fontFamily: theme.typography.fontFamily,
       lineHeight: theme.typography.body.lineHeight,
       fontKerning: 'normal',
