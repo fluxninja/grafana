@@ -84,5 +84,7 @@ func corePlugins(rt *thema.Runtime) []pfs.ParsedPlugin {
 		parsePluginOrPanic("public/app/plugins/panel/trend", "trend", rt),
 		parsePluginOrPanic("public/app/plugins/panel/welcome", "welcome", rt),
 		parsePluginOrPanic("public/app/plugins/panel/xychart", "xychart", rt),
+		parsePluginOrPanic("public/app/plugins/datasource/grafadruid-druid-datasource", "grafadruid_druid_datasource", rt),
+		parsePluginOrPanic("public/app/plugins/panel/sankey-panel-0.5.0", "ismael_sankey_panel", rt),
 	}
 }
