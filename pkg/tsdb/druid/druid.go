@@ -11,7 +11,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/Knetic/govaluate"
 	"github.com/bitly/go-simplejson"
 	"github.com/grafadruid/go-druid"
 	druidquerybuilder "github.com/grafadruid/go-druid/builder"
@@ -196,7 +195,7 @@ type grafanaMetricFindValue struct {
 }
 
 func (ds *Service) QueryVariableData(ctx context.Context, req *backend.CallResourceRequest) ([]grafanaMetricFindValue, error) {
-	s, err := ds.settings(req.PluginContext)
+	s, err := ds.settings(req.PluginContext, ctx)
 	if err != nil {
 		return []grafanaMetricFindValue{}, err
 	}
@@ -286,7 +285,7 @@ func (ds *Service) CheckHealth(ctx context.Context, req *backend.CheckHealthRequ
 		Message: "Can't connect to Druid",
 	}
 
-	i, err := ds.im.Get(req.PluginContext)
+	i, err := ds.im.Get(ctx, req.PluginContext)
 	if err != nil {
 		result.Message = "Can't get Druid instance"
 		return result, nil
@@ -305,7 +304,7 @@ func (ds *Service) CheckHealth(ctx context.Context, req *backend.CheckHealthRequ
 
 func (ds *Service) QueryData(ctx context.Context, req *backend.QueryDataRequest) (*backend.QueryDataResponse, error) {
 	response := backend.NewQueryDataResponse()
-	s, err := ds.settings(req.PluginContext)
+	s, err := ds.settings(req.PluginContext, ctx)
 	if err != nil {
 		return response, err
 	}
@@ -342,8 +341,8 @@ func toHTTPHeaders(rawOriginal interface{}) http.Header {
 	return headers
 }
 
-func (ds *Service) settings(ctx backend.PluginContext) (*druidInstanceSettings, error) {
-	s, err := ds.im.Get(ctx)
+func (ds *Service) settings(ctx backend.PluginContext, getCtx context.Context) (*druidInstanceSettings, error) {
+	s, err := ds.im.Get(getCtx, ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -441,9 +440,6 @@ func (ds *Service) prepareQuery(qry []byte, s *druidInstanceSettings) (druidquer
 			defaultQueryContext,
 			ds.prepareQueryContext(queryContextParameters.([]interface{})))
 	}
-	if g, ok := q.Builder["granularity"].(map[string]any); ok {
-		q.Builder["granularity"] = resolveGranularity(g)
-	}
 	jsonQuery, err := json.Marshal(q.Builder)
 	if err != nil {
 		return nil, nil, err
@@ -451,28 +447,6 @@ func (ds *Service) prepareQuery(qry []byte, s *druidInstanceSettings) (druidquer
 	query, err := s.client.Query().Load(jsonQuery)
 	// feature: could ensure __time column is selected, time interval is set based on qry given timerange and consider max data points ?
 	return query, mergeSettings(s.defaultQuerySettings, q.Settings), err
-}
-
-func resolveGranularity(m map[string]any) map[string]any {
-	// granularity is optional, so return early if not set and is of wrong type
-	if m == nil || m["type"] != "duration" {
-		return m
-	}
-	expr, ok := m["duration"].(string)
-	if !ok {
-		return m
-	}
-
-	eval, err := govaluate.NewEvaluableExpression(expr)
-	if err != nil {
-		return m
-	}
-	result, err := eval.Evaluate(nil)
-	if err != nil {
-		return m
-	}
-	m["duration"] = result
-	return m
 }
 
 func (ds *Service) prepareQueryContext(parameters []interface{}) map[string]interface{} {
@@ -499,21 +473,21 @@ func (ds *Service) executeQuery(
 		return nil, errors.New("not implemented")
 	case "timeseries":
 		var r result.TimeseriesResult
-		_, err := s.client.Query().Execute(q, &r, headers)
+		_, err := s.client.Query().Execute(q, &r)
 		if err != nil {
 			return nil, fmt.Errorf("Query error: %w", err)
 		}
 		resultFramer = &r
 	case "topN":
 		var r result.TopNResult
-		_, err := s.client.Query().Execute(q, &r, headers)
+		_, err := s.client.Query().Execute(q, &r)
 		if err != nil {
 			return nil, fmt.Errorf("Query error: %w", err)
 		}
 		resultFramer = &r
 	case "groupBy":
 		var r result.GroupByResult
-		_, err := s.client.Query().Execute(q, &r, headers)
+		_, err := s.client.Query().Execute(q, &r)
 		if err != nil {
 			return nil, fmt.Errorf("Query error: %w", err)
 		}
@@ -548,7 +522,7 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 		q.(*druidquery.Scan).SetResultFormat("compactedList")
 	}
 	var res json.RawMessage
-	_, err := s.client.Query().Execute(q, &res, headers)
+	_, err := s.client.Query().Execute(q, &res)
 	if err != nil {
 		return r, err
 	}

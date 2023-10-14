@@ -47,7 +47,6 @@ const (
 	Loki            = "loki"
 	OpenTSDB        = "opentsdb"
 	Druid           = "grafadruid-druid-datasource"
-	Graphql			= "fifemon-graphql-datasource"
 	Prometheus      = "prometheus"
 	Tempo           = "tempo"
 	TestData        = "grafana-testdata-datasource"
@@ -96,10 +95,7 @@ func NewRegistry(store map[string]backendplugin.PluginFactoryFunc) *Registry {
 func ProvideCoreRegistry(tracer tracing.Tracer, am *azuremonitor.Service, cw *cloudwatch.CloudWatchService, cm *cloudmonitoring.Service,
 	es *elasticsearch.Service, grap *graphite.Service, idb *influxdb.Service, lk *loki.Service, otsdb *opentsdb.Service,
 	pr *prometheus.Service, t *tempo.Service, td *testdatasource.Service, pg *postgres.Service, my *mysql.Service,
-	ms *mssql.Service, graf *grafanads.Service, pyroscope *pyroscope.Service, parca *parca.Service) *Registry {
-	// Non-optimal global solution to replace plugin SDK default tracer for core plugins.
-	sdktracing.InitDefaultTracer(tracer)
-
+	ms *mssql.Service, graf *grafanads.Service, pyroscope *pyroscope.Service, parca *parca.Service, dr *druid.Service) *Registry {
 	return NewRegistry(map[string]backendplugin.PluginFactoryFunc{
 		CloudWatch:      asBackendPlugin(cw.Executor),
 		CloudMonitoring: asBackendPlugin(cm),
