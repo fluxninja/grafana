@@ -319,12 +319,4 @@ export const Pages = {
       },
     },
   },
-  UserListPage: {
-    org: {
-      url: '/org/users',
-    },
-    admin: {
-      url: '/admin/users',
-    },
-  },
 };
