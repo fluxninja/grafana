@@ -183,7 +183,10 @@ func (ds *Service) CallResource(ctx context.Context, req *backend.CallResourceRe
 	default:
 		body = "Path not supported"
 	}
-	resp := &backend.CallResourceResponse{Status: code}
+	resp := &backend.CallResourceResponse{
+		Headers: map[string][]string{},
+		Status:  code,
+	}
 	resp.Body, err = json.Marshal(body)
 	sender.Send(resp)
 	return nil
