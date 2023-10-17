@@ -287,6 +287,8 @@ require (
 	k8s.io/klog/v2 v2.90.1 // @grafana/grafana-app-platform-squad
 )
 
+require github.com/Knetic/govaluate v3.0.1-0.20171022003610-9aa49832a739+incompatible
+
 require (
 	cloud.google.com/go v0.110.0 // indirect
 	cloud.google.com/go/compute/metadata v0.2.3 // indirect
@@ -444,7 +446,7 @@ require (
 	github.com/go-logr/logr v1.2.4 // @grafana/grafana-app-platform-squad
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/google/go-github v17.0.0+incompatible // @grafana/grafana-app-platform-squad
-	github.com/grafadruid/go-druid v0.0.6
+	github.com/grafadruid/go-druid v0.0.7-0.20230607082331-983aa577d90a
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.0 // indirect
 	github.com/hmarr/codeowners v1.1.2 // @grafana/grafana-as-code
 	github.com/imdario/mergo v0.3.13 // indirect
