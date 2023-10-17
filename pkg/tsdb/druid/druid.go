@@ -502,21 +502,21 @@ func (ds *Service) executeQuery(
 		return nil, errors.New("not implemented")
 	case "timeseries":
 		var r result.TimeseriesResult
-		_, err := s.client.Query().Execute(q, &r)
+		_, err := s.client.Query().Execute(q, &r, headers)
 		if err != nil {
 			return nil, fmt.Errorf("Query error: %w", err)
 		}
 		resultFramer = &r
 	case "topN":
 		var r result.TopNResult
-		_, err := s.client.Query().Execute(q, &r)
+		_, err := s.client.Query().Execute(q, &r, headers)
 		if err != nil {
 			return nil, fmt.Errorf("Query error: %w", err)
 		}
 		resultFramer = &r
 	case "groupBy":
 		var r result.GroupByResult
-		_, err := s.client.Query().Execute(q, &r)
+		_, err := s.client.Query().Execute(q, &r, headers)
 		if err != nil {
 			return nil, fmt.Errorf("Query error: %w", err)
 		}
