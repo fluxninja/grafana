@@ -551,7 +551,7 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 		q.(*druidquery.Scan).SetResultFormat("compactedList")
 	}
 	var res json.RawMessage
-	_, err := s.client.Query().Execute(q, &res)
+	_, err := s.client.Query().Execute(q, &res, headers)
 	if err != nil {
 		return r, err
 	}
