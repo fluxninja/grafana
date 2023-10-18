@@ -42,9 +42,7 @@ export const Icon = React.forwardRef<HTMLDivElement, IconProps>(
 
     /* Temporary solution to display also font awesome icons */
     if (name?.startsWith('fa fa-')) {
-      {
-        /* @ts-ignore */
-      }
+      /* @ts-ignore */
       return <i className={getFontAwesomeIconStyles(name, className)} {...divElementProps} style={style} />;
     }
 
