@@ -184,6 +184,7 @@ export class Connections {
           options.connections = [];
         }
         if (this.didConnectionLeaveHighlight) {
+          // @ts-ignore
           this.connectionSource.options.connections = [...options.connections, connection];
           this.connectionSource.onChange(this.connectionSource.options);
         }

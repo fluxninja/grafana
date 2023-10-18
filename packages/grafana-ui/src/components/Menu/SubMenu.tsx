@@ -50,6 +50,7 @@ export const SubMenu = React.memo(
     return (
       <>
         <div className={styles.iconWrapper} aria-label={selectors.components.Menu.SubMenu.icon}>
+          {/* @ts-ignore */}
           <Icon name="angle-right" className={styles.icon} aria-hidden />
         </div>
         {isOpen && (
@@ -60,6 +61,7 @@ export const SubMenu = React.memo(
             style={customStyle}
           >
             <div tabIndex={-1} className={styles.itemsWrapper} role="menu" onKeyDown={handleKeys}>
+              {/* @ts-ignore */}
               {items}
             </div>
           </div>

@@ -22,7 +22,6 @@ const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'history' | 'route'
     routeName: DashboardRoutes.Normal,
     path: '/d/:uid/:slug?',
     pageClass: 'page-dashboard',
-    // @ts-ignore
     component: DashboardPage,
   },
 };
@@ -72,6 +71,5 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
     [controlsContainer, hiddenVariables, isLoading, props, queryParams]
   );
 
-  // @ts-ignore
   return <DashboardPage {...dashboardPageProps} />;
 };

@@ -1,10 +1,7 @@
-import _ from 'lodash';
-import { isEqual } from 'lodash';
-import defaults from 'lodash/defaults';
+import { defaults, isEqual, isNumber } from 'lodash';
 
 import {
   AnnotationEvent,
-  AnnotationQueryRequest,
   DataQueryRequest,
   DataQueryResponse,
   DataSourceApi,
@@ -12,8 +9,11 @@ import {
   DataSourceInstanceSettings,
   ScopedVars,
   TimeRange,
+  dateTime,
+  MutableDataFrame,
+  FieldType,
+  DataFrame,
 } from '@grafana/data';
-import { dateTime, MutableDataFrame, FieldType, DataFrame } from '@grafana/data';
 import { getTemplateSrv } from '@grafana/runtime';
 
 import {
@@ -183,7 +183,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
                 let t: FieldType = FieldType.string;
                 if (fieldName === timePath || isRFC3339_ISO6801(String(doc[fieldName]))) {
                   t = FieldType.time;
-                } else if (_.isNumber(doc[fieldName])) {
+                } else if (isNumber(doc[fieldName])) {
                   t = FieldType.number;
                 }
                 let title;
@@ -208,6 +208,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
                   name: fieldName,
                   type: t,
                   config: { displayName: title },
+                  // @ts-ignore
                 }).parse = (v: any) => {
                   return v || '';
                 };
@@ -225,7 +226,7 @@ export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
       return { data: dataFrameArray };
     });
   }
-  annotationQuery(options: AnnotationQueryRequest<MyQuery>): Promise<AnnotationEvent[]> {
+  annotationQuery(options: any): Promise<AnnotationEvent[]> {
     const query = defaults(options.annotation, defaultQuery);
     return Promise.all([this.createQuery(query, options.range)]).then((results: any) => {
       const r: AnnotationEvent[] = [];

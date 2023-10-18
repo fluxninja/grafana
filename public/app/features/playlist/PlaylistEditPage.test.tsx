@@ -25,7 +25,6 @@ jest.mock('app/core/components/TagFilter/TagFilter', () => ({
 
 async function getTestContext({ name, interval, items, uid }: Partial<Playlist> = {}) {
   jest.clearAllMocks();
-  const store = configureStore();
   const playlist = { name, items, interval, uid } as unknown as Playlist;
   const queryParams = {};
   const route = {} as RouteDescriptor;

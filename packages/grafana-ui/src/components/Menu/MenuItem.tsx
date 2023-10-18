@@ -160,26 +160,31 @@ export const MenuItem = React.memo(
         {...disabledProps}
       >
         <>
+          {/* @ts-ignore */}
           {icon && <Icon name={icon} className={styles.icon} aria-hidden />}
           {label}
 
           <div className={cx(styles.rightWrapper, { [styles.withShortcut]: hasShortcut })}>
-            {hasShortcut && (
-              <div className={styles.shortcut}>
-                <Icon name="keyboard" aria-hidden />
-                {shortcut}
-              </div>
-            )}
-            {hasSubMenu && (
-              <SubMenu
-                items={childItems}
-                isOpen={isSubMenuOpen}
-                openedWithArrow={openedWithArrow}
-                setOpenedWithArrow={setOpenedWithArrow}
-                close={closeSubMenu}
-                customStyle={customSubMenuContainerStyles}
-              />
-            )}
+            {
+              hasShortcut && (
+                <div className={styles.shortcut}>
+                  <Icon name="keyboard" aria-hidden />
+                  {shortcut}
+                </div>
+              )
+            }
+            {
+              hasSubMenu && (
+                <SubMenu
+                  items={childItems}
+                  isOpen={isSubMenuOpen}
+                  openedWithArrow={openedWithArrow}
+                  setOpenedWithArrow={setOpenedWithArrow}
+                  close={closeSubMenu}
+                  customStyle={customSubMenuContainerStyles}
+                />
+              )
+            }
           </div>
         </>
       </ItemElement>

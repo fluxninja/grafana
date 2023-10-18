@@ -156,7 +156,6 @@ function FolderGroupAndEvaluationInterval({
 function ForInput({ evaluateEvery }: { evaluateEvery: string }) {
   const styles = useStyles2(getStyles);
   const {
-    watch,
     register,
     formState: { errors },
   } = useFormContext<RuleFormValues>();

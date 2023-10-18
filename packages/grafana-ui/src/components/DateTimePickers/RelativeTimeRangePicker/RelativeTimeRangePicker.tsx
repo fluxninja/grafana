@@ -14,7 +14,6 @@ import CustomScrollbar from '../../CustomScrollbar/CustomScrollbar';
 import { Field } from '../../Forms/Field';
 import { Icon } from '../../Icon/Icon';
 import { getInputStyles, Input } from '../../Input/Input';
-import { Portal } from '../../Portal/Portal';
 import { Tooltip } from '../../Tooltip/Tooltip';
 import { TimePickerTitle } from '../TimeRangePicker/TimePickerTitle';
 import { TimeRangeList } from '../TimeRangePicker/TimeRangeList';

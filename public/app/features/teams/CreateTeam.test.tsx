@@ -5,8 +5,6 @@ import { TestProvider } from 'test/helpers/TestProvider';
 
 import { BackendSrv, setBackendSrv } from '@grafana/runtime';
 
-import { configureStore } from '../../store/configureStore';
-
 import { CreateTeam } from './CreateTeam';
 
 beforeEach(() => {

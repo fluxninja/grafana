@@ -1,5 +1,4 @@
 import { cx, css } from '@emotion/css';
-import { isString } from 'lodash';
 import React, { forwardRef, ButtonHTMLAttributes, ReactNode } from 'react';
 
 import { GrafanaTheme2, IconName, isIconName } from '@grafana/data';

@@ -1,6 +1,8 @@
 import { config } from '@grafana/runtime';
 
-import { translateForCDN, extractPluginIdVersionFromUrl } from './pluginCDN';
+import { extractPluginIdVersionFromUrl } from '../cdn/utils';
+
+import { translateForCDN } from './pluginCDN';
 describe('Plugin CDN', () => {
   describe('translateForCDN', () => {
     const load = {

@@ -9,7 +9,6 @@ import {
   Route,
   TimeInterval,
   TimeRange,
-  ObjectMatcher,
 } from 'app/plugins/datasource/alertmanager/types';
 import { Labels } from 'app/types/unified-alerting-dto';
 

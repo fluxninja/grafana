@@ -58,6 +58,7 @@ export type DashboardPageRouteSearchParams = {
   viewPanel?: string;
   editview?: string;
   shareView?: string;
+  addWidget?: boolean;
   panelType?: string;
   inspect?: string;
   from?: string;
@@ -67,10 +68,10 @@ export type DashboardPageRouteSearchParams = {
 };
 
 export type MapStateToDashboardPageProps = MapStateToProps<
-  Pick<DashboardState, 'initPhase' | 'initError'> & { dashboard: ReturnType<DashboardState['getModel']> } & Pick<
-      FnGlobalState,
-      'FNDashboard'
-    >,
+  Pick<DashboardState, 'initPhase' | 'initError'> & {
+    dashboard: ReturnType<DashboardState['getModel']>;
+    navIndex: StoreState['navIndex'];
+  } & Pick<FnGlobalState, 'FNDashboard'>,
   OwnProps,
   StoreState
 >;
@@ -451,7 +452,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
           {inspectPanel && !FNDashboard && <PanelInspector dashboard={dashboard} panel={inspectPanel} />}
         </Page>
-        {editPanel && !FNDashboard && (
+        {editPanel && !FNDashboard && sectionNav && pageNav && (
           <PanelEditor
             dashboard={dashboard}
             sourcePanel={editPanel}
@@ -460,7 +461,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
             pageNav={pageNav}
           />
         )}
-        {queryParams.editview && !FNDashboard && (
+        {queryParams.editview && !FNDashboard && pageNav && sectionNav && (
           <DashboardSettings
             dashboard={dashboard}
             editview={queryParams.editview}
