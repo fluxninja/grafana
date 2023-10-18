@@ -6,8 +6,6 @@ import { TestProvider } from 'test/helpers/TestProvider';
 import { RouteDescriptor } from 'app/core/navigation/types';
 import { ApiKey, OrgRole, ServiceAccountDTO } from 'app/types';
 
-import { configureStore } from '../../store/configureStore';
-
 import { ServiceAccountPageUnconnected, Props } from './ServiceAccountPage';
 
 jest.mock('app/core/core', () => ({
@@ -19,7 +17,6 @@ jest.mock('app/core/core', () => ({
 }));
 
 const setup = (propOverrides: Partial<Props>) => {
-  const store = configureStore();
   const createServiceAccountTokenMock = jest.fn();
   const deleteServiceAccountMock = jest.fn();
   const deleteServiceAccountTokenMock = jest.fn();

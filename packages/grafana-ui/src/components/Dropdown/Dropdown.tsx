@@ -85,9 +85,9 @@ export const Dropdown = React.memo(({ children, overlay, placement, offset, onVi
 
   return (
     <>
-      {React.cloneElement(children, {
-        ref: refs.setReference,
-        ...getReferenceProps(),
+      {/* @ts-ignore */}
+      {React.cloneElement(typeof children === 'function' ? children(visible) : children, {
+        ref: setTriggerRef,
       })}
       {show && (
         <Portal>
@@ -105,7 +105,8 @@ export const Dropdown = React.memo(({ children, overlay, placement, offset, onVi
                 timeout={{ appear: animationDuration, exit: 0, enter: 0 }}
                 classNames={animationStyles}
               >
-                <div ref={transitionRef}>{ReactUtils.renderOrCallToRender(overlay, { ...getFloatingProps() })}</div>
+                {/* @ts-ignore */}
+                <div ref={transitionRef}>{ReactUtils.renderOrCallToRender(overlay, {})}</div>
               </CSSTransition>
             </div>
           </FloatingFocusManager>

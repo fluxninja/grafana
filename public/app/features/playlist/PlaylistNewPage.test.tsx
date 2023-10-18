@@ -22,7 +22,6 @@ jest.mock('app/core/components/TagFilter/TagFilter', () => ({
 }));
 
 function getTestContext({ name, interval, items }: Partial<Playlist> = {}) {
-  const store = configureStore();
   jest.clearAllMocks();
   const playlist = { name, items, interval } as unknown as Playlist;
   const backendSrvMock = jest.spyOn(backendSrv, 'post').mockImplementation(() => Promise.resolve());

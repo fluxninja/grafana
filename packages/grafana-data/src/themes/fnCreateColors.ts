@@ -75,6 +75,7 @@ class FnDarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
     disabledText: this.text.disabled,
     disabledBackground: `rgba(${this.whiteBase}, 0.04)`,
     disabledOpacity: 0.38,
+    selectedBorder: palette.orangeDarkMain,
   };
 
   gradients = {
@@ -155,6 +156,7 @@ class FnLightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
     disabledBackground: `rgba(${this.blackBase}, 0.04)`,
     disabledText: this.text.disabled,
     disabledOpacity: 0.38,
+    selectedBorder: palette.orangeLightMain,
   };
 
   gradients = {

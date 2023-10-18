@@ -1,11 +1,10 @@
 import { cx, css } from '@emotion/css';
-import { forwardRef, ButtonHTMLAttributes } from 'react';
-import * as React from 'react';
+import React, { forwardRef, ButtonHTMLAttributes, ReactNode } from 'react';
 
 import { GrafanaTheme2, IconName, isIconName } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 
-import { styleMixins, useStyles2 } from '../../themes';
+import { styleMixins, useStyles2, useTheme2 } from '../../themes';
 import { getFocusStyles, getMouseFocusStyles } from '../../themes/mixins';
 import { IconSize } from '../../types/icon';
 import { getPropertiesForVariant } from '../Button';
@@ -66,6 +65,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
     ref
   ) => {
     const styles = useStyles2(getStyles);
+    const theme2 = useTheme2();
 
     const buttonStyles = cx(
       {
@@ -90,7 +90,10 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         aria-label={getButtonAriaLabel(ariaLabel, tooltip)}
         aria-expanded={isOpen}
         {...rest}
-        style={{ display: isHidden ? 'none' : '' }}
+        style={{
+          display: isHidden ? 'none' : '',
+          border: `1px solid ${theme2.colors.border.weak}`,
+        }}
       >
         {renderIcon(icon, iconSize)}
         {imgSrc && <img className={styles.img} src={imgSrc} alt={imgAlt ?? ''} />}
@@ -103,7 +106,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
     );
 
     return tooltip ? (
-      <Tooltip ref={ref} content={tooltip} placement="bottom">
+      <Tooltip content={tooltip} placement="bottom-start">
         {body}
       </Tooltip>
     ) : (
@@ -153,16 +156,14 @@ const getStyles = (theme: GrafanaTheme2) => {
       alignItems: 'center',
       height: theme.spacing(theme.components.height.md),
       padding: theme.spacing(0, 1),
-      borderRadius: theme.shape.radius.default,
+      borderRadius: theme.shape.borderRadius(),
       lineHeight: `${theme.components.height.md * theme.spacing.gridSize - 2}px`,
       fontWeight: theme.typography.fontWeightMedium,
       border: `1px solid ${theme.colors.secondary.border}`,
       whiteSpace: 'nowrap',
-      [theme.transitions.handleMotion('no-preference', 'reduce')]: {
-        transition: theme.transitions.create(['background', 'box-shadow', 'border-color', 'color'], {
-          duration: theme.transitions.duration.short,
-        }),
-      },
+      transition: theme.transitions.create(['background', 'box-shadow', 'border-color', 'color'], {
+        duration: theme.transitions.duration.short,
+      }),
 
       '&:focus, &:focus-visible': {
         ...getFocusStyles(theme),
@@ -190,7 +191,7 @@ const getStyles = (theme: GrafanaTheme2) => {
     }),
     default: css({
       color: theme.colors.text.secondary,
-      background: 'transparent',
+      background: theme.colors.background.primary,
       border: `1px solid transparent`,
 
       '&:hover': {

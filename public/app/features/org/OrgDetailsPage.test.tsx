@@ -7,7 +7,6 @@ import { NavModel } from '@grafana/data';
 import { ModalManager } from 'app/core/services/ModalManager';
 
 import { backendSrv } from '../../core/services/backend_srv';
-import { configureStore } from '../../store/configureStore';
 import { Organization } from '../../types';
 
 import { OrgDetailsPage, Props } from './OrgDetailsPage';
@@ -23,7 +22,6 @@ jest.mock('app/core/core', () => {
 });
 
 const setup = (propOverrides?: object) => {
-  const store = configureStore();
   jest.clearAllMocks();
   // needed because SharedPreferences is rendered in the test
   jest.spyOn(backendSrv, 'put');

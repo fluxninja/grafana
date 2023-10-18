@@ -4,8 +4,6 @@ import { TestProvider } from 'test/helpers/TestProvider';
 
 import { OrgRole, ServiceAccountDTO, ServiceAccountStateFilter } from 'app/types';
 
-import { configureStore } from '../../store/configureStore';
-
 import { Props, ServiceAccountsListPageUnconnected } from './ServiceAccountsListPage';
 
 jest.mock('app/core/core', () => ({
