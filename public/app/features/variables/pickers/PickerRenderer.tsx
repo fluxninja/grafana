@@ -25,6 +25,9 @@ const renderWrapperStyle = css`
     font-size: 12px;
     line-height: 24px;
   }
+  & span {
+    margin-top: 2px;
+  }
 `;
 
 export const PickerRenderer: FunctionComponent<Props> = (props) => {
