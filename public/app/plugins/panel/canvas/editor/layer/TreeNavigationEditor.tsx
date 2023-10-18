@@ -129,6 +129,7 @@ export const TreeNavigationEditor = ({ item }: StandardEditorProps<any, TreeView
   return (
     <>
       <Global styles={globalCSS} />
+      {/*@ts-ignore */}
       <Tree
         selectable={true}
         onSelect={onSelect}

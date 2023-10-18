@@ -5359,14 +5359,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@lezer/common@npm:1.0.2":
-  version: 1.0.2
-  resolution: "@lezer/common@npm:1.0.2"
-  checksum: bbcc58e07be02652bf0700d2856042ec089d5be0b95893d628b3e18192ade864fac83b61b19653e10b9f1472261a178b12318d934e9004edd5483a577c0db56b
-  languageName: node
-  linkType: hard
-
-"@lezer/common@npm:^1.0.0":
+"@lezer/common@npm:^1.0.0, @lezer/common@npm:^1.1.0":
   version: 1.1.0
   resolution: "@lezer/common@npm:1.1.0"
   checksum: 93c208a44d1c0bdf7407853ba7c4ddcedf1c52d1b82170813d83b9bd6301aa23587405ac54332fe39ce8bc37f706936ab237ceb4d3d535d1dead650153b6474c
@@ -6611,20 +6604,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@popperjs/core@npm:^2.11.5, @popperjs/core@npm:^2.11.8":
+"@popperjs/core@npm:^2.11.5, @popperjs/core@npm:^2.11.8, @popperjs/core@npm:^2.9.2":
   version: 2.11.8
   resolution: "@popperjs/core@npm:2.11.8"
   checksum: e5c69fdebf52a4012f6a1f14817ca8e9599cb1be73dd1387e1785e2ed5e5f0862ff817f420a87c7fc532add1f88a12e25aeb010ffcbdc98eace3d55ce2139cf0
   languageName: node
   linkType: hard
 
-"@prometheus-io/lezer-promql@npm:^0.37.0-rc.1":
-  version: 0.37.9
-  resolution: "@prometheus-io/lezer-promql@npm:0.37.9"
+"@prometheus-io/lezer-promql@npm:0.37.0-rc.1":
+  version: 0.37.0-rc.1
+  resolution: "@prometheus-io/lezer-promql@npm:0.37.0-rc.1"
   peerDependencies:
     "@lezer/highlight": ^1.0.0
     "@lezer/lr": ^1.0.0
-  checksum: afb5e2ddaff99dfb6170af0d121f6960aae76d3f73d184ae3576e68bd4501dc41182075e717008e2f8b587dfc76ff73a7b9fe0b26a7e871ee3d93118b7330c1f
+  checksum: 07187c66baa618912fc157e8514780c3517f6b96687423a2d268a7b74cbe226aa5013be1a842dd5c7ac23a217966dc82155a52109bb99c3e1ec4c165a6f10bf8
   languageName: node
   linkType: hard
 
@@ -11165,6 +11158,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/react-datepicker@npm:^4.19.0":
+  version: 4.19.0
+  resolution: "@types/react-datepicker@npm:4.19.0"
+  dependencies:
+    "@popperjs/core": ^2.9.2
+    "@types/react": "*"
+    date-fns: ^2.0.1
+    react-popper: ^2.2.5
+  checksum: 18c3a6c0aaad1476ac255497eff4fe4d16776e201bc05c3aeb8206b265133b9854652eb7b346279304b8532a97ca368c0ba9d04485721e9f0bcf6ae8fcf019d0
+  languageName: node
+  linkType: hard
+
 "@types/react-dom@npm:*, @types/react-dom@npm:^18.0.0":
   version: 18.2.13
   resolution: "@types/react-dom@npm:18.2.13"
@@ -11328,7 +11333,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:>=16":
+"@types/react@npm:*, @types/react@npm:18.2.28, @types/react@npm:>=16":
   version: 18.2.28
   resolution: "@types/react@npm:18.2.28"
   dependencies:
@@ -16235,7 +16240,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"date-fns@npm:2.30.0, date-fns@npm:^2.30.0":
+"date-fns@npm:2.30.0, date-fns@npm:^2.0.1, date-fns@npm:^2.30.0":
   version: 2.30.0
   resolution: "date-fns@npm:2.30.0"
   dependencies:
@@ -19760,7 +19765,7 @@ __metadata:
     "@grafana/ui": "workspace:*"
     "@kusto/monaco-kusto": ^7.4.0
     "@leeoniya/ufuzzy": 1.0.8
-    "@lezer/common": 1.0.2
+    "@lezer/common": ^1.1.0
     "@lezer/highlight": 1.1.3
     "@lezer/lr": 1.3.3
     "@locker/near-membrane-dom": ^0.12.15
@@ -19773,7 +19778,7 @@ __metadata:
     "@opentelemetry/semantic-conventions": 1.15.0
     "@pmmmwh/react-refresh-webpack-plugin": 0.5.10
     "@popperjs/core": 2.11.6
-    "@prometheus-io/lezer-promql": ^0.37.0-rc.1
+    "@prometheus-io/lezer-promql": 0.37.0-rc.1
     "@pyroscope/flamegraph": ^0.35.5
     "@react-aria/button": 3.8.0
     "@react-aria/dialog": 3.5.3
@@ -19828,8 +19833,9 @@ __metadata:
     "@types/papaparse": 5.3.7
     "@types/pluralize": ^0.0.29
     "@types/prismjs": 1.26.0
-    "@types/react": 18.2.15
+    "@types/react": 18.2.28
     "@types/react-beautiful-dnd": 13.1.3
+    "@types/react-datepicker": ^4.19.0
     "@types/react-dom": 18.2.7
     "@types/react-grid-layout": 1.3.2
     "@types/react-highlight-words": 0.16.4
@@ -20018,7 +20024,7 @@ __metadata:
     react-table: 7.8.0
     react-test-renderer: 18.2.0
     react-transition-group: 4.4.5
-    react-use: 17.4.0
+    react-use: ^17.4.0
     react-virtual: 2.10.4
     react-virtualized-auto-sizer: 1.0.7
     react-window: 1.8.8
@@ -27866,7 +27872,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-popper@npm:2.3.0, react-popper@npm:^2.3.0":
+"react-popper@npm:2.3.0, react-popper@npm:^2.2.5, react-popper@npm:^2.3.0":
   version: 2.3.0
   resolution: "react-popper@npm:2.3.0"
   dependencies:
@@ -28259,7 +28265,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-use@npm:17.4.0":
+"react-use@npm:17.4.0, react-use@npm:^17.4.0":
   version: 17.4.0
   resolution: "react-use@npm:17.4.0"
   dependencies:

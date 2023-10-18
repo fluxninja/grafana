@@ -1,7 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
-import { Provider } from 'react-redux';
 import { openMenu } from 'react-select-event';
 import { mockToolkitActionCreator } from 'test/core/redux/mocks';
 import { TestProvider } from 'test/helpers/TestProvider';
@@ -10,7 +9,6 @@ import { locationService } from '@grafana/runtime';
 import { getRouteComponentProps } from 'app/core/navigation/__mocks__/routeProps';
 
 import appEvents from '../../core/app_events';
-import { configureStore } from '../../store/configureStore';
 import { ShowModalReactEvent } from '../../types/events';
 
 import { AlertHowToModal } from './AlertHowToModal';
@@ -32,7 +30,6 @@ const defaultProps: Props = {
 };
 
 const setup = (propOverrides?: object) => {
-  const store = configureStore();
   const props: Props = {
     ...defaultProps,
     ...propOverrides,

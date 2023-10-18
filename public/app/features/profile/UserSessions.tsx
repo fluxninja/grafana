@@ -57,6 +57,7 @@ class UserSessions extends PureComponent<Props> {
                         {session.browser} on {session.os} {session.osVersion}
                       </td>
                       <td>
+                        {/* @ts-ignore */}
                         <Button
                           size="sm"
                           variant="destructive"

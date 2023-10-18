@@ -1,4 +1,4 @@
-import defaults from 'lodash/defaults';
+import { defaults } from 'lodash';
 import React, { PureComponent, ChangeEvent } from 'react';
 
 import { QueryEditorProps } from '@grafana/data';

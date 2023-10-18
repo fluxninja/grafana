@@ -6,7 +6,6 @@ import { TestProvider } from 'test/helpers/TestProvider';
 import config from 'app/core/config';
 
 import { backendSrv } from '../../core/services/backend_srv';
-import { configureStore } from '../../store/configureStore';
 
 import { Props, ChangePasswordPage } from './ChangePasswordPage';
 import { initialUserState } from './state/reducers';
@@ -28,7 +27,6 @@ const defaultProps: Props = {
 };
 
 async function getTestContext(overrides: Partial<Props> = {}) {
-  const store = configureStore();
   jest.clearAllMocks();
   jest.spyOn(backendSrv, 'get').mockResolvedValue({
     id: 1,

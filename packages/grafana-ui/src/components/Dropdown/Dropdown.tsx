@@ -51,6 +51,7 @@ export const Dropdown = React.memo(({ children, overlay, placement, offset, onVi
 
   return (
     <>
+      {/* @ts-ignore */}
       {React.cloneElement(typeof children === 'function' ? children(visible) : children, {
         ref: setTriggerRef,
       })}
@@ -71,6 +72,7 @@ export const Dropdown = React.memo(({ children, overlay, placement, offset, onVi
                 timeout={{ appear: animationDuration, exit: 0, enter: 0 }}
                 classNames={animationStyles}
               >
+                {/* @ts-ignore */}
                 <div ref={transitionRef}>{ReactUtils.renderOrCallToRender(overlay, {})}</div>
               </CSSTransition>
             </div>

@@ -4,8 +4,6 @@ import { TestProvider } from 'test/helpers/TestProvider';
 
 import { contextSrv } from 'app/core/services/context_srv';
 
-import { configureStore } from '../../store/configureStore';
-
 import { PlaylistPage } from './PlaylistPage';
 
 const fnMock = jest.fn();

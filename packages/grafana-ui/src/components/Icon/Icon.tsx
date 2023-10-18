@@ -37,11 +37,12 @@ const getIconStyles = (theme: GrafanaTheme2) => {
 };
 
 export const Icon = React.forwardRef<HTMLDivElement, IconProps>(
-  ({ size = 'md', type = 'default', name, className, style, title = '', ...divElementProps }, ref) => {
+  ({ size = 'md', type = 'default', name, className, style, title = '', ...divElementProps }, ref): JSX.Element => {
     const styles = useStyles2(getIconStyles);
 
     /* Temporary solution to display also font awesome icons */
     if (name?.startsWith('fa fa-')) {
+      /* @ts-ignore */
       return <i className={getFontAwesomeIconStyles(name, className)} {...divElementProps} style={style} />;
     }
 
@@ -65,6 +66,7 @@ export const Icon = React.forwardRef<HTMLDivElement, IconProps>(
 
     return (
       <div className={styles.container} {...divElementProps} ref={ref}>
+        {/* @ts-ignore */}
         <SVG
           src={svgPath}
           width={svgWid}

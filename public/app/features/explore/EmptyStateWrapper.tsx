@@ -7,7 +7,7 @@ import { ExploreQueryParams, useSelector } from 'app/types';
 
 import { useLoadDataSources } from '../datasources/state';
 
-import { ExplorePage } from './ExplorePage';
+import ExplorePage from './ExplorePage';
 
 export default function EmptyStateWrapper(props: GrafanaRouteComponentProps<{}, ExploreQueryParams>) {
   const { isLoading } = useLoadDataSources();

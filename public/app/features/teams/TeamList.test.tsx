@@ -5,7 +5,6 @@ import { TestProvider } from 'test/helpers/TestProvider';
 
 import { contextSrv, User } from 'app/core/services/context_srv';
 
-import { configureStore } from '../../store/configureStore';
 import { OrgRole, Team } from '../../types';
 
 import { Props, TeamList } from './TeamList';
@@ -17,7 +16,6 @@ jest.mock('app/core/config', () => ({
 }));
 
 const setup = (propOverrides?: object) => {
-  const store = configureStore();
   const props: Props = {
     teams: [] as Team[],
     noTeams: false,
