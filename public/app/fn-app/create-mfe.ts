@@ -4,7 +4,7 @@ declare let __webpack_public_path__: string;
 window.__grafana_public_path__ =
   __webpack_public_path__.substring(0, __webpack_public_path__.lastIndexOf('build/')) || __webpack_public_path__;
 
-import { isNull, merge, noop, omit, pick } from 'lodash';
+import { isNull, merge, noop, pick } from 'lodash';
 import React, { ComponentType } from 'react';
 import ReactDOM from 'react-dom';
 
@@ -294,6 +294,7 @@ class createMfe {
             slug: other.slug,
             version: other.version,
             queryParams: other.queryParams,
+            controlsContainer: other.controlsContainer,
           })
         );
       }
@@ -308,15 +309,10 @@ class createMfe {
   static renderMfeComponent(props: FNDashboardProps, onSuccess = noop) {
     const container = createMfe.getContainer(props);
 
-    ReactDOM.render(
-      // @ts-ignore
-      React.createElement(createMfe.Component, omit(props, 'hiddenVariables', 'FNDashboard')),
-      container,
-      () => {
-        createMfe.logger('Created mfe component.', { props, container });
-        onSuccess();
-      }
-    );
+    ReactDOM.render(React.createElement(createMfe.Component, props), container, () => {
+      createMfe.logger('Created mfe component.', { props, container });
+      onSuccess();
+    });
   }
 }
 

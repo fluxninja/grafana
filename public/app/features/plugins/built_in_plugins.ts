@@ -25,8 +25,6 @@ const postgresPlugin = async () =>
   await import(/* webpackChunkName: "postgresPlugin" */ 'app/plugins/datasource/postgres/module');
 const grafadruidDruidDatasourcePlugin = async () =>
   await import(/* webpackChunkName: "druidPlugin" */ 'app/plugins/datasource/grafadruid-druid-datasource/module');
-const fifemonGraphqlDatasourcePlugin = async () =>
-  await import(/* webpackChunkName: "graphqlPlugin" */ 'app/plugins/datasource/fifemon-graphql-datasource/module');
 const prometheusPlugin = async () =>
   await import(/* webpackChunkName: "prometheusPlugin" */ 'app/plugins/datasource/prometheus/module');
 const mssqlPlugin = async () =>
@@ -102,8 +100,8 @@ const builtInPlugins: any = {
   'app/plugins/datasource/mysql/module': mysqlPlugin,
   'app/plugins/datasource/postgres/module': postgresPlugin,
   'app/plugins/datasource/mssql/module': mssqlPlugin,
+  // Default FluxNinja Druid datasource
   'app/plugins/datasource/grafadruid-druid-datasource/module': grafadruidDruidDatasourcePlugin,
-  'app/plugins/datasource/fifemon-graphql-datasource/module': fifemonGraphqlDatasourcePlugin,
   'app/plugins/datasource/prometheus/module': prometheusPlugin,
   'app/plugins/datasource/testdata/module': testDataDSPlugin,
   'app/plugins/datasource/cloud-monitoring/module': cloudMonitoringPlugin,

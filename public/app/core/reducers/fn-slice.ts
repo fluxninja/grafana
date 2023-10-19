@@ -23,7 +23,7 @@ export type SetFnStateAction = PayloadAction<Omit<FnGlobalState, 'hiddenVariable
 
 export type FnPropMappedFromState = Extract<
   keyof FnGlobalState,
-  'FNDashboard' | 'hiddenVariables' | 'mode' | 'uid' | 'queryParams' | 'slug' | 'version'
+  'FNDashboard' | 'hiddenVariables' | 'mode' | 'uid' | 'queryParams' | 'slug' | 'version' | 'controlsContainer'
 >;
 export type FnStateProp = keyof FnGlobalState;
 
