@@ -25,8 +25,16 @@ const renderWrapperStyle = css`
     font-size: 12px;
     line-height: 24px;
   }
-  & span {
+
+  /* Center align filter picker buttons */
+  & button {
     margin-top: 2px;
+  }
+
+  /* Adhoc filter: Disable green border and make input height similar to others */
+  & div[class*='input-wrapper'] {
+    min-height: 0 !important;
+    box-shadow: none !important;
   }
 `;
 
