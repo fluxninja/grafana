@@ -1,12 +1,10 @@
 /*! For license information please see module.js.LICENSE.txt */
 define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
   return (function (t) {
-    let e = {};
+    var e = {};
     function n(r) {
-      if (e[r]) {
-        return e[r].exports;
-      }
-      let o = (e[r] = { i: r, l: !1, exports: {} });
+      if (e[r]) return e[r].exports;
+      var o = (e[r] = { i: r, l: !1, exports: {} });
       return t[r].call(o.exports, o, o.exports, n), (o.l = !0), o.exports;
     }
     return (
@@ -16,23 +14,17 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
         n.o(t, e) || Object.defineProperty(t, e, { enumerable: !0, get: r });
       }),
       (n.r = function (t) {
-        'undefined' !== typeof Symbol &&
+        'undefined' != typeof Symbol &&
           Symbol.toStringTag &&
           Object.defineProperty(t, Symbol.toStringTag, { value: 'Module' }),
           Object.defineProperty(t, '__esModule', { value: !0 });
       }),
       (n.t = function (t, e) {
-        if ((1 & e && (t = n(t)), 8 & e)) {
-          return t;
-        }
-        if (4 & e && 'object' === typeof t && t && t.__esModule) {
-          return t;
-        }
-        let r = Object.create(null);
-        if (
-          (n.r(r), Object.defineProperty(r, 'default', { enumerable: !0, value: t }), 2 & e && 'string' !== typeof t)
-        ) {
-          for (let o in t) {
+        if ((1 & e && (t = n(t)), 8 & e)) return t;
+        if (4 & e && 'object' == typeof t && t && t.__esModule) return t;
+        var r = Object.create(null);
+        if ((n.r(r), Object.defineProperty(r, 'default', { enumerable: !0, value: t }), 2 & e && 'string' != typeof t))
+          for (var o in t)
             n.d(
               r,
               o,
@@ -40,12 +32,10 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
                 return t[e];
               }.bind(null, o)
             );
-          }
-        }
         return r;
       }),
       (n.n = function (t) {
-        let e =
+        var e =
           t && t.__esModule
             ? function () {
                 return t.default;
@@ -78,7 +68,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
     function (t, e, n) {
       'use strict';
       n.r(e);
-      let r = {};
+      var r = {};
       n.r(r),
         n.d(r, 'sankey', function () {
           return M;
@@ -98,100 +88,73 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
         n.d(r, 'sankeyLinkHorizontal', function () {
           return q;
         });
-      let o = n(2);
-      let i = function () {
+      var o = n(2);
+      var i = function () {
         return (i =
           Object.assign ||
           function (t) {
-            for (var e, n = 1, r = arguments.length; n < r; n++) {
-              for (let o in (e = arguments[n])) {
-                Object.prototype.hasOwnProperty.call(e, o) && (t[o] = e[o]);
-              }
-            }
+            for (var e, n = 1, r = arguments.length; n < r; n++)
+              for (var o in (e = arguments[n])) Object.prototype.hasOwnProperty.call(e, o) && (t[o] = e[o]);
             return t;
           }).apply(this, arguments);
       };
       function a(t, e) {
-        let n = {};
-        for (var r in t) {
-          Object.prototype.hasOwnProperty.call(t, r) && e.indexOf(r) < 0 && (n[r] = t[r]);
-        }
-        if (null != t && 'function' === typeof Object.getOwnPropertySymbols) {
-          let o = 0;
-          for (r = Object.getOwnPropertySymbols(t); o < r.length; o++) {
+        var n = {};
+        for (var r in t) Object.prototype.hasOwnProperty.call(t, r) && e.indexOf(r) < 0 && (n[r] = t[r]);
+        if (null != t && 'function' == typeof Object.getOwnPropertySymbols) {
+          var o = 0;
+          for (r = Object.getOwnPropertySymbols(t); o < r.length; o++)
             e.indexOf(r[o]) < 0 && Object.prototype.propertyIsEnumerable.call(t, r[o]) && (n[r[o]] = t[r[o]]);
-          }
         }
         return n;
       }
       function s(t, e) {
-        let n = 'function' === typeof Symbol && t[Symbol.iterator];
-        if (!n) {
-          return t;
-        }
-        let r,
+        var n = 'function' == typeof Symbol && t[Symbol.iterator];
+        if (!n) return t;
+        var r,
           o,
           i = n.call(t),
           a = [];
         try {
-          for (; (void 0 === e || e-- > 0) && !(r = i.next()).done; ) {
-            a.push(r.value);
-          }
+          for (; (void 0 === e || e-- > 0) && !(r = i.next()).done; ) a.push(r.value);
         } catch (t) {
           o = { error: t };
         } finally {
           try {
             r && !r.done && (n = i.return) && n.call(i);
           } finally {
-            if (o) {
-              throw o.error;
-            }
+            if (o) throw o.error;
           }
         }
         return a;
       }
-      let u = n(0),
+      var u = n(0),
         l = n.n(u),
         c = n(1);
       function f(t, e) {
         let n = 0;
-        if (void 0 === e) {
-          for (let e of t) {
-            (e = +e) && (n += e);
-          }
-        } else {
+        if (void 0 === e) for (let e of t) (e = +e) && (n += e);
+        else {
           let r = -1;
-          for (let o of t) {
-            (o = +e(o, ++r, t)) && (n += o);
-          }
+          for (let o of t) (o = +e(o, ++r, t)) && (n += o);
         }
         return n;
       }
       function h(t, e) {
         let n;
-        if (void 0 === e) {
-          for (const e of t) {
-            null != e && (n < e || (void 0 === n && e >= e)) && (n = e);
-          }
-        } else {
+        if (void 0 === e) for (const e of t) null != e && (n < e || (void 0 === n && e >= e)) && (n = e);
+        else {
           let r = -1;
-          for (let o of t) {
-            null != (o = e(o, ++r, t)) && (n < o || (void 0 === n && o >= o)) && (n = o);
-          }
+          for (let o of t) null != (o = e(o, ++r, t)) && (n < o || (void 0 === n && o >= o)) && (n = o);
         }
         return n;
       }
       function d(t, e) {
         let n;
-        if (void 0 === e) {
-          for (const e of t) {
-            null != e && (n > e || (void 0 === n && e >= e)) && (n = e);
-          }
-        } else {
+        if (void 0 === e) for (const e of t) null != e && (n > e || (void 0 === n && e >= e)) && (n = e);
+        else {
           let r = -1;
-          for (let o of t) {
-            null != (o = e(o, ++r, t)) && (n > o || (void 0 === n && o >= o)) && (n = o);
-          }
+          for (let o of t) null != (o = e(o, ++r, t)) && (n > o || (void 0 === n && o >= o)) && (n = o);
         }
         return n;
       }
@@ -238,21 +201,15 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
       }
       function O(t, e) {
         const n = t.get(e);
-        if (!n) {
-          throw new Error('missing: ' + e);
-        }
+        if (!n) throw new Error('missing: ' + e);
         return n;
       }
       function j({ nodes: t }) {
         for (const e of t) {
           let t = e.y0,
             n = t;
-          for (const n of e.sourceLinks) {
-            (n.y0 = t + n.width / 2), (t += n.width);
-          }
-          for (const t of e.targetLinks) {
-            (t.y1 = n + t.width / 2), (n += t.width);
-          }
+          for (const n of e.sourceLinks) (n.y0 = t + n.width / 2), (t += n.width);
+          for (const t of e.targetLinks) (t.y1 = n + t.width / 2), (n += t.width);
         }
       }
       function M() {
@@ -275,28 +232,21 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
           return M(t), T(t), V(t), P(t), E(t), j(t), t;
         }
         function M({ nodes: t, links: e }) {
-          for (const [e, n] of t.entries()) {
-            (n.index = e), (n.sourceLinks = []), (n.targetLinks = []);
-          }
+          for (const [e, n] of t.entries()) (n.index = e), (n.sourceLinks = []), (n.targetLinks = []);
           const r = new Map(t.map((e, n) => [l(e, n, t), e]));
           for (const [t, n] of e.entries()) {
             n.index = t;
             let { source: e, target: o } = n;
-            'object' !== typeof e && (e = n.source = O(r, e)),
-              'object' !== typeof o && (o = n.target = O(r, o)),
+            'object' != typeof e && (e = n.source = O(r, e)),
+              'object' != typeof o && (o = n.target = O(r, o)),
               e.sourceLinks.push(n),
               o.targetLinks.push(n);
           }
-          if (null != n) {
-            for (const { sourceLinks: e, targetLinks: r } of t) {
-              e.sort(n), r.sort(n);
-            }
-          }
+          if (null != n) for (const { sourceLinks: e, targetLinks: r } of t) e.sort(n), r.sort(n);
         }
         function T({ nodes: t }) {
-          for (const e of t) {
+          for (const e of t)
             e.value = void 0 === e.fixedValue ? Math.max(f(e.sourceLinks, w), f(e.targetLinks, w)) : e.fixedValue;
-          }
         }
         function V({ nodes: t }) {
           const e = t.length;
@@ -306,13 +256,9 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
           for (; n.size; ) {
             for (const t of n) {
               t.depth = o;
-              for (const { target: e } of t.sourceLinks) {
-                r.add(e);
-              }
+              for (const { target: e } of t.sourceLinks) r.add(e);
             }
-            if (++o > e) {
-              throw new Error('circular link');
-            }
+            if (++o > e) throw new Error('circular link');
             (n = r), (r = new Set());
           }
         }
@@ -324,13 +270,9 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
           for (; n.size; ) {
             for (const t of n) {
               t.height = o;
-              for (const { source: e } of t.targetLinks) {
-                r.add(e);
-              }
+              for (const { source: e } of t.targetLinks) r.add(e);
             }
-            if (++o > e) {
-              throw new Error('circular link');
-            }
+            if (++o > e) throw new Error('circular link');
             (n = r), (r = new Set());
           }
         }
@@ -343,11 +285,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
               const t = Math.max(0, Math.min(n - 1, Math.floor(c.call(null, e, n))));
               (e.layer = t), (e.x0 = r + t * o), (e.x1 = e.x0 + s), a[t] ? a[t].push(e) : (a[t] = [e]);
             }
-            if (e) {
-              for (const t of a) {
-                t.sort(e);
-              }
-            }
+            if (e) for (const t of a) t.sort(e);
             return a;
           })(n);
           (t = Math.min(u, (a - o) / (h(l, (t) => t.length) - 1))),
@@ -357,9 +295,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
                 let e = o;
                 for (const o of r) {
                   (o.y0 = e), (o.y1 = e + o.value * n), (e = o.y1 + t);
-                  for (const t of o.sourceLinks) {
-                    t.width = t.value * n;
-                  }
+                  for (const t of o.sourceLinks) t.width = t.value * n;
                 }
                 e = (a - e + t) / (r.length + 1);
                 for (let t = 0; t < r.length; ++t) {
@@ -385,9 +321,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
                 let i = o * (t.layer - n.layer);
                 (e += G(n, t) * i), (r += i);
               }
-              if (!(r > 0)) {
-                continue;
-              }
+              if (!(r > 0)) continue;
               let o = (e / r - t.y0) * n;
               (t.y0 += o), (t.y1 += o), F(t);
             }
@@ -404,9 +338,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
                 let i = o * (n.layer - t.layer);
                 (e += I(t, n) * i), (r += i);
               }
-              if (!(r > 0)) {
-                continue;
-              }
+              if (!(r > 0)) continue;
               let o = (e / r - t.y0) * n;
               (t.y0 += o), (t.y1 += o), F(t);
             }
@@ -436,35 +368,25 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
           if (void 0 === n) {
             for (const {
               source: { sourceLinks: t },
-            } of e) {
+            } of e)
               t.sort(b);
-            }
             for (const {
               target: { targetLinks: e },
-            } of t) {
+            } of t)
               e.sort(m);
-            }
           }
         }
         function J(t) {
-          if (void 0 === n) {
-            for (const { sourceLinks: e, targetLinks: n } of t) {
-              e.sort(b), n.sort(m);
-            }
-          }
+          if (void 0 === n) for (const { sourceLinks: e, targetLinks: n } of t) e.sort(b), n.sort(m);
         }
         function G(e, n) {
           let r = e.y0 - ((e.sourceLinks.length - 1) * t) / 2;
           for (const { target: o, width: i } of e.sourceLinks) {
-            if (o === n) {
-              break;
-            }
+            if (o === n) break;
             r += i + t;
           }
           for (const { source: t, width: o } of n.targetLinks) {
-            if (t === e) {
-              break;
-            }
+            if (t === e) break;
             r -= o;
           }
           return r;
@@ -472,15 +394,11 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
         function I(e, n) {
           let r = n.y0 - ((n.targetLinks.length - 1) * t) / 2;
           for (const { source: o, width: i } of n.targetLinks) {
-            if (o === e) {
-              break;
-            }
+            if (o === e) break;
             r += i + t;
           }
           for (const { target: t, width: o } of e.sourceLinks) {
-            if (t === n) {
-              break;
-            }
+            if (t === n) break;
             r -= o;
           }
           return r;
@@ -490,10 +408,10 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
             return j(t), t;
           }),
           (v.nodeId = function (t) {
-            return arguments.length ? ((l = 'function' === typeof t ? t : k(t)), v) : l;
+            return arguments.length ? ((l = 'function' == typeof t ? t : k(t)), v) : l;
           }),
           (v.nodeAlign = function (t) {
-            return arguments.length ? ((c = 'function' === typeof t ? t : k(t)), v) : c;
+            return arguments.length ? ((c = 'function' == typeof t ? t : k(t)), v) : c;
           }),
           (v.nodeSort = function (t) {
             return arguments.length ? ((e = t), v) : e;
@@ -505,10 +423,10 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
             return arguments.length ? ((u = t = +e), v) : u;
           }),
           (v.nodes = function (t) {
-            return arguments.length ? ((y = 'function' === typeof t ? t : k(t)), v) : y;
+            return arguments.length ? ((y = 'function' == typeof t ? t : k(t)), v) : y;
           }),
           (v.links = function (t) {
-            return arguments.length ? ((g = 'function' === typeof t ? t : k(t)), v) : g;
+            return arguments.length ? ((g = 'function' == typeof t ? t : k(t)), v) : g;
           }),
           (v.linkSort = function (t) {
             return arguments.length ? ((n = t), v) : n;
@@ -530,7 +448,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
           v
         );
       }
-      let T = Math.PI,
+      var T = Math.PI,
         V = 2 * T,
         P = V - 1e-6;
       function E() {
@@ -558,21 +476,18 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
         },
         arcTo: function (t, e, n, r, o) {
           (t = +t), (e = +e), (n = +n), (r = +r), (o = +o);
-          let i = this._x1,
+          var i = this._x1,
             a = this._y1,
             s = n - t,
             u = r - e,
             l = i - t,
             c = a - e,
             f = l * l + c * c;
-          if (o < 0) {
-            throw new Error('negative radius: ' + o);
-          }
-          if (null === this._x1) {
-            this._ += 'M' + (this._x1 = t) + ',' + (this._y1 = e);
-          } else if (f > 1e-6) {
+          if (o < 0) throw new Error('negative radius: ' + o);
+          if (null === this._x1) this._ += 'M' + (this._x1 = t) + ',' + (this._y1 = e);
+          else if (f > 1e-6)
             if (Math.abs(c * s - u * l) > 1e-6 && o) {
-              let h = n - i,
+              var h = n - i,
                 d = r - a,
                 y = s * s + u * u,
                 g = h * h + d * d,
@@ -593,23 +508,18 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
                   (this._x1 = t + m * s) +
                   ',' +
                   (this._y1 = e + m * u));
-            } else {
-              this._ += 'L' + (this._x1 = t) + ',' + (this._y1 = e);
-            }
-          } else {
-          }
+            } else this._ += 'L' + (this._x1 = t) + ',' + (this._y1 = e);
+          else;
         },
         arc: function (t, e, n, r, o, i) {
           (t = +t), (e = +e), (i = !!i);
-          let a = (n = +n) * Math.cos(r),
+          var a = (n = +n) * Math.cos(r),
             s = n * Math.sin(r),
             u = t + a,
             l = e + s,
             c = 1 ^ i,
             f = i ? r - o : o - r;
-          if (n < 0) {
-            throw new Error('negative radius: ' + n);
-          }
+          if (n < 0) throw new Error('negative radius: ' + n);
           null === this._x1
             ? (this._ += 'M' + u + ',' + l)
             : (Math.abs(this._x1 - u) > 1e-6 || Math.abs(this._y1 - l) > 1e-6) && (this._ += 'L' + u + ',' + l),
@@ -660,7 +570,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
           return this._;
         },
       };
-      let N = C,
+      var N = C,
         B = Array.prototype.slice,
         H = function (t) {
           return function () {
@@ -680,13 +590,13 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
         return t.target;
       }
       function I(t) {
-        let e = J,
+        var e = J,
           n = G,
           r = z,
           o = F,
           i = null;
         function a() {
-          let a,
+          var a,
             s = B.call(arguments),
             u = e.apply(this, s),
             l = n.apply(this, s);
@@ -700,9 +610,8 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
               +o.apply(this, s)
             ),
             a)
-          ) {
+          )
             return (i = null), a + '' || null;
-          }
         }
         return (
           (a.source = function (t) {
@@ -712,10 +621,10 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
             return arguments.length ? ((n = t), a) : n;
           }),
           (a.x = function (t) {
-            return arguments.length ? ((r = 'function' === typeof t ? t : H(+t)), a) : r;
+            return arguments.length ? ((r = 'function' == typeof t ? t : H(+t)), a) : r;
           }),
           (a.y = function (t) {
-            return arguments.length ? ((o = 'function' === typeof t ? t : H(+t)), a) : o;
+            return arguments.length ? ((o = 'function' == typeof t ? t : H(+t)), a) : o;
           }),
           (a.context = function (t) {
             return arguments.length ? ((i = null == t ? null : t), a) : i;
@@ -736,8 +645,8 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
         return I(D).source(R).target(W);
       };
       function U(t, e) {
-        for (let n = 0; n < e.length; n++) {
-          let r = e[n];
+        for (var n = 0; n < e.length; n++) {
+          var r = e[n];
           (r.enumerable = r.enumerable || !1),
             (r.configurable = !0),
             'value' in r && (r.writable = !0),
@@ -754,9 +663,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
         et = (function () {
           function t(e, n) {
             !(function (t, e) {
-              if (!(t instanceof e)) {
-                throw new TypeError('Cannot call a class as a function');
-              }
+              if (!(t instanceof e)) throw new TypeError('Cannot call a class as a function');
             })(this, t),
               (this._svg = e),
               (this._container = n || e),
@@ -787,7 +694,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
               (this._displayValues = 'none'),
               (this._highlightOnHover = !1);
           }
-          let e, n, o;
+          var e, n, o;
           return (
             (e = t),
             (n = [
@@ -836,7 +743,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
               {
                 key: '_calculateSankey',
                 value: function () {
-                  let t = this._sankeyGenerator({
+                  var t = this._sankeyGenerator({
                     nodes: this._data.nodes.map(function (t) {
                       return Object.assign({}, t);
                     }),
@@ -867,7 +774,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
               {
                 key: '_setLinkGradient',
                 value: function () {
-                  let t = this,
+                  var t = this,
                     e = this._svgLink
                       .append('linearGradient')
                       .attr('id', function (t) {
@@ -914,7 +821,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
               {
                 key: '_showLinks',
                 value: function (t) {
-                  let e = [];
+                  var e = [];
                   [
                     { linkType: 'sourceLinks', nodeType: 'target' },
                     { linkType: 'targetLinks', nodeType: 'source' },
@@ -964,7 +871,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
               {
                 key: '_labelNodeValue',
                 value: function (t) {
-                  let e = this._nodes.filter(function (e) {
+                  var e = this._nodes.filter(function (e) {
                       return e.depth === t.depth;
                     }),
                     n = c.sum(e, function (t) {
@@ -989,7 +896,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
               {
                 key: '_renderSVG',
                 value: function () {
-                  let t = this;
+                  var t = this;
                   this._container.style('background-color', this._background),
                     (this._gBound = this._container
                       .append('g')
@@ -1021,15 +928,19 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
                         return t.x1 - t.x0;
                       })
                       .attr('stroke', function (e) {
-                        let n = JSON.parse(t._colorArray);
+                        var n = JSON.parse(t._colorArray);
                         return Object.keys(n).includes(e.name) ? n[e.name] : 'rgba(148, 153, 168, 1)';
                       })
                       .attr('fill', function (e) {
-                        let n = JSON.parse(t._colorArray);
+                        var n = JSON.parse(t._colorArray);
                         return Object.keys(n).includes(e.name) ? n[e.name] : 'rgba(148, 153, 168, 1)';
                       })
                       .on('mouseover', function (e) {
-                        return t._highlightOnHover && t._showLinks(e);
+                        var n;
+                        return (
+                          t._highlightOnHover &&
+                          t._showLinks(null === (n = e.target) || void 0 === n ? void 0 : n.__data__)
+                        );
                       })
                       .on('mouseout', function (e) {
                         return t._highlightOnHover && t._showAll();
@@ -1167,7 +1078,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
         })(),
         nt = n(3),
         rt = function (t) {
-          let e = t.message;
+          var e = t.message;
           return l.a.createElement(
             'p',
             { style: ot },
@@ -1195,29 +1106,22 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
         at = { marginLeft: 10 },
         st = (function (t) {
           void 0 === t && (t = !0);
-          if (!t) {
+          if (!t)
             return {
               warn: function () {
-                for (let t = [], e = 0; e < arguments.length; e++) {
-                  t[e] = arguments[e];
-                }
+                for (var t = [], e = 0; e < arguments.length; e++) t[e] = arguments[e];
               },
               error: function () {
-                for (let t = [], e = 0; e < arguments.length; e++) {
-                  t[e] = arguments[e];
-                }
+                for (var t = [], e = 0; e < arguments.length; e++) t[e] = arguments[e];
               },
               log: function () {
-                for (let t = [], e = 0; e < arguments.length; e++) {
-                  t[e] = arguments[e];
-                }
+                for (var t = [], e = 0; e < arguments.length; e++) t[e] = arguments[e];
               },
             };
-          }
           return { warn: console.warn, error: console.error, log: console.log };
         })();
-      let ut = function (t) {
-        let e = t.options,
+      var ut = function (t) {
+        var e = t.options,
           n = t.data,
           r = t.width,
           o = t.height,
@@ -1237,7 +1141,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
           [n]
         );
         var _ = function () {
-            let t = n.series[0],
+            var t = n.series[0],
               e = t.fields.find(function (t) {
                 return t.name === i.source;
               }),
@@ -1252,18 +1156,16 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
               l = null == o ? void 0 : o.values.toArray();
             if (
               (function (t, e, n) {
-                let r = !0;
-                if (!(t && e && n)) {
-                  return d({ isError: !0, message: a }), !1;
-                }
-                let o = t.every(function (t) {
-                    return 'string' === typeof t;
+                var r = !0;
+                if (!(t && e && n)) return d({ isError: !0, message: a }), !1;
+                var o = t.every(function (t) {
+                    return 'string' == typeof t;
                   }),
                   i = e.every(function (t) {
-                    return 'string' === typeof t;
+                    return 'string' == typeof t;
                   }),
                   s = n.every(function (t) {
-                    return 'number' === typeof t;
+                    return 'number' == typeof t;
                   });
                 return o && i && s
                   ? (d({}), r)
@@ -1275,7 +1177,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
                     !1);
               })(s, u, l)
             ) {
-              let f = c.zip(s, u, l);
+              var f = c.zip(s, u, l);
               return {
                 nodes: Array.from(new Set(s.concat(u))).map(function (t) {
                   return { name: t };
@@ -1287,7 +1189,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
             }
           },
           v = function (t) {
-            let n = new et(t)
+            var n = new et(t)
               .width(r)
               .height(o)
               .align(e.align)
@@ -1315,32 +1217,29 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
       };
       function lt() {
         return function (t) {
-          let e = t.series,
+          var e = t.series,
             n = a(t, ['series']),
             r = e.map(function (t) {
               return Object(o.toDataFrame)(
                 i(i({}, t), {
                   fields: t.fields.map(function (t, e, n) {
-                    let r,
+                    var r,
                       a = ct.includes(t.name),
                       s =
                         t.values instanceof o.ArrayVector ||
-                        'function' === typeof (null === (r = t.values) || void 0 === r ? void 0 : r.toArray),
+                        'function' == typeof (null === (r = t.values) || void 0 === r ? void 0 : r.toArray),
                       u = Array.isArray(t.values);
-                    if (!a || !t.values || (!u && !s)) {
-                      return t;
-                    }
-                    let l = s ? t.values.toArray() : u ? t.values : null;
-                    if (null === l) {
+                    if (!a || !t.values || (!u && !s)) return t;
+                    var l = s ? t.values.toArray() : u ? t.values : null;
+                    if (null === l)
                       return (
                         st.warn('[FN] Failed to transform sankey data.', 'Values are not an array.'),
                         i(i({}, t), { values: new o.ArrayVector([]) })
                       );
-                    }
-                    let c = a
+                    var c = a
                       ? l
                           .map(function (t) {
-                            return 'string' === typeof t ? t.split('|') : t;
+                            return 'string' == typeof t ? t.split('|') : t;
                           })[0]
                           .map(function (t, e, n) {
                             return Number.isNaN(Number(t)) ? t : Number(t);
@@ -1352,7 +1251,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
                           null == c
                             ? void 0
                             : c.every(function (t) {
-                                return 'number' === typeof t;
+                                return 'number' == typeof t;
                               })
                         )
                           ? o.FieldType.number
@@ -1377,7 +1276,7 @@ define(['react', 'd3', '@grafana/data', '@grafana/ui'], function (t, e, n, r) {
         return ft;
       });
       var ft = new o.PanelPlugin(function (t) {
-        let e = t.data,
+        var e = t.data,
           n = a(t, ['data']),
           r = Object(u.useMemo)(lt, []),
           o = Object(u.useMemo)(
