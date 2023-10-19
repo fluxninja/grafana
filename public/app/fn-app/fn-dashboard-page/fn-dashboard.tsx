@@ -1,14 +1,8 @@
 import { pick } from 'lodash';
 import React, { FC, useMemo } from 'react';
-import { connect, MapStateToProps } from 'react-redux';
 
-import {
-  FnGlobalState,
-  FN_STATE_KEY,
-  FnPropMappedFromState,
-  fnPropsMappedFromState,
-  FnPropsMappedFromState,
-} from 'app/core/reducers/fn-slice';
+import { FnPropMappedFromState, fnPropsMappedFromState } from 'app/core/reducers/fn-slice';
+import { StoreState, useSelector } from 'app/types';
 
 import { AngularRoot } from '../../angular/AngularRoot';
 import { FnAppProvider } from '../fn-app-provider';
@@ -30,23 +24,29 @@ export const FNDashboard: FC<FNDashboardComponentProps> = (props) => {
   );
 };
 
-function mapStateToProps(): MapStateToProps<
-  FnPropsMappedFromState,
-  Omit<FNDashboardProps, FnPropMappedFromState>,
-  { [K in typeof FN_STATE_KEY]: FnGlobalState }
-> {
-  return ({ fnGlobalState }) => pick(fnGlobalState, ...fnPropsMappedFromState);
+function mapStateToProps() {
+  return ({ fnGlobalState }: StoreState) => pick(fnGlobalState, ...fnPropsMappedFromState);
 }
 
-export const DashboardPortalComponent: FC<FNDashboardComponentProps & FnPropsMappedFromState> = (props) => {
+export const DashboardPortal: FC<FNDashboardComponentProps> = (p) => {
+  const globalFnProps = useSelector(mapStateToProps());
+
+  const props = useMemo(
+    () => ({
+      ...p,
+      ...globalFnProps,
+    }),
+    [p, globalFnProps]
+  );
+
   const content = useMemo(() => {
     if (!props.FNDashboard) {
       return null;
     }
 
-    const { uid, slug, queryParams = {} } = props;
+    const { uid, queryParams = {} } = props;
 
-    if (!uid || !slug) {
+    if (!uid) {
       return null;
     }
 
@@ -55,7 +55,6 @@ export const DashboardPortalComponent: FC<FNDashboardComponentProps & FnPropsMap
         {...{
           ...props,
           uid,
-          slug,
           queryParams,
         }}
       />
@@ -64,5 +63,3 @@ export const DashboardPortalComponent: FC<FNDashboardComponentProps & FnPropsMap
 
   return <RenderPortal ID="grafana-portal">{content}</RenderPortal>;
 };
-
-export const DashboardPortal = connect(mapStateToProps())(DashboardPortalComponent);

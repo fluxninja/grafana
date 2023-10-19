@@ -27,7 +27,7 @@ export interface FNDashboardProps {
   queryParams: ParsedQuery<string>;
   fnError?: ReactNode;
   pageTitle?: string;
-  controlsContainer: string;
+  controlsContainer: string | null;
   isLoading: (isLoading: boolean) => void;
   setErrors: (errors?: { [K: number | string]: string }) => void;
   hiddenVariables: readonly string[];

@@ -1,4 +1,5 @@
 import { cx } from '@emotion/css';
+import { Portal } from '@mui/material';
 import React, { PureComponent } from 'react';
 import { connect, ConnectedProps, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
@@ -71,7 +72,7 @@ export type MapStateToDashboardPageProps = MapStateToProps<
   Pick<DashboardState, 'initPhase' | 'initError'> & {
     dashboard: ReturnType<DashboardState['getModel']>;
     navIndex: StoreState['navIndex'];
-  } & Pick<FnGlobalState, 'FNDashboard'>,
+  } & Pick<FnGlobalState, 'FNDashboard' | 'controlsContainer'>,
   OwnProps,
   StoreState
 >;
@@ -92,6 +93,7 @@ export const mapStateToProps: MapStateToDashboardPageProps = (state) => ({
   dashboard: state.dashboard.getModel(),
   navIndex: state.navIndex,
   FNDashboard: state.fnGlobalState.FNDashboard,
+  controlsContainer: state.fnGlobalState.controlsContainer,
 });
 
 const mapDispatchToProps: MapDispatchToDashboardPageProps = {
@@ -376,7 +378,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   render() {
-    const { dashboard, initError, queryParams, FNDashboard } = this.props;
+    const { dashboard, initError, queryParams, FNDashboard, controlsContainer } = this.props;
     const { editPanel, viewPanel, updateScrollTop, pageNav, sectionNav } = this.state;
     const kioskMode = getKioskMode(this.props.queryParams);
 
@@ -402,6 +404,18 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       );
     }
 
+    const FNTimeRange = !controlsContainer ? (
+      <ToolbarButtonRow alignment="right" style={{ marginBottom: '16px' }}>
+        <DashNavTimeControls dashboard={dashboard} onChangeTimeZone={updateTimeZoneForSession} key="time-controls" />
+      </ToolbarButtonRow>
+    ) : (
+      <Portal container={document.getElementById(controlsContainer)!}>
+        <ToolbarButtonRow>
+          <DashNavTimeControls dashboard={dashboard} onChangeTimeZone={updateTimeZoneForSession} key="time-controls" />
+        </ToolbarButtonRow>
+      </Portal>
+    );
+
     return (
       <React.Fragment>
         <Page
@@ -416,13 +430,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           {showToolbar && (
             <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
               {FNDashboard ? (
-                <ToolbarButtonRow alignment="right" style={{ marginBottom: '16px' }}>
-                  <DashNavTimeControls
-                    dashboard={dashboard}
-                    onChangeTimeZone={updateTimeZoneForSession}
-                    key="time-controls"
-                  />
-                </ToolbarButtonRow>
+                FNTimeRange
               ) : (
                 <DashNav
                   dashboard={dashboard}
