@@ -1,12 +1,14 @@
 import classNames from 'classnames';
 import React, { PureComponent, CSSProperties } from 'react';
 import ReactGridLayout, { ItemCallback } from 'react-grid-layout';
+import { connect } from 'react-redux';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { Subscription } from 'rxjs';
 
 import { config } from '@grafana/runtime';
 import { GRID_CELL_HEIGHT, GRID_CELL_VMARGIN, GRID_COLUMN_COUNT } from 'app/core/constants';
 import { contextSrv } from 'app/core/services/context_srv';
+import { StoreState } from 'app/types';
 import { DashboardPanelsChangedEvent } from 'app/types/events';
 
 import { AddLibraryPanelWidget } from '../components/AddLibraryPanelWidget';
@@ -24,8 +26,10 @@ export interface Props {
   editPanel: PanelModel | null;
   viewPanel: PanelModel | null;
   hidePanelMenus?: boolean;
+  isFnDashboard?: boolean;
 }
-export class DashboardGrid extends PureComponent<Props> {
+
+export class Component extends PureComponent<Props> {
   private panelMap: { [key: string]: PanelModel } = {};
   private eventSubs = new Subscription();
   private windowHeight = 1200;
@@ -216,7 +220,7 @@ export class DashboardGrid extends PureComponent<Props> {
   };
 
   render() {
-    const { isEditable, dashboard } = this.props;
+    const { isEditable, dashboard, isFnDashboard } = this.props;
 
     if (config.featureToggles.emptyDashboardPage && dashboard.panels.length === 0) {
       return <DashboardEmpty dashboard={dashboard} canCreate={isEditable} />;
@@ -249,7 +253,7 @@ export class DashboardGrid extends PureComponent<Props> {
                 <ReactGridLayout
                   width={width}
                   isDraggable={draggable}
-                  isResizable={isEditable}
+                  isResizable={isFnDashboard ? true : isEditable}
                   containerPadding={[0, 0]}
                   useCSSTransforms={true}
                   margin={[GRID_CELL_VMARGIN, GRID_CELL_VMARGIN]}
@@ -336,3 +340,11 @@ function translateGridHeightToScreenHeight(gridHeight: number): number {
 }
 
 GrafanaGridItem.displayName = 'GridItemWithDimensions';
+
+function mapStateToProps() {
+  return (state: StoreState) => ({
+    isFnDashboard: state.fnGlobalState.FNDashboard,
+  });
+}
+
+export const DashboardGrid = connect(mapStateToProps)(Component);
