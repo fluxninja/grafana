@@ -40,16 +40,16 @@ export function mediaUp(breakpoint: string) {
   return `only screen and (min-width: ${breakpoint})`;
 }
 
-// const isGrafanaTheme2 = (theme: GrafanaTheme | GrafanaTheme2): theme is GrafanaTheme2 => theme.hasOwnProperty('v1');
+const isGrafanaTheme2 = (theme: GrafanaTheme | GrafanaTheme2): theme is GrafanaTheme2 => theme.hasOwnProperty('v1');
 export const focusCss = (theme: GrafanaTheme | GrafanaTheme2) => {
-  /* const isTheme2 = isGrafanaTheme2(theme);
+  const isTheme2 = isGrafanaTheme2(theme);
   const firstColor = isTheme2 ? theme.colors.background.canvas : theme.colors.bodyBg;
   const secondColor = isTheme2 ? theme.colors.primary.main : theme.colors.formFocusOutline;
-  box-shadow: 0 0 0 2px ${firstColor}, 0 0 0px 4px ${secondColor}; */
 
   return `
   outline: 2px dotted transparent;
   outline-offset: 2px;
+  box-shadow: 0 0 0 2px ${firstColor}, 0 0 0px 4px ${secondColor};
   transition-property: outline, outline-offset, box-shadow;
   transition-duration: 0.2s;
   transition-timing-function: cubic-bezier(0.19, 1, 0.22, 1);`;
