@@ -227,8 +227,10 @@ export class GrafanaApp {
     } catch (error) {
       console.error('Failed to start Grafana', error);
       window.__grafana_load_failed();
+      window.dispatchEvent(new CustomEvent('grafana-startup:failed'));
     } finally {
       stopMeasure('frontend_app_init');
+      window.dispatchEvent(new CustomEvent('grafana-startup:success'));
     }
   }
 }
