@@ -106,11 +106,37 @@ if (process.env.NODE_ENV === 'development') {
   initDevFeatures();
 }
 
+export declare type FNGrafanaStartupState = {
+  isLoading: boolean;
+  isError: boolean;
+  error?: unknown;
+  isIdeal: boolean;
+};
+
+export const DefaultGrafanaStartupState: FNGrafanaStartupState = {
+  isLoading: false,
+  isError: false,
+  isIdeal: true,
+};
+
+const dispatchFnEvent = (info: FNGrafanaStartupState = DefaultGrafanaStartupState, ek = 'grafana-startup') => {
+  window.dispatchEvent(
+    new CustomEvent(ek, {
+      detail: info,
+    })
+  );
+};
+
 export class GrafanaApp {
   context!: GrafanaContextType;
 
   async init() {
     try {
+      dispatchFnEvent({
+        isIdeal: false,
+        isLoading: true,
+        isError: false,
+      });
       // Let iframe container know grafana has started loading
       parent.postMessage('GrafanaAppInit', '*');
 
@@ -224,7 +250,19 @@ export class GrafanaApp {
         keybindings: keybindingsService,
         config,
       };
+
+      dispatchFnEvent({
+        isLoading: false,
+        isError: false,
+        isIdeal: false,
+      });
     } catch (error) {
+      dispatchFnEvent({
+        isLoading: false,
+        isError: true,
+        error,
+        isIdeal: false,
+      });
       console.error('Failed to start Grafana', error);
       window.__grafana_load_failed();
     } finally {
