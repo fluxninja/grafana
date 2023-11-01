@@ -1,21 +1,18 @@
 import { css } from '@emotion/css';
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { Box, styled } from '@mui/material';
-import React, { FC, PureComponent } from 'react';
+import React, { PureComponent } from 'react';
 import { connect, MapStateToProps } from 'react-redux';
 
-import { AnnotationQuery, DataQuery, TypedVariableModel, GrafanaTheme2 } from '@grafana/data';
-import { FnGlobalState } from 'app/core/reducers/fn-slice';
+import { AnnotationQuery, DataQuery, GrafanaTheme2 } from '@grafana/data';
+import { stylesFactory, Themeable2, withTheme2 } from '@grafana/ui';
 
 import { StoreState } from '../../../../types';
 import { getSubMenuVariables, getVariablesState } from '../../../variables/state/selectors';
+import { VariableModel } from '../../../variables/types';
 import { DashboardModel } from '../../state';
 
 import { Annotations } from './Annotations';
 import { DashboardLinks } from './DashboardLinks';
 import { SubMenuItems } from './SubMenuItems';
-// import { VariableModel } from 'app/features/variables/types';
-import { Themeable2, stylesFactory, withTheme2 } from '@grafana-ui';
 import { DashboardLink } from '@grafana/schema/dist/esm/index';
 
 interface OwnProps extends Themeable2 {
@@ -25,8 +22,7 @@ interface OwnProps extends Themeable2 {
 }
 
 interface ConnectedProps {
-  variables: TypedVariableModel[];
-  hiddenVariables: FnGlobalState['hiddenVariables'];
+  variables: VariableModel[];
 }
 
 interface DispatchProps {}
@@ -56,17 +52,16 @@ class SubMenuUnConnected extends PureComponent<Props> {
 
     const styles = getStyles(theme);
 
+    if (!dashboard.isSubMenuVisible()) {
+      return null;
+    }
+
     const readOnlyVariables = dashboard.meta.isSnapshot ?? false;
 
     return (
-      <div className="submenu-controls">
-        <form aria-label="Template variables" className={styles}>
-          <FilterWithIcon />
-          <SubMenuItems
-            variables={variables}
-            readOnly={readOnlyVariables}
-            hiddenVariables={this.props.hiddenVariables}
-          />
+      <div className={styles.submenu}>
+        <form aria-label="Template variables" className={styles.formStyles} onSubmit={this.disableSubmitOnEnter}>
+          <SubMenuItems variables={variables} readOnly={readOnlyVariables} />
         </form>
         <Annotations
           annotations={annotations}
@@ -86,25 +81,25 @@ const mapStateToProps: MapStateToProps<ConnectedProps, OwnProps, StoreState> = (
 
   return {
     variables: getSubMenuVariables(uid, templatingState.variables),
-    hiddenVariables: state.fnGlobalState.hiddenVariables,
   };
 };
 
 const getStyles = stylesFactory((theme: GrafanaTheme2) => {
   return {
-    formStyles: css({
-      display: 'contents',
-      flexWrap: 'wrap',
-    }),
-    submenu: css({
-      display: 'flex',
-      flexDirection: 'row',
-      flexWrap: 'wrap',
-      alignContent: 'flex-start',
-      alignItems: 'flex-start',
-      gap: `${theme.spacing(1)} ${theme.spacing(2)}`,
-      padding: `0 0 ${theme.spacing(1)} 0`,
-    }),
+    formStyles: css`
+      display: flex;
+      flex-wrap: wrap;
+      display: contents;
+    `,
+    submenu: css`
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      align-content: flex-start;
+      align-items: flex-start;
+      gap: ${theme.spacing(1)} ${theme.spacing(2)};
+      padding: 0 0 ${theme.spacing(1)} 0;
+    `,
     spacer: css({
       flexGrow: 1,
     }),
@@ -114,20 +109,3 @@ const getStyles = stylesFactory((theme: GrafanaTheme2) => {
 export const SubMenu = withTheme2(connect(mapStateToProps)(SubMenuUnConnected));
 
 SubMenu.displayName = 'SubMenu';
-
-const FilterWithIcon: FC = () => (
-  <FilterWithIconStyled>
-    <FilterListIcon sx={{ color: '#3A785E' }} />
-    FILTERS
-  </FilterWithIconStyled>
-);
-
-const FilterWithIconStyled = styled(Box)({
-  display: 'flex',
-  gap: 1,
-  alignItems: 'center',
-  color: '#3A785E',
-  fontWeight: 600,
-  lineHeight: '160%',
-  fontSize: 12,
-});
