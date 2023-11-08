@@ -608,8 +608,11 @@ func (ds *Service) oldExecuteQuery(queryRef string, q druidquerybuilder.Query, s
 		err := json.Unmarshal(res, &tn)
 		if err == nil && len(tn) > 0 {
 			columns := []string{"timestamp"}
-			for c := range tn[0]["result"].([]interface{})[0].(map[string]interface{}) {
-				columns = append(columns, c)
+			results := tn[0]["result"].([]interface{})
+			if len(results) > 0 {
+				for c := range results[0].(map[string]interface{}) {
+					columns = append(columns, c)
+				}
 			}
 			for _, result := range tn {
 				for _, record := range result["result"].([]interface{}) {
