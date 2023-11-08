@@ -7,6 +7,10 @@ import (
 )
 
 func detectColumnType(c *responseColumn, pos int, rows [][]interface{}) {
+	if len(rows) == 0 {
+		c.Type = ColumnString
+		return
+	}
 	t := map[columnType]int{"nil": 0}
 	maxRowsToScan := (len(rows) / 5) + 1
 	for _, row := range rows[:maxRowsToScan] {
