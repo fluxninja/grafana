@@ -6,6 +6,7 @@ import { config, navigationLogger } from '@grafana/runtime';
 import { ErrorBoundaryAlert, GlobalStyles } from '@grafana/ui';
 import { loadAndInitAngularIfEnabled } from 'app/angular/loadAndInitAngularIfEnabled';
 import { ThemeProvider } from 'app/core/utils/ConfigProvider';
+import { FnLoader } from 'app/features/dashboard/components/DashboardLoading/FnLoader';
 import { store } from 'app/store/store';
 
 import { GrafanaContext } from '../core/context/GrafanaContext';
@@ -16,7 +17,7 @@ import { FNDashboardProps } from './types';
 type FnAppProviderProps = Pick<FNDashboardProps, 'fnError'>;
 
 export const FnAppProvider: FC<PropsWithChildren<FnAppProviderProps>> = (props) => {
-  const { children, fnError = null } = props;
+  const { children } = props;
 
   const [ready, setReady] = useState(false);
   navigationLogger('AppWrapper', false, 'rendering');
@@ -24,24 +25,13 @@ export const FnAppProvider: FC<PropsWithChildren<FnAppProviderProps>> = (props) 
     loadAndInitAngularIfEnabled()
       .then(() => {
         setReady(true);
-        // $('.preloader').remove();
       })
       .catch((err) => console.error(err));
     return () => {};
   }, []);
 
-  if (!ready) {
-    /**
-     * TODO: I think loader would be better
-     */
-    return <>{fnError}</>;
-  }
-
-  if (!store) {
-    /**
-     * TODO: I think loader would be better
-     */
-    return <>{fnError}</>;
+  if (!store || !ready) {
+    return <FnLoader />;
   }
 
   return (

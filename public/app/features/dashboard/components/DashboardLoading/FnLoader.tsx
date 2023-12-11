@@ -1,14 +1,12 @@
-import { Box, Typography, type BoxProps } from '@mui/material';
-import Lottie, { type LottieComponentProps } from 'lottie-react';
+import { Box, CircularProgress, CircularProgressProps, Typography, type BoxProps } from '@mui/material';
 import React, { type ReactNode, type FC, type HTMLAttributes } from 'react';
 
 import logoUrl from './fn-logo.svg';
-import logoLoader from './fn-lottie-loader.json';
 
 export type FnLoaderProps = {
   outerContainerProps?: Omit<BoxProps, 'children'>;
   innerContainerProps?: Omit<BoxProps, 'children'>;
-  lottieProps?: LottieComponentProps;
+  circularProgressProps?: CircularProgressProps;
   imageProps?: HTMLAttributes<HTMLImageElement>;
   text?: ReactNode;
 };
@@ -16,7 +14,7 @@ export type FnLoaderProps = {
 export const FnLoader: FC<FnLoaderProps> = ({
   outerContainerProps,
   innerContainerProps,
-  lottieProps,
+  circularProgressProps,
   imageProps,
   text,
 }) => (
@@ -30,11 +28,12 @@ export const FnLoader: FC<FnLoaderProps> = ({
   >
     <img src={logoUrl} alt={'FluxNinja logo'} style={{ transform: 'scale(4)' }} {...imageProps} />
     <Box marginTop="100px" {...innerContainerProps}>
-      <Lottie
-        animationData={logoLoader}
+      <CircularProgress
+        role="alert"
+        aria-busy="true"
         aria-label="Loading..."
-        style={{ maxWidth: '150px', margin: '0 auto' }}
-        {...lottieProps}
+        disableShrink
+        {...circularProgressProps}
       />
     </Box>
     {typeof text === 'string' ? <Typography>{text}</Typography> : text || null}
