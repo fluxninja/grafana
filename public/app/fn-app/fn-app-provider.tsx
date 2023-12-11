@@ -6,6 +6,7 @@ import { config, navigationLogger } from '@grafana/runtime';
 import { ErrorBoundaryAlert, GlobalStyles } from '@grafana/ui';
 import { loadAndInitAngularIfEnabled } from 'app/angular/loadAndInitAngularIfEnabled';
 import { ThemeProvider } from 'app/core/utils/ConfigProvider';
+import { FnLoader } from 'app/features/dashboard/components/DashboardLoading/FnLoader';
 import { store } from 'app/store/store';
 
 import { GrafanaContext } from '../core/context/GrafanaContext';
@@ -31,16 +32,10 @@ export const FnAppProvider: FC<PropsWithChildren<FnAppProviderProps>> = (props) 
   }, []);
 
   if (!ready) {
-    /**
-     * TODO: I think loader would be better
-     */
-    return <>{fnError}</>;
+    return <FnLoader />;
   }
 
   if (!store) {
-    /**
-     * TODO: I think loader would be better
-     */
     return <>{fnError}</>;
   }
 
