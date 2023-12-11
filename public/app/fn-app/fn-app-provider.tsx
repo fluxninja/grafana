@@ -17,7 +17,7 @@ import { FNDashboardProps } from './types';
 type FnAppProviderProps = Pick<FNDashboardProps, 'fnError'>;
 
 export const FnAppProvider: FC<PropsWithChildren<FnAppProviderProps>> = (props) => {
-  const { children, fnError = null } = props;
+  const { children } = props;
 
   const [ready, setReady] = useState(false);
   navigationLogger('AppWrapper', false, 'rendering');
@@ -25,18 +25,13 @@ export const FnAppProvider: FC<PropsWithChildren<FnAppProviderProps>> = (props) 
     loadAndInitAngularIfEnabled()
       .then(() => {
         setReady(true);
-        // $('.preloader').remove();
       })
       .catch((err) => console.error(err));
     return () => {};
   }, []);
 
-  if (!ready) {
+  if (!store || !ready) {
     return <FnLoader />;
-  }
-
-  if (!store) {
-    return <>{fnError}</>;
   }
 
   return (
