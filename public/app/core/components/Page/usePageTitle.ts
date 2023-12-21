@@ -1,13 +1,12 @@
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
+import {useEffect} from 'react';
 
-import { NavModel, NavModelItem } from '@grafana/data';
-import { HOME_NAV_ID } from 'app/core/reducers/navModel';
-import { FnGlobalState } from 'app/core/reducers/fn-slice';
-import type { StoreState } from 'app/types';
+import {NavModel, NavModelItem} from '@grafana/data';
+import {FnGlobalState} from 'app/core/reducers/fn-slice';
+import {HOME_NAV_ID} from 'app/core/reducers/navModel';
+import {StoreState, useSelector} from 'app/types';
 
-import { Branding } from '../Branding/Branding';
-import { buildBreadcrumbs } from '../Breadcrumbs/utils';
+import {Branding} from '../Branding/Branding';
+import {buildBreadcrumbs} from '../Breadcrumbs/utils';
 
 export function usePageTitle(navModel?: NavModel, pageNav?: NavModelItem) {
   const homeNav = useSelector((state) => state.navIndex)[HOME_NAV_ID];
@@ -22,6 +21,6 @@ export function usePageTitle(navModel?: NavModel, pageNav?: NavModelItem) {
     // Override `Home` with the custom brand title
     parts[parts.length - 1] = Branding.AppTitle;
 
-    document.title = !FNDashboard ? parts.join(' - ') : pageTitle ? pageTitle : 'Flux Ninja';
-  }, [homeNav, navModel, pageNav]);
+    document.title = !FNDashboard ? parts.join(' - ') : pageTitle ? pageTitle : 'FluxNinja';
+  }, [FNDashboard, homeNav, navModel, pageNav, pageTitle]);
 }
