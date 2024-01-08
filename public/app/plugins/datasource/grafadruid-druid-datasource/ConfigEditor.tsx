@@ -55,9 +55,9 @@ export class ConfigEditor extends PureComponent<Props, State> {
 
   onConnectionOptionsChange = (connectionSettingsOptions: ConnectionSettingsOptions) => {
     const { options, onOptionsChange } = this.props;
-    const { settings, secretSettings, secretSettingsFields } = connectionSettingsOptions;
+    const { settings, secretSettings, secretSettingsFields, jsonData: connectionJsonData } = connectionSettingsOptions;
     const connectionSettings = this.normalizeData(settings, true, 'connection');
-    const jsonData = { ...options.jsonData, ...connectionSettings };
+    const jsonData = { ...options.jsonData, ...connectionSettings, ...connectionJsonData };
     const connectionSecretSettings = this.normalizeData(secretSettings, true, 'connection');
     const secureJsonData = { ...options.secureJsonData, ...connectionSecretSettings };
     const connectionSecretSettingsFields = this.normalizeData(
@@ -83,6 +83,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
       settings: this.normalizeData(jsonData, false, 'connection'),
       secretSettings: this.normalizeData(secureJsonData || {}, false, 'connection'),
       secretSettingsFields: this.normalizeData(secureJsonFields || {}, false, 'connection') as KeyValue<boolean>,
+      jsonData: { keepCookies: (jsonData as ConnectionSettingsOptions['jsonData'])?.keepCookies || [] },
     };
   };
 

@@ -16,6 +16,9 @@ export interface ConnectionSettingsOptions {
   settings: ConnectionSettings;
   secretSettings: ConnectionSecretSettings;
   secretSettingsFields: KeyValue<boolean>;
+  jsonData?: {
+    keepCookies?: string[];
+  },
 }
 
 export interface ConnectionSettingsProps {
