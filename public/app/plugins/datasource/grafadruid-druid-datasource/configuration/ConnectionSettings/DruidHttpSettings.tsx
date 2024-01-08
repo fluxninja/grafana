@@ -1,7 +1,7 @@
 import { css } from '@emotion/css';
 import React, { ChangeEvent } from 'react';
 
-import { LegacyForms, FieldSet, Field, Switch } from '@grafana/ui';
+import { LegacyForms, FieldSet, Field, Switch, TagsInput, InlineFormLabel } from '@grafana/ui';
 
 import { ConnectionSettingsProps } from './types';
 
@@ -92,6 +92,19 @@ export const DruidHttpSettings = (props: ConnectionSettingsProps) => {
           <Switch value={settings.skipTls} name="skipTls" onChange={onSettingChange} />
         </Field>
       )}
+      <div className="gf-form">
+        <InlineFormLabel
+          width={11}
+          tooltip="Grafana proxy deletes forwarded cookies by default. Specify cookies by name that should be forwarded to the data source."
+        >
+          Allowed cookies
+        </InlineFormLabel>
+        <TagsInput
+          tags={options.jsonData?.keepCookies || []}
+          width={40}
+          onChange={(cookies) => onOptionsChange({ ...options, jsonData: { keepCookies: cookies } })}
+        />
+      </div>
     </FieldSet>
   );
 };
