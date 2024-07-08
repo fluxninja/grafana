@@ -171,16 +171,16 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   blackBase = '45, 51, 62';
 
   primary = {
-    main: '#8EC4AD',
-    border: palette.blueLightText,
-    text: '#F0E4B6',
+    main: '#FF4702',
+    border: '#E33E00',
+    text: '#101828',
   };
 
   text = {
-    primary: '#2D333E',
-    secondary: '#2d333e',
+    primary: '#101828',
+    secondary: '#344054',
     disabled: '#9DA7B8',
-    link: this.primary.text,
+    link: '#FF4702',
     maxContrast: palette.black,
   };
 
@@ -191,7 +191,7 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   secondary = {
-    main: '#FC9A69',
+    main: '#FF4702',
     shade: '#FC9A6990',
     contrastText: `rgba(${this.blackBase},  1)`,
     text: this.text.primary,

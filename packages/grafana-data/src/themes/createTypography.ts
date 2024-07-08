@@ -53,8 +53,8 @@ export interface ThemeTypographyInput {
   htmlFontSize?: number;
 }
 
-const defaultFontFamily = '"Source Sans Pro", Nunito, Roboto, Arial'; //'"Roboto", "Helvetica", "Arial", sans-serif';
-const defaultFontFamilyMonospace = "'Nunito Mono', 'Roboto Mono', monospace"; // "'Roboto Mono', monospace";
+const defaultFontFamily = '"Poppins", Inter, Satoshi, sans-serif'; //'"Roboto", "Helvetica", "Arial", sans-serif';
+const defaultFontFamilyMonospace = '"SatoshiLight", "FigtreeLight", monospace'; // "'Roboto Mono', monospace";
 
 export function createTypography(colors: ThemeColors, typographyInput: ThemeTypographyInput = {}): ThemeTypography {
   const {
@@ -65,10 +65,10 @@ export function createTypography(colors: ThemeColors, typographyInput: ThemeTypo
     fontWeightLight = 300,
     fontWeightRegular = 400,
     fontWeightMedium = 500,
-    fontWeightBold = 500,
+    fontWeightBold = 600,
     // Tell Grafana-UI what's the font-size on the html element.
     // 16px is the default font-size used by browsers.
-    htmlFontSize = 14,
+    htmlFontSize = 16,
   } = typographyInput;
 
   if (process.env.NODE_ENV !== 'production') {
