@@ -19,9 +19,9 @@ $colors-action-selected: #F27A40;
 
 // New Colors
 // -------------------------
-$blue-light: #F0E4B6;
-$blue-base: #8EC4AD;
-$blue-shade: rgb(113, 156, 138);
+$blue-light: #101828;
+$blue-base: #FF4702;
+$blue-shade: rgb(204, 56, 1);
 $red-base: #E0226E;
 $red-shade: rgb(179, 27, 88);
 $green-base: #83D39E;
@@ -67,12 +67,12 @@ $border1: rgba(45, 51, 62, 0.30);
 
 // Accent colors
 // -------------------------
-$blue: #F0E4B6;
+$blue: #101828;
 $red: $red-base;
 $yellow: #ecbb13;
 $orange: #eb7b18;
 $purple: #9933cc;
-$variable: #F0E4B6;
+$variable: #101828;
 
 $brand-primary: #eb7b18;
 $brand-success: #83D39E;
@@ -97,13 +97,13 @@ $body-bg: #F6F5F3;
 $page-bg: #F6F5F3;
 $dashboard-bg: #F6F5F3;
 
-$text-color: #2D333E;
+$text-color: #101828;
 $text-color-strong: #000000;
-$text-color-semi-weak: #2d333e;
-$text-color-weak: #2d333e;
+$text-color-semi-weak: #344054;
+$text-color-weak: #344054;
 $text-color-faint: #9DA7B8;
 $text-color-emphasis: #000000;
-$text-blue: #F0E4B6;
+$text-blue: #101828;
 
 $text-shadow-faint: none;
 
@@ -113,14 +113,14 @@ $brand-gradient-vertical: linear-gradient(0.01deg, #F53E4C -31.2%, #FF8833 113.0
 
 // Links
 // -------------------------
-$link-color: #2D333E;
+$link-color: #101828;
 $link-color-disabled: #9DA7B8;
 $link-hover-color: #000000;
-$external-link-color: #F0E4B6;
+$external-link-color: #FF4702;
 
 // Typography
 // -------------------------
-$headings-color: #2D333E;
+$headings-color: #101828;
 $abbr-border-color: $gray-2 !default;
 $text-muted: $text-color-weak;
 
@@ -210,7 +210,7 @@ $btn-active-box-shadow: 0px 0px 4px rgba(234, 161, 51, 0.6);
 $input-bg: #FDFDFC;
 $input-bg-disabled: rgba(45, 51, 62, 0.04);
 
-$input-color: #2D333E;
+$input-color: #101828;
 $input-border-color: rgba(45, 51, 62, 0.30);
 $input-box-shadow: none;
 $input-border-focus: #5794f2;
@@ -284,13 +284,13 @@ $alert-info-bg: #F3D086;
 
 // Tooltips and popovers
 $tooltipBackground: #FDFDFC;
-$tooltipColor: #2D333E;
+$tooltipColor: #101828;
 $tooltipArrowColor: #FDFDFC;
 $tooltipBackgroundError: #E0226E;
 $tooltipShadow: 0px 4px 8px rgba(24, 26, 27, 0.2);
 
 $popover-bg: #FDFDFC;
-$popover-color: #2D333E;
+$popover-color: #101828;
 $popover-border-color: rgba(45, 51, 62, 0.12);
 $popover-header-bg: #FDFDFC;
 $popover-shadow: 0px 13px 20px 1px rgba(24, 26, 27, 0.18);
@@ -341,7 +341,7 @@ $diff-arrow-color: $dark-2;
 $diff-group-bg: #FDFDFC;
 
 $diff-json-bg: #FDFDFC;
-$diff-json-fg: #2D333E;
+$diff-json-fg: #101828;
 
 $diff-json-added: $blue-shade;
 $diff-json-deleted: $red-shade;
