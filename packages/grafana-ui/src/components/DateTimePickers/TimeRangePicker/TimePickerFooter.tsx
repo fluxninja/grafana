@@ -57,7 +57,7 @@ export const TimePickerFooter = (props: Props) => {
     return null;
   }
 
-  const fnColor = theme.isDark ? '#8EC4AD' : '#3A785E';
+  const fnColor = theme.isDark ? '#8EC4AD' : '#344054';
 
   return (
     <div>

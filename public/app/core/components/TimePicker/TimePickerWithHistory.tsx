@@ -29,7 +29,7 @@ const FnText: React.FC = () => {
 
   const FN_TEXT_STYLE: CSSProperties = { fontWeight: 700, fontSize: 14, marginLeft: 8 };
 
-  return <>{FNDashboard ? <span style={{ ...FN_TEXT_STYLE, color: theme.colors.warning.main }}>UTC</span> : ''}</>;
+  return <>{FNDashboard ? <span style={{ ...FN_TEXT_STYLE, color: theme.colors.primary.main }}>UTC</span> : ''}</>;
 };
 
 export const TimePickerWithHistory: FC<Props> = (props) => (

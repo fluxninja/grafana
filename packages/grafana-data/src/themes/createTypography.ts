@@ -62,10 +62,10 @@ export function createTypography(colors: ThemeColors, typographyInput: ThemeTypo
     fontFamilyMonospace = defaultFontFamilyMonospace,
     // The default font size of the Material Specification.
     fontSize = 14, // px
-    fontWeightLight = 300,
-    fontWeightRegular = 400,
-    fontWeightMedium = 500,
-    fontWeightBold = 600,
+    fontWeightLight = 200,
+    fontWeightRegular = 300,
+    fontWeightMedium = 400,
+    fontWeightBold = 500,
     // Tell Grafana-UI what's the font-size on the html element.
     // 16px is the default font-size used by browsers.
     htmlFontSize = 16,

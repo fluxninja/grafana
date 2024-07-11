@@ -9,7 +9,7 @@ import React, { ComponentType } from 'react';
 import ReactDOM from 'react-dom';
 
 import { createTheme, GrafanaThemeType } from '@grafana/data';
-import { createFnColors } from '@grafana/data/src/themes/fnCreateColors';
+import { createColors } from '@grafana/data/src/themes/createColors';
 import { GrafanaTheme2 } from '@grafana/data/src/themes/types';
 import { ThemeChangedEvent } from '@grafana/runtime';
 import { GrafanaBootConfig } from '@grafana/runtime/src/config';
@@ -113,7 +113,7 @@ class createMfe {
       },
     });
 
-    config.theme2.colors = createFnColors({ mode });
+    config.theme2.colors = createColors({ mode });
 
     config.theme2.v1 = getTheme(mode);
 

@@ -1,20 +1,18 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-  <head>
-    <title>FluxNinja Microfrontend</title>
+  <head id="qiankun-head">
+    <title>CodeRabbit Micro-frontend</title>
     <base href="/" />
-    <link rel="stylesheet" href="../../../public/build/<%= htmlWebpackPlugin.files.cssChunks.dark %>" />
   </head>
 
-  <body class="theme-dark app-grafana">
+  <body class="app-grafana">
     <div id="grafanaRoot"></div>
-
     <script nonce="">
       window.fnData = {
         themePaths: {
           light: '../../../public/build/<%= htmlWebpackPlugin.files.cssChunks.light %>',
-          dark: '../../../public/build/<%= htmlWebpackPlugin.files.cssChunks.dark %>'
-        }
+          dark: '../../../public/build/<%= htmlWebpackPlugin.files.cssChunks.dark %>',
+        },
       };
     </script>
 
@@ -27,11 +25,7 @@
       crossorigin="<%= webpackConfig.output.crossOriginLoading %>"
     ></script>
     <% } else { %>
-    <script
-      nonce=""
-      src="../../../<%= htmlWebpackPlugin.files.js[index] %>"
-      type="text/javascript"
-    ></script>
+    <script nonce="" src="../../../<%= htmlWebpackPlugin.files.js[index] %>" type="text/javascript"></script>
     <% } %> <% } %>
   </body>
 </html>
