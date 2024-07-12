@@ -4,7 +4,6 @@ import React, { FC, useMemo } from 'react';
 import { FnPropMappedFromState, fnPropsMappedFromState } from 'app/core/reducers/fn-slice';
 import { StoreState, useSelector } from 'app/types';
 
-import { AngularRoot } from '../../angular/AngularRoot';
 import { FnAppProvider } from '../fn-app-provider';
 import { FNDashboardProps } from '../types';
 import { RenderPortal } from '../utils';
@@ -16,10 +15,7 @@ type FNDashboardComponentProps = Omit<FNDashboardProps, FnPropMappedFromState>;
 export const FNDashboard: FC<FNDashboardComponentProps> = (props) => {
   return (
     <FnAppProvider fnError={props.fnError}>
-      <div className="page-dashboard">
-        <AngularRoot />
-        <DashboardPortal {...props} />
-      </div>
+      <DashboardPortal {...props} />
     </FnAppProvider>
   );
 };
@@ -61,5 +57,9 @@ export const DashboardPortal: FC<FNDashboardComponentProps> = (p) => {
     );
   }, [props]);
 
-  return <RenderPortal ID="grafana-portal">{content}</RenderPortal>;
+  return (
+    <RenderPortal ID="grafana-portal">
+      <div className="page-dashboard">{content}</div>
+    </RenderPortal>
+  );
 };
