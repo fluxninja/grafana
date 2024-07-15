@@ -10,14 +10,12 @@ export function getFormElementStyles(theme: GrafanaTheme2) {
       fontWeight: theme.typography.body.fontWeight,
       lineHeight: theme.typography.body.lineHeight,
     },
-
     'input, select': {
       backgroundColor: theme.components.input.background,
       color: theme.components.input.text,
       border: 'none',
       boxShadow: 'none',
     },
-
     textarea: {
       height: 'auto',
     },

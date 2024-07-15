@@ -137,9 +137,8 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
       )}
 
       <Tooltip
-        ref={buttonRef}
         content={<TimePickerTooltip timeRange={value} timeZone={timeZone} />}
-        placement="bottom"
+        placement="bottom-start"
         interactive
       >
         <ToolbarButton
@@ -194,7 +193,7 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
         />
       )}
 
-      <Tooltip content={ZoomOutTooltip} placement="bottom">
+      <Tooltip content={ZoomOutTooltip} placement="bottom-start">
         <ToolbarButton
           aria-label={t('time-picker.range-picker.zoom-out-button', 'Zoom out time range')}
           onClick={onZoom}
@@ -209,11 +208,9 @@ export function TimeRangePicker(props: TimeRangePickerProps) {
 TimeRangePicker.displayName = 'TimeRangePicker';
 
 const ZoomOutTooltip = () => (
-  <>
-    <Trans i18nKey="time-picker.range-picker.zoom-out-tooltip">
-      Time range zoom out <br /> CTRL+Z
-    </Trans>
-  </>
+  <Trans i18nKey="time-picker.range-picker.zoom-out-tooltip">
+    Time range zoom out <br /> CTRL+Z
+  </Trans>
 );
 
 export const TimePickerTooltip = ({ timeRange, timeZone }: { timeRange: TimeRange; timeZone?: TimeZone }) => {

@@ -6,10 +6,21 @@ config.featureToggles = {
   ...config.featureToggles,
   publicDashboards: true,
 };
+interface FnData {
+  themePaths: {
+    light: string;
+    dark: string;
+  };
+}
+
+declare global {
+  interface Window {
+    fnData: FnData;
+  }
+}
 
 config.isPublicDashboardView = false;
-// eslint-disable-next-line
-config.bootData.themePaths = (window as any).fnData?.themePaths;
+config.bootData.themePaths = window.fnData.themePaths;
 
 export const { bootstrap, mount, unmount, update, afterMount, afterUnmount, beforeLoad, beforeMount, beforeUnmount } =
   createMfe.create(FNDashboard);

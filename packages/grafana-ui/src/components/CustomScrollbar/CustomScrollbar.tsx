@@ -116,10 +116,8 @@ export const CustomScrollbar = ({
         passedProps.style['WebkitOverflowScrolling'] = 'auto';
       }
 
-      return <div {...passedProps} className="scrollbar-view" id={divId} />;
-    },
-    [divId]
-  );
+    return <div {...passedProps} style={{ ...passedProps.style, overflow: 'auto' }} className="scrollbar-view" />;
+  }, []);
 
   const onScrollStop = useCallback(() => {
     ref.current && setScrollTop && setScrollTop(ref.current.getValues());
