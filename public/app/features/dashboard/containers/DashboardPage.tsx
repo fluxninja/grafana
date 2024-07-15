@@ -425,7 +425,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           className={pageClassName}
           scrollRef={this.setScrollRef}
           scrollTop={updateScrollTop}
-          style={{ minHeight: 550 }}
+          style={{ minHeight: '550px' }}
         >
           {showToolbar && (
             <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>

@@ -36,7 +36,12 @@ export function Portal(props: PropsWithChildren<Props>) {
     };
   }, [portalRoot]);
 
-  return ReactDOM.createPortal(<div ref={forwardedRef}>{children}</div>, node.current);
+  return ReactDOM.createPortal(
+    <div data-qiankun="grafana-full-app" ref={forwardedRef}>
+      {children}
+    </div>,
+    node.current
+  );
 }
 
 /** @internal */
