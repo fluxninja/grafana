@@ -36,8 +36,6 @@ jobs:
           tags: gcr.io/coderabbit/grafana:latest
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache-new
-          build-contexts: |
-            mono=${{ github.workspace }}
 
       - name: Move Docker cache
         run: |
