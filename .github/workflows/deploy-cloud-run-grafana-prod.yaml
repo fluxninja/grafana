@@ -43,4 +43,4 @@ jobs:
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
       - name: Deploy to Cloud Run
-        run: gcloud run deploy grafana --image gcr.io/coderabbitprod/grafana:latest --region us-central1 --allow-unauthenticated --vpc-connector=coderabbitaiprod-prod-cr
+        run: gcloud run deploy grafana-internal --image gcr.io/coderabbitprod/grafana:latest --region us-central1 --allow-unauthenticated --vpc-connector=coderabbitaiprod-prod-cr
