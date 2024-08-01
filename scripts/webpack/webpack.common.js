@@ -10,7 +10,6 @@ module.exports = {
   target: 'web',
   entry: {
     app: './public/app/index.ts',
-    fn_dashboard: './public/app/fn_dashboard.ts',
   },
   output: {
     clean: true,

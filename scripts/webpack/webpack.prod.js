@@ -7,6 +7,7 @@ const { resolveToEsbuildTarget } = require('esbuild-plugin-browserslist');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
+const { DefinePlugin } = require('webpack');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { merge } = require('webpack-merge');
 
@@ -92,6 +93,11 @@ module.exports = (env = {}) =>
         excludeChunks: ['dark', 'light', 'app'],
       }),
       new HTMLWebpackCSSChunks(),
+      new DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('development'),
+        },
+      }),
       new WebpackManifestPlugin({
         fileName: path.join(process.cwd(), 'manifest.json'),
         filter: (file) => !file.name.endsWith('.map'),
