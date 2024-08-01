@@ -1,4 +1,4 @@
-name: Deploy Grafana Server Cloud Run
+name: Deploy Grafana Server Cloud Run on prod
 
 on:
   push:
@@ -42,5 +42,5 @@ jobs:
           rm -rf /tmp/.buildx-cache
           mv /tmp/.buildx-cache-new /tmp/.buildx-cache
 
-      # - name: Deploy to Cloud Run
-      #   run: gcloud run deploy grafana --image gcr.io/coderabbit/grafana:latest --region us-central1 --allow-unauthenticated --vpc-connector=coderabbitai-dev-cr
+      - name: Deploy to Cloud Run
+        run: gcloud run deploy grafana --image gcr.io/coderabbitprod/grafana:latest --region us-central1 --allow-unauthenticated --vpc-connector=coderabbitaiprod-prod-cr
