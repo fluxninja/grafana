@@ -153,6 +153,9 @@ const getStyle = stylesFactory((theme: GrafanaTheme2) => {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
+      '& button': {
+        borderRadius: '6px',
+      },
     }),
     editContainer: css({
       borderTop: `1px solid ${theme.colors.border.weak}`,

@@ -153,6 +153,8 @@ export class Component extends PureComponent<Props> {
       this.gridWidth = gridWidth;
     }
 
+    console.log('this.props.dashboard.panels', config.theme2.shape.radius.default);
+
     for (const panel of this.props.dashboard.panels) {
       const panelClasses = classNames({ 'react-grid-item--fullscreen': panel.isViewing });
 
@@ -241,7 +243,8 @@ export class Component extends PureComponent<Props> {
 
             // Disable draggable if mobile device, solving an issue with unintentionally
             // moving panels. https://github.com/grafana/grafana/issues/18497
-            const draggable = width <= config.theme2.breakpoints.values.md ? false : isEditable;
+            const isLg = width > config.theme2.breakpoints.values.md;
+            const draggable = isLg ? false : isEditable;
 
             return (
               /**
@@ -252,8 +255,8 @@ export class Component extends PureComponent<Props> {
               <div style={{ width: width, height: '100%' }} ref={this.onGetWrapperDivRef}>
                 <ReactGridLayout
                   width={width}
-                  isDraggable={draggable}
-                  isResizable={isFnDashboard ? true : isEditable}
+                  isDraggable={(isLg && isFnDashboard) || draggable}
+                  isResizable={isLg && isFnDashboard ? true : isEditable}
                   containerPadding={[0, 0]}
                   useCSSTransforms={true}
                   margin={[GRID_CELL_VMARGIN, GRID_CELL_VMARGIN]}

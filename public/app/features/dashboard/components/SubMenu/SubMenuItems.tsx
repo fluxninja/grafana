@@ -1,6 +1,4 @@
-import FilterListIcon from '@mui/icons-material/FilterList';
-import { Box, styled } from '@mui/material';
-import React, { FC, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { selectors } from '@grafana/e2e-selectors';
 import { useSelector } from 'app/types';
@@ -30,7 +28,6 @@ export const SubMenuItems = ({ variables, readOnly }: Props) => {
 
   return (
     <>
-      <FilterWithIcon />
       {visibleVariables.map((variable) => {
         return (
           <div
@@ -45,20 +42,3 @@ export const SubMenuItems = ({ variables, readOnly }: Props) => {
     </>
   );
 };
-
-const FilterWithIcon: FC = () => (
-  <FilterWithIconStyled>
-    <FilterListIcon sx={{ color: '#3A785E' }} />
-    FILTERS
-  </FilterWithIconStyled>
-);
-
-const FilterWithIconStyled = styled(Box)({
-  display: 'flex',
-  gap: 1,
-  alignItems: 'center',
-  color: '#3A785E',
-  fontWeight: 600,
-  lineHeight: '160%',
-  fontSize: 12,
-});
