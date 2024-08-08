@@ -4,7 +4,7 @@ import React, { forwardRef, ButtonHTMLAttributes, ReactNode } from 'react';
 import { GrafanaTheme2, IconName, isIconName } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 
-import { styleMixins, useStyles2 } from '../../themes';
+import { styleMixins, useStyles2, useTheme2 } from '../../themes';
 import { getFocusStyles, getMouseFocusStyles } from '../../themes/mixins';
 import { IconSize } from '../../types/icon';
 import { getPropertiesForVariant } from '../Button';
@@ -65,6 +65,7 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
     ref
   ) => {
     const styles = useStyles2(getStyles);
+    const theme2 = useTheme2();
 
     const buttonStyles = cx(
       {
@@ -89,7 +90,10 @@ export const ToolbarButton = forwardRef<HTMLButtonElement, ToolbarButtonProps>(
         aria-label={getButtonAriaLabel(ariaLabel, tooltip)}
         aria-expanded={isOpen}
         {...rest}
-        style={{ display: isHidden ? 'none' : '' }}
+        style={{
+          display: isHidden ? 'none' : '',
+          border: `1px solid ${theme2.colors.border.weak}`,
+        }}
       >
         {renderIcon(icon, iconSize)}
         {imgSrc && <img className={styles.img} src={imgSrc} alt={imgAlt ?? ''} />}

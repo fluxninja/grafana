@@ -274,7 +274,7 @@ const getStyles = stylesFactory((theme: GrafanaTheme2, isReversed, hideQuickRang
       background: theme.colors.background.primary,
       boxShadow: theme.shadows.z3,
       width: `${isFullscreen ? '546px' : '262px'}`,
-      borderRadius: '2px',
+      borderRadius: '6px',
       border: `1px solid ${theme.colors.border.weak}`,
       [`${isReversed ? 'left' : 'right'}`]: 0,
     }),
@@ -283,6 +283,9 @@ const getStyles = stylesFactory((theme: GrafanaTheme2, isReversed, hideQuickRang
       flexDirection: 'row-reverse',
       height: `${isContainerTall ? '281px' : '217px'}`,
       maxHeight: '100vh',
+      '& button': {
+        borderRadius: '6px',
+      },
     }),
     leftSide: css({
       display: 'flex',

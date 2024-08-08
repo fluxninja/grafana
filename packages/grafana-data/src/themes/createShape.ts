@@ -16,7 +16,7 @@ export interface ThemeShapeInput {
 }
 
 export function createShape(options: ThemeShapeInput): ThemeShape {
-  const baseBorderRadius = options.borderRadius ?? 2;
+  const baseBorderRadius = options.borderRadius ?? 6;
 
   const radius = {
     default: '2px',
