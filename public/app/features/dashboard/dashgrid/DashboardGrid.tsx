@@ -153,6 +153,8 @@ export class Component extends PureComponent<Props> {
       this.gridWidth = gridWidth;
     }
 
+    console.log('this.props.dashboard.panels', config.theme2.shape.radius.default);
+
     for (const panel of this.props.dashboard.panels) {
       const panelClasses = classNames({ 'react-grid-item--fullscreen': panel.isViewing });
 

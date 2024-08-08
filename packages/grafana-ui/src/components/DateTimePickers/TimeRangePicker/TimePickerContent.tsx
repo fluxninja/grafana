@@ -277,42 +277,43 @@ const useTimeOption = (raw: RawTimeRange, quickOptions: TimeOption[]): TimeOptio
 
 const getStyles = stylesFactory((theme: GrafanaTheme2, isReversed, hideQuickRanges, isContainerTall, isFullscreen) => {
   return {
-    container: css`
-      background: ${theme.colors.background.primary};
-      box-shadow: ${theme.shadows.z3};
-      position: absolute;
-      z-index: ${theme.zIndex.dropdown};
-      width: ${isFullscreen ? '546px' : '262px'};
-      top: 116%;
-      border-radius: 2px;
-      border: 1px solid ${theme.colors.border.weak};
-      ${isReversed ? 'left' : 'right'}: 0;
-    `,
-    body: css`
-      display: flex;
-      flex-direction: row-reverse;
-      height: ${isContainerTall ? '281px' : '217px'};
-    `,
-    leftSide: css`
-      display: flex;
-      flex-direction: column;
-      border-right: ${isReversed ? 'none' : `1px solid ${theme.colors.border.weak}`};
-      width: ${!hideQuickRanges ? '50%' : '100%'};
-      overflow: auto;
-      order: ${isReversed ? 1 : 0};
-    `,
-    rightSide: css`
-      width: ${isFullscreen ? '50%' : '100%'}; !important;
-      border-right: ${isReversed ? `1px solid ${theme.colors.border.weak}` : 'none'};
-      display: flex;
-      flex-direction: column;
-    `,
-    timeRangeFilter: css`
-      padding: ${theme.spacing(1)};
-    `,
-    spacing: css`
-      margin-top: 16px;
-    `,
+    container: css({
+      background: theme.colors.background.primary,
+      boxShadow: theme.shadows.z3,
+      width: `${isFullscreen ? '546px' : '262px'}`,
+      borderRadius: '6px',
+      border: `1px solid ${theme.colors.border.weak}`,
+      [`${isReversed ? 'left' : 'right'}`]: 0,
+    }),
+    body: css({
+      display: 'flex',
+      flexDirection: 'row-reverse',
+      height: `${isContainerTall ? '281px' : '217px'}`,
+      maxHeight: '100vh',
+      '& button': {
+        borderRadius: '6px',
+      },
+    }),
+    leftSide: css({
+      display: 'flex',
+      flexDirection: 'column',
+      borderRight: `${isReversed ? 'none' : `1px solid ${theme.colors.border.weak}`}`,
+      width: `${!hideQuickRanges ? '60%' : '100%'}`,
+      overflow: 'hidden',
+      order: isReversed ? 1 : 0,
+    }),
+    rightSide: css({
+      width: `${isFullscreen ? '40%' : '100%'}; !important`,
+      borderRight: isReversed ? `1px solid ${theme.colors.border.weak}` : 'none',
+      display: 'flex',
+      flexDirection: 'column',
+    }),
+    timeRangeFilter: css({
+      padding: theme.spacing(1),
+    }),
+    spacing: css({
+      marginTop: '16px',
+    }),
   };
 });
 
