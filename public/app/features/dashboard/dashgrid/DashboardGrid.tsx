@@ -153,8 +153,6 @@ export class Component extends PureComponent<Props> {
       this.gridWidth = gridWidth;
     }
 
-    console.log('this.props.dashboard.panels', config.theme2.shape.radius.default);
-
     for (const panel of this.props.dashboard.panels) {
       const panelClasses = classNames({ 'react-grid-item--fullscreen': panel.isViewing });
 
@@ -255,8 +253,8 @@ export class Component extends PureComponent<Props> {
               <div style={{ width: width, height: '100%' }} ref={this.onGetWrapperDivRef}>
                 <ReactGridLayout
                   width={width}
-                  isDraggable={(isLg && isFnDashboard) || draggable}
-                  isResizable={isLg && isFnDashboard ? true : isEditable}
+                  isDraggable={isFnDashboard ? false : draggable}
+                  isResizable={isFnDashboard ? false : isEditable}
                   containerPadding={[0, 0]}
                   useCSSTransforms={true}
                   margin={[GRID_CELL_VMARGIN, GRID_CELL_VMARGIN]}
