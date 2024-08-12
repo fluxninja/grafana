@@ -241,7 +241,7 @@ export class Component extends PureComponent<Props> {
 
             // Disable draggable if mobile device, solving an issue with unintentionally
             // moving panels. https://github.com/grafana/grafana/issues/18497
-            const isLg = width > config.theme2.breakpoints.values.md;
+            const isLg = width <= config.theme2.breakpoints.values.md;
             const draggable = isLg ? false : isEditable;
 
             return (
