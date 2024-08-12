@@ -174,7 +174,7 @@ describe('BarChart utils', () => {
       });
       const result = prepareBarChartDisplayValues([df], createTheme(), { stacking: StackingMode.None } as Options);
       const warning = assertIsDefined('warn' in result ? result : null);
-      expect(warning.warn).toEqual('Bar charts requires a string or time field');
+      expect(warning.warn).toEqual('No Data');
       expect(warning).not.toHaveProperty('viz');
     });
 

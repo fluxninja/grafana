@@ -457,7 +457,7 @@ export function prepareBarChartDisplayValues(
 
   if (!firstField) {
     return {
-      warn: 'Bar charts requires a string or time field',
+      warn: 'No Data',
     };
   }
 
