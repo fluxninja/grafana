@@ -539,10 +539,7 @@ function getRotationPadding(
 function getScaleOrientation(orientation: VizOrientation) {
   if (orientation === VizOrientation.Vertical) {
     return {
-      xOri: ScaleOrientation.Horizontal,
-      xDir: ScaleDirection.Right,
-      yOri: ScaleOrientation.Vertical,
-      yDir: ScaleDirection.Up,
+      warn: 'No Data',
     };
   }
 
