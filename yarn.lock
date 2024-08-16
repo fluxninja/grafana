@@ -19954,6 +19954,7 @@ __metadata:
     lint-staged: 13.2.3
     lodash: 4.17.21
     logfmt: ^1.3.2
+    loglevel: ^1.9.1
     lru-cache: 10.0.0
     lru-memoize: ^1.1.0
     marked: 5.1.1
@@ -23520,6 +23521,13 @@ __metadata:
   bin:
     logfmt: ./bin/logfmt
   checksum: 639d327c1ec5c9b4078278c13f2dd4ea6be0c1057a8735e2b066b7c506532d6b7c267bc4b1c9a6ed7e5d2017abaa69dbe8b4bf9eec4c0b69069a2a53d50f24cb
+  languageName: node
+  linkType: hard
+
+"loglevel@npm:^1.9.1":
+  version: 1.9.1
+  resolution: "loglevel@npm:1.9.1"
+  checksum: e1c8586108c4d566122e91f8a79c8df728920e3a714875affa5120566761a24077ec8ec9e5fc388b022e39fc411ec6e090cde1b5775871241b045139771eeb06
   languageName: node
   linkType: hard
 

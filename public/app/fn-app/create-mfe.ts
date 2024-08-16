@@ -60,17 +60,13 @@ type DeepPartial<T> = {
 
 class createMfe {
   private static readonly containerSelector = '#grafanaRoot';
-
-  private static readonly logPrefix = '[FN Grafana]';
+  private static logger = FnLoggerService;
 
   mode: FNDashboardProps['mode'];
   static Component: ComponentType<Omit<FNDashboardProps, FnPropMappedFromState>>;
   constructor(readonly props: FNDashboardProps) {
     this.mode = props.mode;
   }
-
-  /* eslint-disable-next-line @typescript-eslint/no-explicit-any */
-  private static logger = (...args: any[]) => console.log(createMfe.logPrefix, ...args);
 
   static getLifeCycles(component: ComponentType<Omit<FNDashboardProps, FnPropMappedFromState>>) {
     const lifeCycles: FrameworkLifeCycles = {
@@ -168,7 +164,7 @@ class createMfe {
    * If isRuntimeOnly then the stylesheets of the turned off theme are not removed
    */
   private static loadFnTheme = (mode: FNDashboardProps['mode'] = GrafanaThemeType.Light, isRuntimeOnly = false) => {
-    createMfe.logger('Trying to load theme.', { mode });
+    createMfe.logger.info('Trying to load theme.', { mode });
 
     const grafanaTheme2 = createMfe.createGrafanaTheme2(mode);
 
@@ -179,7 +175,7 @@ class createMfe {
     createMfe.publishTheme(bootConfigWithTheme.theme2);
 
     if (isRuntimeOnly) {
-      createMfe.logger('Successfully loaded theme', { mode });
+      createMfe.logger.info('Successfully loaded theme', { mode });
 
       return;
     }
@@ -190,7 +186,7 @@ class createMfe {
     newCssLink.href = config.bootData.themePaths[mode];
     document.body.appendChild(newCssLink);
 
-    createMfe.logger('Successfully loaded theme.', { mode });
+    createMfe.logger.info('Successfully loaded theme.', { mode });
   };
 
   private static getContainer(props: FNDashboardProps) {
@@ -201,8 +197,6 @@ class createMfe {
 
   static mountFnApp(Component: ComponentType<Omit<FNDashboardProps, FnPropMappedFromState>>) {
     const lifeCycleFn: FrameworkLifeCycles['mount'] = (props: FNDashboardProps) => {
-      createMfe.logger('Trying to mount grafana...');
-
       return new Promise((res, rej) => {
         try {
           createMfe.loadFnTheme(props.mode);
@@ -214,19 +208,19 @@ class createMfe {
             ...pick(props, ...fnStateProps),
           };
 
-          FnLoggerService.log(null, '[FN Grafana] Dispatching initial state.', { initialState });
+          createMfe.logger.info('[FN Grafana] Dispatching initial state.', { initialState });
 
           dispatch(updateFnState(initialState));
 
           createMfe.renderMfeComponent(props, () => {
-            createMfe.logger('Mounted grafana.', { props });
+            createMfe.logger.info('Mounted grafana.', { props });
 
             return res(true);
           });
         } catch (err) {
           const message = `[FN Grafana]: Failed to mount grafana. ${err}`;
 
-          FnLoggerService.log(null, message);
+          FnLoggerService.info(null, message);
 
           const fnError = new Error(message);
 
@@ -246,13 +240,13 @@ class createMfe {
       const container = createMfe.getContainer(props);
 
       if (container) {
-        createMfe.logger('Trying to unmount grafana...');
+        createMfe.logger.info('Trying to unmount grafana...');
 
         ReactDOM.unmountComponentAtNode(container);
 
-        createMfe.logger('Successfully unmounted grafana.');
+        createMfe.logger.info('Successfully unmounted grafana.');
       } else {
-        createMfe.logger('Failed to unmount grafana. Container does not exist.');
+        createMfe.logger.error('Failed to unmount grafana. Container does not exist.');
       }
 
       backendSrv.cancelAllInFlightRequests();
@@ -266,26 +260,17 @@ class createMfe {
   static updateFnApp() {
     const lifeCycleFn: FrameworkLifeCycles['update'] = ({ mode, ...other }: FNDashboardProps) => {
       if (mode) {
-        createMfe.logger('Trying to update grafana with theme.', { mode });
-
         dispatch(
           updatePartialFnStates({
             mode,
           })
         );
-        /**
-         * NOTE:
-         * Here happens the theme change.
-         *
-         * TODO:
-         * We could probably made the theme change smoother
-         * if we use state to update the theme
-         */
+
         createMfe.loadFnTheme(mode);
       }
 
       if (other.uid) {
-        createMfe.logger('Trying to update grafana with hidden variables.', { updatedProps: other });
+        createMfe.logger.info('Trying to render dashboard using update: ', { updatedProps: other });
 
         dispatch(
           updatePartialFnStates({
@@ -310,7 +295,7 @@ class createMfe {
     const container = createMfe.getContainer(props);
 
     ReactDOM.render(React.createElement(createMfe.Component, props), container, () => {
-      createMfe.logger('Created mfe component.', { props, container });
+      createMfe.logger.info('Created mfe component.', { props, container });
       onSuccess();
     });
   }
