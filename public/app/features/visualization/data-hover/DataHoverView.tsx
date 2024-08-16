@@ -138,7 +138,6 @@ const getStyles = (theme: GrafanaTheme2) => {
     wrapper: css`
       background: ${bg};
       border: 1px solid ${headerBg};
-      border-radius: ${theme.shape.borderRadius(2)};
     `,
     header: css`
       background: ${headerBg};
@@ -158,13 +157,18 @@ const getStyles = (theme: GrafanaTheme2) => {
       padding: 8px;
       th {
         font-weight: ${theme.typography.fontWeightMedium};
-        padding: ${theme.spacing(0.25, 2)};
+        padding: ${theme.spacing(0.25)};
+        padding-left: ${theme.spacing(1)};
       }
       tr {
         background-color: ${theme.colors.background.primary};
         &:nth-child(even) {
           background-color: ${tableBgOdd};
         }
+      }
+      td {
+        padding: ${theme.spacing(0.25)};
+        padding-right: ${theme.spacing(1)};
       }
     `,
     highlight: css`
