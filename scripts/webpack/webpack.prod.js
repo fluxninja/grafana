@@ -4,6 +4,7 @@ const browserslist = require('browserslist');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const { EsbuildPlugin } = require('esbuild-loader');
 const { resolveToEsbuildTarget } = require('esbuild-plugin-browserslist');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 const { DefinePlugin } = require('webpack');
@@ -93,7 +94,6 @@ module.exports = (env = {}) =>
         chunksSortMode: 'none',
         excludeChunks: ['dark', 'light', 'app'],
       }),
-      new HTMLWebpackCSSChunks(),
       new DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify('development'),

@@ -34,7 +34,7 @@ const mapStateToProps = (state: StoreState, props: OwnProps) => {
   return {
     plugin: panelState.plugin,
     instanceState: panelState.instanceState,
-    fnGlobalState: state.fnGlobalState
+    fnGlobalState: state.fnGlobalState,
   };
 };
 
@@ -47,7 +47,6 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 
 export type Props = OwnProps & ConnectedProps<typeof connector>;
 export class DashboardPanelUnconnected extends PureComponent<Props> {
-
   static defaultProps: Partial<Props> = {
     lazy: true,
   };
@@ -74,7 +73,18 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
   };
 
   renderPanel = (isInView: boolean) => {
-    const { dashboard, panel, isViewing, isEditing, width, height, plugin, timezone, fnGlobalState, isDraggable = true } = this.props;
+    const {
+      dashboard,
+      panel,
+      isViewing,
+      isEditing,
+      width,
+      height,
+      plugin,
+      timezone,
+      fnGlobalState,
+      isDraggable = true,
+    } = this.props;
 
     // console.log(this.props, "on render panel")
 
@@ -125,7 +135,7 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
         {this.renderPanel}
       </LazyLoader>
     ) : (
-      this.renderPanel({ isInView: true })
+      this.renderPanel(true)
     );
   }
 }
