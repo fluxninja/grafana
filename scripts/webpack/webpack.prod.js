@@ -97,6 +97,7 @@ module.exports = (env = {}) =>
       new DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify('development'),
+          SHOULD_LOG: JSON.stringify('false'),
         },
       }),
       new WebpackManifestPlugin({
