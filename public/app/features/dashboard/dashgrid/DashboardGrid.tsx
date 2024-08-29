@@ -12,7 +12,6 @@ import { StoreState } from 'app/types';
 import { DashboardPanelsChangedEvent } from 'app/types/events';
 
 import { AddLibraryPanelWidget } from '../components/AddLibraryPanelWidget';
-import { AddPanelWidget } from '../components/AddPanelWidget';
 import { DashboardRow } from '../components/DashboardRow';
 import { DashboardModel, PanelModel } from '../state';
 import { GridPos } from '../state/PanelModel';
@@ -180,11 +179,6 @@ export class Component extends PureComponent<Props> {
   renderPanel(panel: PanelModel, width: number, height: number, isDraggable: boolean) {
     if (panel.type === 'row') {
       return <DashboardRow key={panel.key} panel={panel} dashboard={this.props.dashboard} />;
-    }
-
-    // Todo: Remove this when we remove the emptyDashboardPage toggle
-    if (panel.type === 'add-panel') {
-      return <AddPanelWidget key={panel.key} panel={panel} dashboard={this.props.dashboard} />;
     }
 
     if (panel.type === 'add-library-panel') {

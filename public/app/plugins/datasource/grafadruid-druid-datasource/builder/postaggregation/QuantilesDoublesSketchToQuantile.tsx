@@ -1,6 +1,6 @@
-import React from 'react';
-import { QueryBuilderProps } from '../types';
 import { useScopedQueryBuilderFieldProps, Input, Row, QueryBuilderComponentSelector } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { FieldAccess, FinalizingFieldAccess, Javascript } from './';
 
 export const QuantilesDoublesSketchToQuantile = (props: QueryBuilderProps) => {

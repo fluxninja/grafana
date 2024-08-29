@@ -1,5 +1,5 @@
 import { pick } from 'lodash';
-import React, { FC, useMemo } from 'react';
+import { FC, useMemo } from 'react';
 
 import { FnPropMappedFromState, fnPropsMappedFromState } from 'app/core/reducers/fn-slice';
 import { StoreState, useSelector } from 'app/types';

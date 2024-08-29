@@ -338,7 +338,7 @@ export const Table = memo((props: Props) => {
             </div>
           ) : (
             <div style={{ height: height - headerHeight, width }} className={tableStyles.noData}>
-              {noValuesDisplayText}
+              {NO_DATA_TEXT}
             </div>
           )}
           {footerItems && (

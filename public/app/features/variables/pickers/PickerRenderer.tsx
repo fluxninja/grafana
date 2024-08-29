@@ -1,15 +1,16 @@
 // import { css } from '@emotion/css';
-import React, { CSSProperties, FunctionComponent, PropsWithChildren, ReactElement, useMemo } from 'react';
+import { CSSProperties, FunctionComponent, PropsWithChildren, ReactElement, useMemo } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useSelector } from 'react-redux';
 
+import { VariableHide } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { Tooltip } from '@grafana/ui';
 import { FnGlobalState } from 'app/core/reducers/fn-slice';
 import type { StoreState } from 'app/types';
 
 import { variableAdapters } from '../adapters';
-import { VariableHide, VariableModel } from '../types';
+import { VariableModel } from '../types';
 
 interface Props {
   variable: VariableModel;

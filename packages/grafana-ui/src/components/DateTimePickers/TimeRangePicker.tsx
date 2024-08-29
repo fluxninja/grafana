@@ -2,7 +2,7 @@ import { css, cx } from '@emotion/css';
 import { useDialog } from '@react-aria/dialog';
 import { FocusScope } from '@react-aria/focus';
 import { useOverlay } from '@react-aria/overlays';
-import React, { memo, FormEvent, createRef, useState, ReactElement, ReactNode, useEffect } from 'react';
+import { memo, createRef, useState, ReactNode, useEffect } from 'react';
 
 import {
   rangeUtil,

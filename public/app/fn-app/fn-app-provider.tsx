@@ -1,4 +1,4 @@
-import React, { useState, useEffect, FC, PropsWithChildren } from 'react';
+import { useState, useEffect, FC, PropsWithChildren } from 'react';
 import { Provider } from 'react-redux';
 import { BrowserRouter } from 'react-router-dom';
 
@@ -7,6 +7,7 @@ import { ErrorBoundaryAlert, GlobalStyles } from '@grafana/ui';
 import { loadAndInitAngularIfEnabled } from 'app/angular/loadAndInitAngularIfEnabled';
 import { ThemeProvider } from 'app/core/utils/ConfigProvider';
 import { FnLoader } from 'app/features/dashboard/components/DashboardLoading/FnLoader';
+import { FnLoggerService } from 'app/fn_logger';
 import { store } from 'app/store/store';
 
 import { GrafanaContext } from '../core/context/GrafanaContext';
@@ -25,9 +26,9 @@ export const FnAppProvider: FC<PropsWithChildren<FnAppProviderProps>> = (props) 
     loadAndInitAngularIfEnabled()
       .then(() => {
         setReady(true);
+        $('.preloader').remove();
       })
-      .catch((err) => console.error(err));
-    return () => {};
+      .catch(FnLoggerService.error);
   }, []);
 
   if (!store || !ready) {

@@ -1,7 +1,7 @@
-import React from 'react';
+import { debounce } from 'lodash';
+
 import { Query } from './query';
 import { QueryBuilderProps } from './types';
-import { debounce } from 'lodash';
 
 export const DruidQueryBuilder = (props: QueryBuilderProps) => {
   return (

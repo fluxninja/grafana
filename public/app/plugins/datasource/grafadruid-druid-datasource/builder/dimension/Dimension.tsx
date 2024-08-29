@@ -1,6 +1,6 @@
-import React from 'react';
-import { QueryBuilderProps } from '../types';
 import { QueryBuilderComponentSelector } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { Default, Extraction, ListFiltered, Lookup, RegisteredLookup, PrefixFiltered, RegexFiltered } from './';
 
 export const Dimension = (props: QueryBuilderProps) => (

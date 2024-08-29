@@ -179,7 +179,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       urlSlug: match.params.slug,
       urlUid: match.params.uid,
       urlType: match.params.type,
-      urlFolderUid: queryParams.folderUid,
+      // urlFolderUid: queryParams.folderUid,
       panelType: queryParams.panelType,
       routeName: this.props.route.routeName,
       fixUrl: !FNDashboard,
@@ -379,7 +379,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
   render() {
     const { dashboard, initError, queryParams, FNDashboard, controlsContainer } = this.props;
-    const { editPanel, viewPanel, updateScrollTop, pageNav, sectionNav } = this.state;
+    const { editPanel, viewPanel, pageNav, sectionNav } = this.state;
     const kioskMode = getKioskMode(this.props.queryParams);
 
     if (!dashboard) {
@@ -423,8 +423,8 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           pageNav={pageNav}
           layout={PageLayoutType.Canvas}
           className={pageClassName}
-          scrollRef={this.setScrollRef}
-          scrollTop={updateScrollTop}
+          // scrollRef={this.setScrollRef}
+          // scrollTop={updateScrollTop}
           style={{ minHeight: '550px' }}
         >
           {showToolbar && (
@@ -437,7 +437,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
                   title={dashboard.title}
                   folderTitle={dashboard.meta.folderTitle}
                   isFullscreen={!!viewPanel}
-                  onAddPanel={this.onAddPanel}
+                  // onAddPanel={this.onAddPanel}
                   kioskMode={kioskMode}
                   hideTimePicker={dashboard.timepicker.hidden}
                 />

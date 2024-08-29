@@ -1,6 +1,5 @@
-import React from 'react';
-import { QueryBuilderProps } from '../types';
 import { useScopedQueryBuilderFieldProps, Input, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
 
 export const LessThan = (props: QueryBuilderProps) => {
   const scopedProps = useScopedQueryBuilderFieldProps(props, LessThan);

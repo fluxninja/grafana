@@ -1,10 +1,13 @@
-import React, { ChangeEvent } from 'react';
-import { InlineLabel, stylesFactory, useTheme } from '@grafana/ui';
-import { GrafanaTheme } from '@grafana/data';
-import { QueryBuilderFieldProps } from './types';
-import { onBuilderChange } from '.';
 import { css, cx, injectGlobal } from '@emotion/css';
 import DatePicker from 'react-datepicker';
+
+import { GrafanaTheme } from '@grafana/data';
+import { InlineLabel, stylesFactory, useTheme } from '@grafana/ui';
+
+import { QueryBuilderFieldProps } from './types';
+
+import { onBuilderChange } from '.';
+
 import 'react-datepicker/dist/react-datepicker.css';
 
 injectGlobal(`
@@ -28,8 +31,8 @@ const ISO8601DURATIONPATTERN = new RegExp(
 
 const useInterval = (interval = ''): any => {
   const intervalPartToDate = (part: string): any => {
-    var date: Date | undefined = undefined;
-    var datePlaceholder: string | undefined = undefined;
+    let date: Date | undefined = undefined;
+    let datePlaceholder: string | undefined = undefined;
     const d = new Date(part);
     if (d instanceof Date && !isNaN(d.getFullYear())) {
       date = d;
@@ -47,24 +50,30 @@ export const DateInterval = (props: Props) => {
     props.options.builder
   );
 
-  const onStartDateChangeRaw = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
+  const onStartDateChangeRaw = (event?: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+    const value = event?.currentTarget?.textContent;
     if (value && value.indexOf('$') !== -1) {
       onBuilderChange(props, value + '/' + intervalStop);
     }
   };
-  const onStartDateChange = (date: Date) => {
-    const value = date.toISOString();
+  const onStartDateChange = (
+    date: Date | null,
+    event?: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>
+  ) => {
+    const value = date?.toISOString();
     onBuilderChange(props, value + '/' + intervalStop);
   };
-  const onStopDateChangeRaw = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
+  const onStopDateChangeRaw = (event?: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+    const value = event?.currentTarget?.textContent;
     if (value && (value.indexOf('$') !== -1 || ISO8601DURATIONPATTERN.exec(value) !== null)) {
       onBuilderChange(props, intervalStart + '/' + value);
     }
   };
-  const onStopDateChange = (date: Date) => {
-    const value = date.toISOString();
+  const onStopDateChange = (
+    date: Date | null,
+    event?: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>
+  ) => {
+    const value = date?.toISOString();
     onBuilderChange(props, intervalStart + '/' + value);
   };
   const { label, description, format, time } = props;

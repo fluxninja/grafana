@@ -1,6 +1,6 @@
-import React from 'react';
-import { QueryBuilderProps } from '../types';
 import { useScopedQueryBuilderFieldProps, Multiple, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { Filter } from './';
 
 export const Or = (props: QueryBuilderProps) => {

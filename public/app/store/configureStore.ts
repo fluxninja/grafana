@@ -1,11 +1,6 @@
-import {
-  configureStore as reduxConfigureStore,
-  EnhancedStore,
-  MiddlewareArray,
-  PreloadedState,
-} from '@reduxjs/toolkit';
-import { AnyAction, CombinedState } from 'redux';
-import { ThunkMiddleware } from 'redux-thunk';
+import { configureStore as reduxConfigureStore, createListenerMiddleware } from '@reduxjs/toolkit';
+import { setupListeners } from '@reduxjs/toolkit/query';
+import { Middleware } from 'redux';
 
 import { browseDashboardsAPI } from 'app/features/browse-dashboards/api/browseDashboardsAPI';
 import { publicDashboardApi } from 'app/features/dashboard/api/publicDashboardApi';
@@ -20,12 +15,6 @@ import { queryLibraryApi } from '../features/query-library/api/factory';
 
 import { setStore } from './store';
 
-export type ConfiguredStore = EnhancedStore<
-  CombinedState<StoreState>,
-  AnyAction,
-  MiddlewareArray<[ThunkMiddleware<CombinedState<StoreState>, AnyAction>]>
->;
-
 export function addRootReducer(reducers: any) {
   // this is ok now because we add reducers before configureStore is called
   // in the future if we want to add reducers during runtime
@@ -33,7 +22,14 @@ export function addRootReducer(reducers: any) {
   addReducer(reducers);
 }
 
-export function configureStore<I extends Partial<PreloadedState<StoreState>>>(initialState?: I | Promise<I>) {
+const listenerMiddleware = createListenerMiddleware();
+const extraMiddleware: Middleware[] = [];
+
+export function addExtraMiddleware(middleware: Middleware) {
+  extraMiddleware.push(middleware);
+}
+
+export function configureStore(initialState?: Partial<StoreState>) {
   const store = reduxConfigureStore({
     reducer: createRootReducer(),
     middleware: (getDefaultMiddleware) =>

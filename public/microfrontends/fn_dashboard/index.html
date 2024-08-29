@@ -1,101 +1,25 @@
-Html Webpack Plugin:
-<pre>
-  Error: Child compilation failed:
-  Module not found: Error: Can't resolve '/home/gurinder/Work/coderabbitai/grafana/public/views/error-template.html' in '/home/gurinder/Work/coderabbitai/grafana'
-  ModuleNotFoundError: Module not found: Error: Can't resolve '/home/gurinder/Work/coderabbitai/grafana/public/views/error-template.html' in '/home/gurinder/Work/coderabbitai/grafana'
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/Compilation.js:2094:28
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:895:13
-      at eval (eval at create (/home/gurinder/Work/coderabbitai/grafana/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:10:1)
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:332:22
-      at eval (eval at create (/home/gurinder/Work/coderabbitai/grafana/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:9:1)
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:509:22
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:151:11
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:767:25
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:979:8
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:1109:5
-  Module not found: Error: Can't resolve '/home/gurinder/Work/coderabbitai/grafana/public/views/index-template.html' in '/home/gurinder/Work/coderabbitai/grafana'
-  ModuleNotFoundError: Module not found: Error: Can't resolve '/home/gurinder/Work/coderabbitai/grafana/public/views/index-template.html' in '/home/gurinder/Work/coderabbitai/grafana'
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/Compilation.js:2094:28
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:895:13
-      at eval (eval at create (/home/gurinder/Work/coderabbitai/grafana/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:10:1)
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:332:22
-      at eval (eval at create (/home/gurinder/Work/coderabbitai/grafana/node_modules/tapable/lib/HookCodeFactory.js:33:10), <anonymous>:9:1)
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:509:22
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:151:11
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:767:25
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:979:8
-      at /home/gurinder/Work/coderabbitai/grafana/node_modules/webpack/lib/NormalModuleFactory.js:1109:5
-  
-  - Compilation.js:2094 
-    [grafana]/[webpack]/lib/Compilation.js:2094:28
-  
-  - NormalModuleFactory.js:895 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:895:13
-  
-  
-  - NormalModuleFactory.js:332 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:332:22
-  
-  
-  - NormalModuleFactory.js:509 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:509:22
-  
-  - NormalModuleFactory.js:151 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:151:11
-  
-  - NormalModuleFactory.js:767 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:767:25
-  
-  - NormalModuleFactory.js:979 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:979:8
-  
-  - NormalModuleFactory.js:1109 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:1109:5
-  
-  - Module not found: Error: Can't resolve '/home/gurinder/Work/coderabbitai/grafana/public/views/index-template.html' in '/home/gurinder/Work/coderabbitai/grafana'
-  
-  - ModuleNotFoundError: Module not found: Error: Can't resolve '/home/gurinder/Work/coderabbitai/grafana/public/views/index-template.html' in '/home/gurinder/Work/coderabbitai/grafana'
-  
-  - Compilation.js:2094 
-    [grafana]/[webpack]/lib/Compilation.js:2094:28
-  
-  - NormalModuleFactory.js:895 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:895:13
-  
-  
-  - NormalModuleFactory.js:332 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:332:22
-  
-  
-  - NormalModuleFactory.js:509 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:509:22
-  
-  - NormalModuleFactory.js:151 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:151:11
-  
-  - NormalModuleFactory.js:767 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:767:25
-  
-  - NormalModuleFactory.js:979 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:979:8
-  
-  - NormalModuleFactory.js:1109 
-    [grafana]/[webpack]/lib/NormalModuleFactory.js:1109:5
-  
-  - child-compiler.js:174 
-    [grafana]/[html-webpack-plugin]/lib/child-compiler.js:174:18
-  
-  - Compiler.js:605 finalCallback
-    [grafana]/[webpack]/lib/Compiler.js:605:5
-  
-  - Compiler.js:640 
-    [grafana]/[webpack]/lib/Compiler.js:640:11
-  
-  - Compiler.js:1329 
-    [grafana]/[webpack]/lib/Compiler.js:1329:17
-  
-  
-  - task_queues:95 process.processTicksAndRejections
-    node:internal/process/task_queues:95:5
-  
-</pre>
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>CodeRabbit Micro-frontend</title>
+    <base href="/" />
+  </head>
+
+  <body class="theme-light app-grafana">
+    <div id="grafanaRoot"></div>
+<script nonce="">
+  window.fnData = {
+    assets: {
+      light: '../../../public/build/grafana.light.56483b57dfda9d617e91.css',
+      dark: '../../../public/build/grafana.dark.ea10a053bf33d9b6d591.css',
+    }
+  };
+</script>
+
+     
+    <script nonce="" src="../../../public/build/runtime~fn_dashboard.8c4efc41962ba1b3df3b.js" type="text/javascript"></script>
+      
+    <script nonce="" src="../../../public/build/fn_dashboard.4b3f77e3a182be7e3dd9.js" type="text/javascript"></script>
+     
+  </body>
+</html>

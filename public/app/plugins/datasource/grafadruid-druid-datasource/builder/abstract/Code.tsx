@@ -1,14 +1,15 @@
 import { uniqueId } from 'lodash';
-import React from 'react';
-import { InlineField } from '@grafana/ui';
-import { QueryBuilderFieldProps } from './types';
-import { onBuilderChange } from '.';
 import AceEditor from 'react-ace';
+
+import { InlineField } from '@grafana/ui';
+
+import { QueryBuilderFieldProps } from './types';
+
+import { onBuilderChange } from '.';
 import 'ace-builds/src-noconflict/mode-javascript';
 import 'ace-builds/src-noconflict/mode-hjson';
 import 'ace-builds/src-noconflict/mode-sql';
 import 'ace-builds/src-noconflict/theme-twilight';
-
 
 interface Props extends QueryBuilderFieldProps {
   lang: string;

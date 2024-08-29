@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction, SliceCaseReducers } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction, SliceCaseReducers, SliceSelectors } from '@reduxjs/toolkit';
 
 import { GrafanaThemeType, TimeRange } from '@grafana/data';
 
@@ -81,7 +81,7 @@ const reducers: SliceCaseReducers<FnGlobalState> = {
   },
 };
 
-const fnSlice = createSlice<FnGlobalState, SliceCaseReducers<FnGlobalState>, string>({
+const fnSlice = createSlice<FnGlobalState, SliceCaseReducers<FnGlobalState>, string, SliceSelectors<FnGlobalState>>({
   name: FN_STATE_KEY,
   initialState: INITIAL_FN_STATE,
   reducers,

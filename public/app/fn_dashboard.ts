@@ -7,7 +7,7 @@ config.featureToggles = {
   publicDashboards: true,
 };
 interface FnData {
-  themePaths: {
+  assets: {
     light: string;
     dark: string;
   };
@@ -19,8 +19,8 @@ declare global {
   }
 }
 
-config.isPublicDashboardView = false;
-config.bootData.themePaths = window.fnData.themePaths;
+// config.isPublicDashboardView = false;
+config.bootData.assets = window.fnData.assets;
 
 export const { bootstrap, mount, unmount, update, afterMount, afterUnmount, beforeLoad, beforeMount, beforeUnmount } =
   createMfe.create(FNDashboard);

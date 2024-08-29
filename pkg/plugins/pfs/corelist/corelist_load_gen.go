@@ -23,7 +23,7 @@ func parsePluginOrPanic(path string, pkgname string, rt *thema.Runtime) pfs.Pars
 	if err != nil {
 		panic("could not create fs sub to " + path)
 	}
-	pp, err := pfs.ParsePluginFS(sub, rt)
+	pp, err := pfs.ParsePluginFS(sub, rt, "public/app/plugins/"+pkgname)
 	if err != nil {
 		panic(fmt.Sprintf("error parsing plugin metadata for %s: %s", pkgname, err))
 	}

@@ -1,6 +1,6 @@
-import React from 'react';
-import { QueryBuilderProps } from '../types';
 import { QueryBuilderComponentSelector } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { GlobalTable, Inline, Join, Lookup, Query, Table, Union } from './';
 
 export const DataSource = (props: QueryBuilderProps) => (

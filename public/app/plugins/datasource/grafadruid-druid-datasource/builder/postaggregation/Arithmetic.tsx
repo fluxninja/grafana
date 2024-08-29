@@ -1,6 +1,6 @@
-import React from 'react';
-import { QueryBuilderProps } from '../types';
 import { useScopedQueryBuilderFieldProps, Input, Select, Multiple, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { PostAggregation } from './.';
 
 export const Arithmetic = (props: QueryBuilderProps) => {

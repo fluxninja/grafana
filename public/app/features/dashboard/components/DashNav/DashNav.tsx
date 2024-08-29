@@ -1,4 +1,5 @@
 import { css } from '@emotion/css';
+import { noop } from 'lodash';
 import { memo, ReactNode } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { useLocation } from 'react-router-dom-v5-compat';
@@ -14,6 +15,7 @@ import {
   ToolbarButtonRow,
   ConfirmModal,
   Badge,
+  PageToolbar,
 } from '@grafana/ui';
 import { updateNavIndex } from 'app/core/actions';
 import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
@@ -53,7 +55,7 @@ const mapDispatchToProps = {
 };
 
 const mapStateToProps = (state: StoreState) => {
-  return { ...state.fnGlobalState, ...state.navIndex };
+  return { ...state.fnGlobalState, navIndex: state.navIndex };
 };
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -275,36 +277,36 @@ export const DashNav = memo<Props>((props) => {
   };
 
   const renderRightActions = () => {
-    const { dashboard, onAddPanel, isFullscreen, kioskMode, FNDashboard, hideTimePicker } = props;
+    const { dashboard, isFullscreen, kioskMode, FNDashboard, hideTimePicker } = props;
     const { canSave, canEdit, showSettings, canShare } = dashboard.meta;
     const { snapshot } = dashboard;
     const snapshotUrl = snapshot && snapshot.originalUrl;
     const buttons: ReactNode[] = [];
-    const tvButton = config.featureToggles.topnav ? null : (
-      <ToolbarButton
-        tooltip={t('dashboard.toolbar.tv-button', 'Cycle view mode')}
-        icon="monitor"
-        onClick={onToggleTVMode}
-        key="tv-button"
-        isHidden={!!FNDashboard}
-      />
-    );
+    // const tvButton = config.featureToggles.topnav ? null : (
+    //   <ToolbarButton
+    //     tooltip={t('dashboard.toolbar.tv-button', 'Cycle view mode')}
+    //     icon="monitor"
+    //     onClick={onToggleTVMode}
+    //     key="tv-button"
+    //     isHidden={!!FNDashboard}
+    //   />
+    // );
 
     if (isPlaylistRunning()) {
       return [renderPlaylistControls(), renderTimeControls()];
     }
 
     if (kioskMode === KioskMode.TV || kioskMode === KioskMode.FN) {
-      return [renderTimeControls(), tvButton];
+      return [renderTimeControls()];
     }
 
     if (snapshotUrl) {
       buttons.push(
         <ToolbarButton
-          tooltip={t('dashboard.toolbar.add-panel', 'Add panel')}
-          icon="panel-add"
-          onClick={onAddPanel}
-          key="button-panel-add"
+          tooltip={t('dashboard.toolbar.open-original', 'Open original dashboard')}
+          onClick={onOpenSnapshotOriginal}
+          icon="link"
+          key="button-snapshot"
           isHidden={!!FNDashboard}
         />
       );
@@ -327,18 +329,6 @@ export const DashNav = memo<Props>((props) => {
             />
           )}
         </ModalsController>
-      );
-    }
-
-    if (snapshotUrl) {
-      buttons.push(
-        <ToolbarButton
-          tooltip={t('dashboard.toolbar.open-original', 'Open original dashboard')}
-          onClick={() => gotoSnapshotOrigin(snapshotUrl)}
-          icon="link"
-          key="button-snapshot"
-          isHidden={!!FNDashboard}
-        />
       );
     }
 
@@ -378,10 +368,6 @@ export const DashNav = memo<Props>((props) => {
     return buttons;
   };
 
-  const gotoSnapshotOrigin = (snapshotUrl: string) => {
-    window.location.href = textUtil.sanitizeUrl(snapshotUrl);
-  };
-
   const { isFullscreen, title, folderTitle } = props;
 
   // let titleHref = '';
@@ -395,7 +381,7 @@ export const DashNav = memo<Props>((props) => {
   //   parentHref = locationUtil.getUrlForPartial(location, { search: 'open', folder: 'current' });
   // }
 
-  const onGoBack = isFullscreen ? onClose : undefined;
+  const onGoBack = isFullscreen ? onclose : undefined;
 
   if (config.featureToggles.topnav) {
     return (
@@ -418,7 +404,7 @@ export const DashNav = memo<Props>((props) => {
       parent={folderTitle}
       // titleHref={titleHref}
       // parentHref={parentHref}
-      onGoBack={onGoBack}
+      onGoBack={onGoBack ?? noop}
       leftItems={renderLeftActions()}
     >
       {renderRightActions()}

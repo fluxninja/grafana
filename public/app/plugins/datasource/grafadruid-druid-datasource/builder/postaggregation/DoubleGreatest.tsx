@@ -1,6 +1,6 @@
-import React from 'react';
-import { QueryBuilderProps } from '../types';
 import { useScopedQueryBuilderFieldProps, Input, Multiple, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { PostAggregation } from './.';
 
 export const DoubleGreatest = (props: QueryBuilderProps) => {

@@ -2,14 +2,12 @@ import { screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { render } from 'test/test-utils';
 
-import { configureStore } from '../../../../store/configureStore';
 import { DashboardModel } from '../../state';
 import { createDashboardModelFixture } from '../../state/__fixtures__/dashboardFixtures';
 
 import { DashboardSettings } from './DashboardSettings';
 
 function setup(dashboard: DashboardModel) {
-  const store = configureStore();
   const sectionNav = {
     main: { text: 'Dashboard' },
     node: {

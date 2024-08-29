@@ -78,7 +78,7 @@ func (s *druidInstanceSettings) Dispose() {
 	s.client.Close()
 }
 
-func newDataSourceInstance(settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
+func newDataSourceInstance(ctx context.Context, settings backend.DataSourceInstanceSettings) (instancemgmt.Instance, error) {
 	data, err := simplejson.NewJson(settings.JSONData)
 	if err != nil {
 		return &druidInstanceSettings{}, err
@@ -189,6 +189,10 @@ func (ds *Service) CallResource(ctx context.Context, req *backend.CallResourceRe
 		Status:  code,
 	}
 	resp.Body, err = json.Marshal(body)
+	if err != nil {
+		resp.Body = []byte("Error marshalling response")
+		resp.Status = 500
+	}
 	sender.Send(resp)
 	return nil
 }

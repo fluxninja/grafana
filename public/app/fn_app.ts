@@ -3,7 +3,6 @@ import 'core-js';
 import 'regenerator-runtime/runtime';
 
 import 'whatwg-fetch'; // fetch polyfill needed for PhantomJs rendering
-import './polyfills/old-mediaquerylist'; // Safari < 14 does not have mql.addEventListener()
 import 'file-saver';
 import 'jquery';
 
@@ -33,7 +32,8 @@ import {
   setPluginImportUtils,
   setPluginExtensionGetter,
   setAppEvents,
-  type GetPluginExtensions,
+  setPluginExtensionsHook,
+  setPluginComponentHook,
 } from '@grafana/runtime';
 import { setPanelDataErrorView } from '@grafana/runtime/src/components/PanelDataErrorView';
 import { setPanelRenderer } from '@grafana/runtime/src/components/PanelRenderer';
@@ -52,7 +52,7 @@ import { PluginPage } from './core/components/Page/PluginPage';
 import { GrafanaContextType } from './core/context/GrafanaContext';
 import { initializeI18n } from './core/internationalization';
 import { interceptLinkClicks } from './core/navigation/patch/interceptLinkClicks';
-import { ModalManager } from './core/services/ModalManager';
+import { NewFrontendAssetsChecker } from './core/services/NewFrontendAssetsChecker';
 import { backendSrv } from './core/services/backend_srv';
 import { contextSrv } from './core/services/context_srv';
 import { Echo } from './core/services/echo/Echo';
@@ -71,9 +71,12 @@ import { getTimeSrv } from './features/dashboard/services/TimeSrv';
 import { PanelDataErrorView } from './features/panel/components/PanelDataErrorView';
 import { PanelRenderer } from './features/panel/components/PanelRenderer';
 import { DatasourceSrv } from './features/plugins/datasource_srv';
-import { createPluginExtensionRegistry } from './features/plugins/extensions/createPluginExtensionRegistry';
 import { getCoreExtensionConfigurations } from './features/plugins/extensions/getCoreExtensionConfigurations';
-import { getPluginExtensions } from './features/plugins/extensions/getPluginExtensions';
+import { createPluginExtensionsGetter } from './features/plugins/extensions/getPluginExtensions';
+import { ReactivePluginExtensionsRegistry } from './features/plugins/extensions/reactivePluginExtensionRegistry';
+import { ExposedComponentsRegistry } from './features/plugins/extensions/registry/ExposedComponentsRegistry';
+import { createUsePluginComponent } from './features/plugins/extensions/usePluginComponent';
+import { createUsePluginExtensions } from './features/plugins/extensions/usePluginExtensions';
 import { importPanelPlugin, syncGetPanelPlugin } from './features/plugins/importPanelPlugin';
 import { preloadPlugins } from './features/plugins/pluginPreloader';
 import { QueryRunner } from './features/query/state/QueryRunner';
@@ -106,37 +109,11 @@ if (process.env.NODE_ENV === 'development') {
   initDevFeatures();
 }
 
-export declare type FNGrafanaStartupState = {
-  isLoading: boolean;
-  isError: boolean;
-  error?: unknown;
-  isIdeal: boolean;
-};
-
-export const DefaultGrafanaStartupState: FNGrafanaStartupState = {
-  isLoading: false,
-  isError: false,
-  isIdeal: true,
-};
-
-const dispatchFnEvent = (info: FNGrafanaStartupState = DefaultGrafanaStartupState, ek = 'grafana-startup') => {
-  window.dispatchEvent(
-    new CustomEvent(ek, {
-      detail: info,
-    })
-  );
-};
-
 export class GrafanaApp {
   context!: GrafanaContextType;
 
   async init() {
     try {
-      dispatchFnEvent({
-        isIdeal: false,
-        isLoading: true,
-        isError: false,
-      });
       // Let iframe container know grafana has started loading
       parent.postMessage('GrafanaAppInit', '*');
 
@@ -216,29 +193,43 @@ export class GrafanaApp {
       setDataSourceSrv(dataSourceSrv);
       initWindowRuntime();
 
-      // init modal manager
-      const modalManager = new ModalManager();
-      modalManager.init();
+      // Initialize plugin extensions
+      const extensionsRegistry = new ReactivePluginExtensionsRegistry();
+      extensionsRegistry.register({
+        pluginId: 'grafana',
+        extensionConfigs: getCoreExtensionConfigurations(),
+        exposedComponentConfigs: [],
+      });
+
+      const exposedComponentsRegistry = new ExposedComponentsRegistry();
 
       // Preload selected app plugins
-      const preloadResults = await preloadPlugins(config.apps);
+      if (contextSrv.user.orgRole !== '') {
+        // The "cloud-home-app" is registering banners once it's loaded, and this can cause a rerender in the AppChrome if it's loaded after the Grafana app init.
+        // TODO: remove the following exception once the issue mentioned above is fixed.
+        const awaitedAppPluginIds = ['cloud-home-app'];
+        const awaitedAppPlugins = Object.values(config.apps).filter((app) => awaitedAppPluginIds.includes(app.id));
+        const appPlugins = Object.values(config.apps).filter((app) => !awaitedAppPluginIds.includes(app.id));
 
-      // Create extension registry out of preloaded plugins and core extensions
-      const extensionRegistry = createPluginExtensionRegistry([
-        { pluginId: 'grafana', extensionConfigs: getCoreExtensionConfigurations() },
-        ...preloadResults,
-      ]);
+        preloadPlugins(appPlugins, extensionsRegistry, exposedComponentsRegistry);
+        await preloadPlugins(
+          awaitedAppPlugins,
+          extensionsRegistry,
+          exposedComponentsRegistry,
+          'frontend_awaited_plugins_preload'
+        );
+      }
 
-      // Expose the getPluginExtension function via grafana-runtime
-      const pluginExtensionGetter: GetPluginExtensions = (options) =>
-        getPluginExtensions({ ...options, registry: extensionRegistry });
-
-      setPluginExtensionGetter(pluginExtensionGetter);
+      setPluginExtensionGetter(createPluginExtensionsGetter(extensionsRegistry));
+      setPluginExtensionsHook(createUsePluginExtensions(extensionsRegistry));
+      setPluginComponentHook(createUsePluginComponent(exposedComponentsRegistry));
 
       // initialize chrome service
       const queryParams = locationService.getSearchObject();
       const chromeService = new AppChromeService();
       const keybindingsService = new KeybindingSrv(locationService, chromeService);
+      const newAssetsChecker = new NewFrontendAssetsChecker();
+      newAssetsChecker.start();
 
       // Read initial kiosk mode from url at app startup
       chromeService.setKioskModeFromUrl(queryParams.kiosk);
@@ -249,20 +240,9 @@ export class GrafanaApp {
         chrome: chromeService,
         keybindings: keybindingsService,
         config,
+        newAssetsChecker,
       };
-
-      dispatchFnEvent({
-        isLoading: false,
-        isError: false,
-        isIdeal: false,
-      });
     } catch (error) {
-      dispatchFnEvent({
-        isLoading: false,
-        isError: true,
-        error,
-        isIdeal: false,
-      });
       console.error('Failed to start Grafana', error);
       window.__grafana_load_failed();
     } finally {
@@ -288,7 +268,7 @@ function initEchoSrv() {
 
   window.addEventListener('load', (e) => {
     const loadMetricName = 'frontend_boot_load_time_seconds';
-    // Metrics below are marked in public/views/index-template.html
+    // Metrics below are marked in public/views/index.html
     const jsLoadMetricName = 'frontend_boot_js_done_time_seconds';
     const cssLoadMetricName = 'frontend_boot_css_time_seconds';
 
@@ -348,6 +328,7 @@ function initEchoSrv() {
         user: config.bootData.user,
         sdkUrl: config.rudderstackSdkUrl,
         configUrl: config.rudderstackConfigUrl,
+        integrationsUrl: config.rudderstackIntegrationsUrl,
         buildInfo: config.buildInfo,
       })
     );

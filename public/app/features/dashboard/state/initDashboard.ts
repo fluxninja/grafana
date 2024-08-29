@@ -88,7 +88,12 @@ async function fetchDashboard(
         return await dashboardLoaderSrv.loadDashboard('public', args.urlSlug, args.accessToken, args.version);
       }
       case DashboardRoutes.Normal: {
-        const dashDTO: DashboardDTO = await dashboardLoaderSrv.loadDashboard(args.urlType, args.urlSlug, args.urlUid, args.version);
+        const dashDTO: DashboardDTO = await dashboardLoaderSrv.loadDashboard(
+          args.urlType,
+          args.urlSlug,
+          args.urlUid,
+          args.version
+        );
 
         // only the folder API has information about ancestors
         // get parent folder (if it exists) and put it in the store
@@ -121,10 +126,10 @@ async function fetchDashboard(
         // only the folder API has information about ancestors
         // get parent folder (if it exists) and put it in the store
         // this will be used to populate the full breadcrumb trail
-        if (args.urlFolderUid) {
-          await dispatch(getFolderByUid(args.urlFolderUid));
+        if (args.urlFolderId) {
+          await dispatch(getFolderByUid(args.urlFolderId));
         }
-        return await buildNewDashboardSaveModel(args.urlFolderUid);
+        return await buildNewDashboardSaveModel(args.urlFolderId);
       }
       case DashboardRoutes.Path: {
         const path = args.urlSlug ?? '';

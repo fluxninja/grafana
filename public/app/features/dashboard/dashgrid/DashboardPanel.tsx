@@ -34,7 +34,6 @@ const mapStateToProps = (state: StoreState, props: OwnProps) => {
   return {
     plugin: panelState.plugin,
     instanceState: panelState.instanceState,
-    fnGlobalState: state.fnGlobalState,
   };
 };
 
@@ -46,6 +45,7 @@ const mapDispatchToProps = {
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
 export type Props = OwnProps & ConnectedProps<typeof connector>;
+
 export class DashboardPanelUnconnected extends PureComponent<Props> {
   static defaultProps: Partial<Props> = {
     lazy: true,
@@ -58,7 +58,7 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
     }
   }
 
-  onInstanceStateChange = (value: unknown) => {
+  onInstanceStateChange = (value: any) => {
     this.props.setPanelInstanceState({ key: this.props.stateKey, value });
   };
 
@@ -72,7 +72,7 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
     }
   };
 
-  renderPanel = (isInView: boolean) => {
+  renderPanel = ({ isInView }: { isInView: boolean }) => {
     const {
       dashboard,
       panel,
@@ -82,11 +82,9 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
       height,
       plugin,
       timezone,
-      fnGlobalState,
+      hideMenu,
       isDraggable = true,
     } = this.props;
-
-    // console.log(this.props, "on render panel")
 
     if (!plugin) {
       return null;
@@ -121,8 +119,7 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
         height={height}
         onInstanceStateChange={this.onInstanceStateChange}
         timezone={timezone}
-        mode={fnGlobalState.mode}
-        FNDashboard={fnGlobalState.FNDashboard}
+        hideMenu={hideMenu}
       />
     );
   };
@@ -135,7 +132,7 @@ export class DashboardPanelUnconnected extends PureComponent<Props> {
         {this.renderPanel}
       </LazyLoader>
     ) : (
-      this.renderPanel(true)
+      this.renderPanel({ isInView: true })
     );
   }
 }

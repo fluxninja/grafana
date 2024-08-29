@@ -8,5 +8,11 @@ export declare global {
     nonce: string | undefined;
     __POWERED_BY_QIANKUN__: boolean;
     __INJECTED_PUBLIC_PATH_BY_QIANKUN__: string;
+    System: typeof System;
+  }
+
+  // Augment DOMParser to accept TrustedType sanitised content
+  interface DOMParser {
+    parseFromString(string: string | TrustedType, type: DOMParserSupportedType): Document;
   }
 }

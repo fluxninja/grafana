@@ -1,5 +1,5 @@
 import { isEqual, uniqBy } from 'lodash';
-import React, { CSSProperties, FC, useEffect, useRef } from 'react';
+import { CSSProperties, FC, useEffect, useRef } from 'react';
 // eslint-disable-next-line no-restricted-imports
 import { useDispatch, useSelector } from 'react-redux';
 

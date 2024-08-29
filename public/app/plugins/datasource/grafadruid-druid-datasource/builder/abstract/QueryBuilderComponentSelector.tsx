@@ -1,9 +1,12 @@
-import React, { useState } from 'react';
-import { QueryBuilderComponent, QueryComponent, Component } from './types';
-import { QueryBuilderProps } from '../types';
-import { InlineField, Select } from '@grafana/ui';
-import { SelectableValue } from '@grafana/data';
 import { cloneDeep } from 'lodash';
+import { useState } from 'react';
+
+import { SelectableValue } from '@grafana/data';
+import { InlineField, Select } from '@grafana/ui';
+
+import { QueryBuilderProps } from '../types';
+
+import { QueryBuilderComponent, QueryComponent, Component } from './types';
 
 const useComponentsRegistry = (
   components: Record<string, QueryBuilderComponent<QueryComponent | Component>>
@@ -25,8 +28,8 @@ const useComponentKey = (
       'type' in defaultComponent
         ? defaultComponent.type
         : 'queryType' in defaultComponent
-        ? defaultComponent.queryType
-        : undefined;
+          ? defaultComponent.queryType
+          : undefined;
   }
   if (key !== undefined) {
     key = key.toLowerCase();

@@ -11,7 +11,7 @@ const { DefinePlugin } = require('webpack');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { merge } = require('webpack-merge');
 
-const getEnvConfig = require('./env-util.js');
+const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
 const esbuildTargets = resolveToEsbuildTarget(browserslist(), { printUnknownTargets: false });
 
@@ -20,10 +20,7 @@ const esbuildTargets = resolveToEsbuildTarget(browserslist(), { printUnknownTarg
 const esbuildOptions = {
   target: esbuildTargets,
   format: undefined,
-  jsx: 'automatic',
 };
-
-const envConfig = getEnvConfig();
 
 module.exports = (env = {}) =>
   merge(common, {
@@ -42,6 +39,7 @@ module.exports = (env = {}) =>
       rules: [
         {
           test: /\.tsx?$/,
+          exclude: /node_modules/,
           use: {
             loader: 'esbuild-loader',
             options: esbuildOptions,
@@ -94,6 +92,7 @@ module.exports = (env = {}) =>
         chunksSortMode: 'none',
         excludeChunks: ['dark', 'light', 'app'],
       }),
+      new HTMLWebpackCSSChunks(),
       new DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify('development'),
@@ -112,6 +111,5 @@ module.exports = (env = {}) =>
           }
         });
       },
-      new EnvironmentPlugin(envConfig),
     ],
   });

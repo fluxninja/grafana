@@ -1,4 +1,5 @@
 import { ComponentType } from 'react';
+
 import { QueryBuilderProps } from '../types';
 
 export interface QueryBuilderFieldProps extends QueryBuilderProps {

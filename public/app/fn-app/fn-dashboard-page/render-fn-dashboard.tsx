@@ -1,5 +1,5 @@
-import { merge,  isFunction } from 'lodash';
-import React, { useEffect, FC, useMemo } from 'react';
+import { merge, isFunction } from 'lodash';
+import { useEffect, FC, useMemo } from 'react';
 
 import { locationService as locationSrv, HistoryWrapper } from '@grafana/runtime';
 import DashboardPage, { DashboardPageProps } from 'app/features/dashboard/containers/DashboardPage';
@@ -66,7 +66,7 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
         queryParams,
         hiddenVariables,
         controlsContainer,
-        isLoading
+        isLoading,
       }),
     [controlsContainer, hiddenVariables, isLoading, props, queryParams]
   );

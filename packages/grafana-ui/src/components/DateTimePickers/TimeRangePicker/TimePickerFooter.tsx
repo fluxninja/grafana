@@ -6,7 +6,7 @@ import * as React from 'react';
 import { getTimeZoneInfo, GrafanaTheme2, TimeZone } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 
-import { stylesFactory, useStyles2 } from '../../../themes';
+import { stylesFactory, useStyles2, useTheme2 } from '../../../themes';
 import { t, Trans } from '../../../utils/i18n';
 import { Button } from '../../Button';
 import { Field } from '../../Forms/Field';
@@ -36,6 +36,7 @@ export const TimePickerFooter = (props: Props) => {
   } = props;
   const [isEditing, setEditing] = useState(false);
   const [editMode, setEditMode] = useState('tz');
+  const theme = useTheme2();
 
   const timeSettingsId = useId();
   const timeZoneSettingsId = useId();

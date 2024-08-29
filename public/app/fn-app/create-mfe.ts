@@ -6,7 +6,7 @@ window.__grafana_public_path__ =
 
 import { isNull, merge, noop, pick } from 'lodash';
 import React, { ComponentType } from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 
 import { createTheme, GrafanaThemeType } from '@grafana/data';
 import { createColors } from '@grafana/data/src/themes/createColors';
@@ -183,7 +183,7 @@ class createMfe {
     createMfe.removeThemeLinks(createMfe.toggleTheme(mode));
 
     const newCssLink = createMfe.styleSheetLink;
-    newCssLink.href = config.bootData.themePaths[mode];
+    newCssLink.href = config.bootData.assets[mode];
     document.body.appendChild(newCssLink);
 
     createMfe.logger.info('Successfully loaded theme.', { mode });
@@ -242,7 +242,7 @@ class createMfe {
       if (container) {
         createMfe.logger.info('Trying to unmount grafana...');
 
-        ReactDOM.unmountComponentAtNode(container);
+        createRoot(container).unmount();
 
         createMfe.logger.info('Successfully unmounted grafana.');
       } else {
@@ -293,11 +293,16 @@ class createMfe {
 
   static renderMfeComponent(props: FNDashboardProps, onSuccess = noop) {
     const container = createMfe.getContainer(props);
+    if (!container) {
+      createMfe.logger.error('Failed to render mfe component. Container does not exist.', { props });
 
-    ReactDOM.render(React.createElement(createMfe.Component, props), container, () => {
-      createMfe.logger.info('Created mfe component.', { props, container });
-      onSuccess();
-    });
+      return;
+    }
+
+    const root = createRoot(container);
+    root.render(React.createElement(createMfe.Component, props));
+    createMfe.logger.info('Created mfe component.', { props, container });
+    onSuccess();
   }
 }
 

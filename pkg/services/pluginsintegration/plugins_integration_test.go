@@ -95,23 +95,10 @@ func TestIntegrationPluginManager(t *testing.T) {
 	graf := grafanads.ProvideService(sv2, nil)
 	pyroscope := pyroscope.ProvideService(hcp)
 	parca := parca.ProvideService(hcp)
-	druid := druid.ProvideService(hcp)
+	dr := druid.ProvideService(hcp)
+	coreRegistry := coreplugin.ProvideCoreRegistry(tracing.InitializeTracerForTest(), am, cw, cm, es, grap, idb, lk, otsdb, pr, tmpo, td, pg, my, ms, graf, pyroscope, parca, dr)
 
-	coreRegistry := coreplugin.ProvideCoreRegistry(am, cw, cm, es, grap, idb, lk, otsdb, pr, tmpo, td, pg, my, ms, graf, phlare, parca, druid)
-
-	pCfg, err := config.ProvideConfig(setting.ProvideProvider(cfg), cfg, featuremgmt.WithFeatures())
-	require.NoError(t, err)
-	reg := registry.ProvideService()
-	lic := plicensing.ProvideLicensing(cfg, &licensing.OSSLicensingService{Cfg: cfg})
-	angularInspector, err := angularinspector.NewStaticInspector()
-	require.NoError(t, err)
-	l := loader.ProvideService(pCfg, lic, signature.NewUnsignedAuthorizer(pCfg),
-		reg, provider.ProvideService(coreRegistry), finder.NewLocalFinder(pCfg.DevMode), fakes.NewFakeRoleRegistry(),
-		assetpath.ProvideService(pluginscdn.ProvideService(pCfg)), signature.ProvideService(statickey.New()),
-		angularInspector, &fakes.FakeOauthService{})
-	srcs := sources.ProvideService(cfg, pCfg)
-	ps, err := store.ProvideService(reg, srcs, l)
-	require.NoError(t, err)
+	testCtx := CreateIntegrationTestCtx(t, cfg, coreRegistry)
 
 	ctx := context.Background()
 	verifyCorePluginCatalogue(t, ctx, testCtx.PluginStore)
@@ -206,7 +193,6 @@ func verifyCorePluginCatalogue(t *testing.T, ctx context.Context, ps *pluginstor
 		"zipkin":                           {},
 		"grafana-pyroscope-datasource":     {},
 		"parca":                            {},
-		"druid":                            {},
 	}
 
 	expApps := map[string]struct{}{

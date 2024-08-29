@@ -1,5 +1,5 @@
 import { Box, CircularProgress, CircularProgressProps, Typography, type BoxProps } from '@mui/material';
-import React, { type ReactNode, type FC } from 'react';
+import { type ReactNode, type FC } from 'react';
 
 import { useTheme2 } from '@grafana/ui';
 

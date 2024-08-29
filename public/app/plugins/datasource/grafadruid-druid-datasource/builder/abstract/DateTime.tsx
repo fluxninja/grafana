@@ -1,10 +1,13 @@
-import React, { ChangeEvent } from 'react';
-import { InlineLabel, stylesFactory, useTheme } from '@grafana/ui';
-import { GrafanaTheme } from '@grafana/data';
-import { QueryBuilderFieldProps } from './types';
-import { onBuilderChange } from '.';
 import { css, cx, injectGlobal } from '@emotion/css';
 import DatePicker from 'react-datepicker';
+
+import { GrafanaTheme } from '@grafana/data';
+import { InlineLabel, stylesFactory, useTheme } from '@grafana/ui';
+
+import { QueryBuilderFieldProps } from './types';
+
+import { onBuilderChange } from '.';
+
 import 'react-datepicker/dist/react-datepicker.css';
 
 injectGlobal(`
@@ -22,8 +25,8 @@ interface Props extends QueryBuilderFieldProps {
 }
 
 const useDate = (value = ''): any => {
-  var date: Date | undefined = undefined;
-  var datePlaceholder: string | undefined = undefined;
+  let date: Date | undefined = undefined;
+  let datePlaceholder: string | undefined = undefined;
   const d = new Date(value);
   if (d instanceof Date && !isNaN(d.getFullYear())) {
     date = d;
@@ -35,14 +38,19 @@ const useDate = (value = ''): any => {
 
 export const DateTime = (props: Props) => {
   const [date, datePlaceholder] = useDate(props.options.builder);
-  const onDateChangeRaw = (event: ChangeEvent<HTMLInputElement>) => {
-    const value = event.target.value;
+  const onDateChangeRaw = (event?: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>) => {
+    const value = event?.currentTarget?.textContent;
     if (value && value.indexOf('$') !== -1) {
       onBuilderChange(props, value);
     }
   };
-  const onDateChange = (date: Date) => {
-    onBuilderChange(props, date.toISOString());
+  const onDateChange = (
+    date: Date | null,
+    event?: React.MouseEvent<HTMLElement> | React.KeyboardEvent<HTMLElement>
+  ) => {
+    if (date) {
+      onBuilderChange(props, date.toISOString());
+    }
   };
   const { label, description, format, time } = props;
   const theme = useTheme();

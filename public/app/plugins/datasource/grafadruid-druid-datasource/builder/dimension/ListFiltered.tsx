@@ -1,6 +1,6 @@
-import React from 'react';
-import { QueryBuilderProps } from '../types';
 import { useScopedQueryBuilderFieldProps, Input, Checkbox, Multiple, Row } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { Dimension } from './Dimension';
 
 export const ListFiltered = (props: QueryBuilderProps) => {

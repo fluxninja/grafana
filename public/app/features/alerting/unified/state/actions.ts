@@ -20,7 +20,12 @@ import {
 import { PromApplication, RulerRuleDTO, RulerRulesConfigDTO } from 'app/types/unified-alerting-dto';
 
 import { backendSrv } from '../../../../core/services/backend_srv';
-import { logInfo, LogMessages, withPerformanceLogging } from '../Analytics';
+import {
+  logMeasurement,
+  withPerformanceLogging,
+  withPromRulesMetadataLogging,
+  withRulerRulesMetadataLogging,
+} from '../Analytics';
 import {
   deleteAlertManagerConfig,
   fetchAlertGroups,

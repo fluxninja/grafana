@@ -1,6 +1,6 @@
-import React from 'react';
-import { QueryBuilderProps } from '../types';
 import { QueryBuilderComponentSelector } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { Polygon, Radius, Rectangular } from './';
 
 export const Bound = (props: QueryBuilderProps) => (

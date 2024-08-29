@@ -1,19 +1,18 @@
 import { css } from '@emotion/css';
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import { connect, MapStateToProps } from 'react-redux';
 
-import { AnnotationQuery, DataQuery, GrafanaTheme2 } from '@grafana/data';
+import { AnnotationQuery, DataQuery, GrafanaTheme2, TypedVariableModel } from '@grafana/data';
+import { DashboardLink } from '@grafana/schema/dist/esm/index';
 import { stylesFactory, Themeable2, withTheme2 } from '@grafana/ui';
 
 import { StoreState } from '../../../../types';
 import { getSubMenuVariables, getVariablesState } from '../../../variables/state/selectors';
-import { VariableModel } from '../../../variables/types';
 import { DashboardModel } from '../../state';
 
 import { Annotations } from './Annotations';
 import { DashboardLinks } from './DashboardLinks';
 import { SubMenuItems } from './SubMenuItems';
-import { DashboardLink } from '@grafana/schema/dist/esm/index';
 
 interface OwnProps extends Themeable2 {
   dashboard: DashboardModel;
@@ -22,7 +21,7 @@ interface OwnProps extends Themeable2 {
 }
 
 interface ConnectedProps {
-  variables: VariableModel[];
+  variables: TypedVariableModel[];
 }
 
 interface DispatchProps {}

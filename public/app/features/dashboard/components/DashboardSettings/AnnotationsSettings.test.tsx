@@ -21,7 +21,7 @@ function setup(dashboard: DashboardModel, editIndex?: number) {
   };
 
   return render(
-    <TestProvider>
+    <TestProvider store={store}>
       <AnnotationsSettings sectionNav={sectionNav} dashboard={dashboard} editIndex={editIndex} />
     </TestProvider>
   );

@@ -1,8 +1,10 @@
-import React from 'react';
-import { FieldSet } from '@grafana/ui';
 import { css, cx } from '@emotion/css';
-import { DruidQueryRequestSettings, DruidQueryResponseSettings } from './';
+
+import { FieldSet } from '@grafana/ui';
+
 import { QuerySettingsProps } from './types';
+
+import { DruidQueryRequestSettings, DruidQueryResponseSettings } from './';
 
 export const DruidQueryDefaultSettings = (props: QuerySettingsProps) => {
   return (

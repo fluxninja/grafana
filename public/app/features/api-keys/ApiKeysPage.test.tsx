@@ -51,7 +51,7 @@ const setup = (propOverrides: Partial<Props>) => {
   Object.assign(props, propOverrides);
 
   const { rerender } = render(
-    <TestProvider>
+    <TestProvider store={store}>
       <ApiKeysPageUnconnected {...props} />
     </TestProvider>
   );

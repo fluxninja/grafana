@@ -4,15 +4,14 @@ import { useEffect, useState } from 'react';
 import { GrafanaTheme2, TypedVariableModel, VariableHide } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { useStyles2 } from '@grafana/ui';
+import { useSelector } from 'app/types';
 
 import { PickerRenderer } from '../../../variables/pickers/PickerRenderer';
-import { useSelector } from 'app/types';
 
 interface Props {
   variables: TypedVariableModel[];
   readOnly?: boolean;
 }
-
 
 export const SubMenuItems = ({ variables, readOnly }: Props) => {
   const [visibleVariables, setVisibleVariables] = useState<TypedVariableModel[]>([]);

@@ -1,6 +1,6 @@
-import React from 'react';
-import { QueryBuilderProps } from '../types';
 import { QueryBuilderComponentSelector } from '../abstract';
+import { QueryBuilderProps } from '../types';
+
 import { Duration, Period, Simple } from './';
 
 export const Granularity = (props: QueryBuilderProps) => {

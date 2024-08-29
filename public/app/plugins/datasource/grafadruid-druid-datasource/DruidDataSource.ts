@@ -54,25 +54,28 @@ export class DruidDataSource extends DataSourceWithBackend<DruidQuery, DruidSett
 
     const exprParsed = JSON.parse(expr);
 
-    const filterMap: Record<string, Record<string, AdHocFilter[]>> = adhocFilters.reduce((acc, filter: AdHocFilter) => {
-      let operatorKey = filter.operator;
+    const filterMap: Record<string, Record<string, AdHocFilter[]>> = adhocFilters.reduce(
+      (acc, filter: AdHocFilter) => {
+        let operatorKey = filter.operator;
 
-      if (filter.operator === '>' || filter.operator === '<') {
-        operatorKey = '><';
-      }
+        if (filter.operator === '>' || filter.operator === '<') {
+          operatorKey = '><';
+        }
 
-      if (!acc[operatorKey]) {
-        acc[operatorKey] = {};
-      }
+        if (!acc[operatorKey]) {
+          acc[operatorKey] = {};
+        }
 
-      if (!acc[operatorKey][filter.key]) {
-        acc[operatorKey][filter.key] = [filter];
-      } else {
-        acc[operatorKey][filter.key].push(filter);
-      }
-      return acc;
-      // eslint-disable-next-line
-    }, {} as Record<string, Record<string, AdHocFilter[]>>);
+        if (!acc[operatorKey][filter.key]) {
+          acc[operatorKey][filter.key] = [filter];
+        } else {
+          acc[operatorKey][filter.key].push(filter);
+        }
+        return acc;
+        // eslint-disable-next-line
+      },
+      {} as Record<string, Record<string, AdHocFilter[]>>
+    );
 
     const equalFilterFields = Object.values(filterMap['='] || {}).map(this.getEqualityFilterField);
     const notEqualFilterFields = Object.values(filterMap['!='] || {}).map(this.getEqualityFilterField);
@@ -115,18 +118,21 @@ export class DruidDataSource extends DataSourceWithBackend<DruidQuery, DruidSett
         ? this.getBoundFilterObject(filters[0].value, null, filters[0].key)
         : this.getBoundFilterObject(null, filters[0].value, filters[0].key);
     } else {
-      const operatorsMap = filters.reduce((acc, filter) => {
-        if (Number.isNaN(Number(filter.value))) {
-          throw Error(`Bound value should be a number. "${filter.value}" is not a number`);
-        }
-        if (!acc[filter.operator]) {
-          acc[filter.operator] = [Number(filter.value)];
-        } else {
-          acc[filter.operator].push(Number(filter.value));
-        }
+      const operatorsMap = filters.reduce(
+        (acc, filter) => {
+          if (Number.isNaN(Number(filter.value))) {
+            throw Error(`Bound value should be a number. "${filter.value}" is not a number`);
+          }
+          if (!acc[filter.operator]) {
+            acc[filter.operator] = [Number(filter.value)];
+          } else {
+            acc[filter.operator].push(Number(filter.value));
+          }
 
-        return acc;
-      }, {} as Record<string, number[]>);
+          return acc;
+        },
+        {} as Record<string, number[]>
+      );
 
       return this.getBoundFilterObject(
         operatorsMap['>'] ? String(Math.max(...operatorsMap['>'])) : null,
@@ -172,9 +178,11 @@ export class DruidDataSource extends DataSourceWithBackend<DruidQuery, DruidSett
   };
 
   async metricFindQuery(query: DruidQuery): Promise<MetricFindValue[]> {
-    return this.postResource('query-variable', this.applyTemplateVariables(query)).then((response) => {
-      return response;
-    });
+    return this.postResource<MetricFindValue[]>('query-variable', this.applyTemplateVariables(query)).then(
+      (response) => {
+        return response;
+      }
+    );
   }
 
   async getTagKeys() {
@@ -188,7 +196,7 @@ export class DruidDataSource extends DataSourceWithBackend<DruidQuery, DruidSett
       expr: `{"builder":{"queryType":"sql","query":"${columnNamesSql}","intervals":{"type":"intervals","intervals":["\${__from:date:iso}/\${__to:date:iso}"]}},"settings":{}}`,
     };
 
-    return this.postResource('query-variable', this.applyTemplateVariables(tagKeysQuery as any));
+    return this.postResource<MetricFindValue[]>('query-variable', this.applyTemplateVariables(tagKeysQuery as any));
   }
 
   async getTagValues(options: { key?: string } = {}) {
@@ -202,7 +210,7 @@ export class DruidDataSource extends DataSourceWithBackend<DruidQuery, DruidSett
       expr: `{"builder":{"queryType":"sql","query":"${columnValuesSql}","intervals":{"type":"intervals","intervals":["\${__from:date:iso}/\${__to:date:iso}"]}},"settings":{}}`,
     };
 
-    return this.postResource('query-variable', this.applyTemplateVariables(tagValuesQuery as any));
+    return this.postResource<MetricFindValue[]>('query-variable', this.applyTemplateVariables(tagValuesQuery as any));
   }
 }
 
