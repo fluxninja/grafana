@@ -7,10 +7,11 @@ const { resolveToEsbuildTarget } = require('esbuild-plugin-browserslist');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
-const { DefinePlugin } = require('webpack');
+const { DefinePlugin, EnvironmentPlugin } = require('webpack');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { merge } = require('webpack-merge');
 
+const getEnvConfig = require('./env-util.js');
 const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
 const esbuildTargets = resolveToEsbuildTarget(browserslist(), { printUnknownTargets: false });
@@ -22,6 +23,8 @@ const esbuildOptions = {
   format: undefined,
 };
 
+const envConfig = getEnvConfig();
+
 module.exports = (env = {}) =>
   merge(common, {
     mode: 'production',
@@ -32,6 +35,7 @@ module.exports = (env = {}) =>
       dark: './public/sass/grafana.dark.scss',
       light: './public/sass/grafana.light.scss',
       fn_dashboard: './public/app/fn_dashboard.ts',
+      swagger: './public/swagger/index.tsx',
     },
 
     module: {
@@ -84,6 +88,13 @@ module.exports = (env = {}) =>
         excludeChunks: ['manifest', 'dark', 'light', 'fn_dashboard'],
         chunksSortMode: 'none',
       }),
+      new HtmlWebpackPlugin({
+        filename: path.resolve(__dirname, '../../public/views/swagger.html'),
+        template: path.resolve(__dirname, '../../public/views/swagger-template.html'),
+        inject: false,
+        chunksSortMode: 'none',
+        excludeChunks: ['dark', 'light', 'fn_dashboard'],
+      }),
       // Added fn_dashboard/index.html
       new HtmlWebpackPlugin({
         filename: path.resolve(__dirname, '../../public/microfrontends/fn_dashboard/index.html'),
@@ -111,5 +122,6 @@ module.exports = (env = {}) =>
           }
         });
       },
+      new EnvironmentPlugin(envConfig),
     ],
   });

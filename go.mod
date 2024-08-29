@@ -480,24 +480,18 @@ require (
 	github.com/grafadruid/go-druid v0.0.7-0.20230607082331-983aa577d90a
 	github.com/grafana/authlib v0.0.0-20240828122726-9edfcbea43e2
 	github.com/grafana/authlib/claims v0.0.0-20240827210201-19d5347dd8dd
-	github.com/grafana/thema v0.0.0-20240605110052-2016107581da
 )
 
 require (
 	cloud.google.com/go/longrunning v0.5.12 // indirect
 	github.com/at-wat/mqtt-go v0.19.4 // indirect
-	github.com/cockroachdb/errors v1.9.1 // indirect
-	github.com/cockroachdb/logtags v0.0.0-20211118104740-dabe8e521a4f // indirect
-	github.com/cockroachdb/redact v1.1.3 // indirect
 	github.com/dprotaso/go-yit v0.0.0-20220510233725-9ba8df137936 // indirect
-	github.com/getsentry/sentry-go v0.12.0 // indirect
 	github.com/grafana/grafana/pkg/semconv v0.0.0-20240808213237-f4d2e064f435 // indirect
 	github.com/hairyhenderson/go-which v0.2.0 // indirect
 	github.com/iancoleman/orderedmap v0.3.0 // indirect
-	github.com/kr/pretty v0.3.1 // indirect
-	github.com/rogpeppe/go-internal v1.12.0 // indirect
 	github.com/speakeasy-api/openapi-overlay v0.9.0 // indirect
 	github.com/vmware-labs/yaml-jsonpath v0.3.2 // indirect
+	github.com/yudai/pp v2.0.1+incompatible // indirect
 )
 
 // Use fork of crewjam/saml with fixes for some issues until changes get merged into upstream

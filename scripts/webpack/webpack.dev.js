@@ -7,9 +7,12 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
-const { DefinePlugin } = require('webpack');
+const { DefinePlugin, EnvironmentPlugin } = require('webpack');
+const WebpackAssetsManifest = require('webpack-assets-manifest');
 const { merge } = require('webpack-merge');
+const WebpackBar = require('webpackbar');
 
+const getEnvConfig = require('./env-util.js');
 const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
 const esbuildTargets = resolveToEsbuildTarget(browserslist(), { printUnknownTargets: false });
@@ -19,6 +22,8 @@ const esbuildOptions = {
   target: esbuildTargets,
   format: undefined,
 };
+
+const envConfig = getEnvConfig();
 
 module.exports = (env = {}) => {
   return merge(common, {
@@ -30,6 +35,7 @@ module.exports = (env = {}) => {
       dark: './public/sass/grafana.dark.scss',
       light: './public/sass/grafana.light.scss',
       fn_dashboard: './public/app/fn_dashboard.ts',
+      swagger: './public/swagger/index.tsx',
     },
 
     // If we enabled watch option via CLI
@@ -128,6 +134,16 @@ module.exports = (env = {}) => {
           SHOULD_LOG: JSON.stringify('true'),
         },
       }),
+      new WebpackAssetsManifest({
+        entrypoints: true,
+        integrity: true,
+        publicPath: true,
+      }),
+      new WebpackBar({
+        color: '#eb7b18',
+        name: 'Grafana',
+      }),
+      new EnvironmentPlugin(envConfig),
     ],
   });
 };
