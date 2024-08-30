@@ -20,7 +20,7 @@ declare global {
 }
 
 // config.isPublicDashboardView = false;
-config.bootData.assets = window.fnData.assets;
+config.bootData.themePaths = window.fnData.assets;
 
 export const { bootstrap, mount, unmount, update, afterMount, afterUnmount, beforeLoad, beforeMount, beforeUnmount } =
   createMfe.create(FNDashboard);

@@ -183,7 +183,7 @@ class createMfe {
     createMfe.removeThemeLinks(createMfe.toggleTheme(mode));
 
     const newCssLink = createMfe.styleSheetLink;
-    newCssLink.href = config.bootData.assets[mode];
+    newCssLink.href = config.bootData.themePaths[mode];
     document.body.appendChild(newCssLink);
 
     createMfe.logger.info('Successfully loaded theme.', { mode });

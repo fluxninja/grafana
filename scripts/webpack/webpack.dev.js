@@ -125,7 +125,7 @@ module.exports = (env = {}) => {
         template: path.resolve(__dirname, '../../public/views/index-microfrontend-template.html'),
         inject: false,
         chunksSortMode: 'none',
-        excludeChunks: ['dark', 'light', 'app'],
+        excludeChunks: ['dark', 'light', 'app', 'swagger'],
       }),
       new HTMLWebpackCSSChunks(),
       new DefinePlugin({
