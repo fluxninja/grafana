@@ -3,7 +3,7 @@ name: Deploy Grafana Server Cloud Run
 on:
   push:
     branches:
-      - fluxninja_micro_frontends
+      - coderabbit_micro_frontend
     paths:
       - "/**"
   workflow_dispatch:

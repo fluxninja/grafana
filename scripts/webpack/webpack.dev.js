@@ -128,12 +128,6 @@ module.exports = (env = {}) => {
         excludeChunks: ['dark', 'light', 'app', 'swagger'],
       }),
       new HTMLWebpackCSSChunks(),
-      new DefinePlugin({
-        'process.env': {
-          NODE_ENV: JSON.stringify('development'),
-          SHOULD_LOG: JSON.stringify('true'),
-        },
-      }),
       new WebpackAssetsManifest({
         entrypoints: true,
         integrity: true,
@@ -144,6 +138,12 @@ module.exports = (env = {}) => {
         name: 'Grafana',
       }),
       new EnvironmentPlugin(envConfig),
+      new DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('development'),
+          SHOULD_LOG: JSON.stringify('true'),
+        },
+      }),
     ],
   });
 };

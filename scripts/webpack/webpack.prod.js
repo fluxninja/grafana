@@ -8,6 +8,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 const { DefinePlugin, EnvironmentPlugin } = require('webpack');
+const WebpackAssetsManifest = require('webpack-assets-manifest');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { merge } = require('webpack-merge');
 
@@ -78,37 +79,28 @@ module.exports = (env = {}) =>
         filename: path.resolve(__dirname, '../../public/views/error.html'),
         template: path.resolve(__dirname, '../../public/views/error-template.html'),
         inject: false,
-        excludeChunks: ['dark', 'light', 'fn_dashboard'],
         chunksSortMode: 'none',
+        excludeChunks: ['dark', 'light', 'fn_dashboard'],
       }),
       new HtmlWebpackPlugin({
         filename: path.resolve(__dirname, '../../public/views/index.html'),
         template: path.resolve(__dirname, '../../public/views/index-template.html'),
         inject: false,
-        excludeChunks: ['manifest', 'dark', 'light', 'fn_dashboard'],
-        chunksSortMode: 'none',
-      }),
-      new HtmlWebpackPlugin({
-        filename: path.resolve(__dirname, '../../public/views/swagger.html'),
-        template: path.resolve(__dirname, '../../public/views/swagger-template.html'),
-        inject: false,
         chunksSortMode: 'none',
         excludeChunks: ['dark', 'light', 'fn_dashboard'],
       }),
-      // Added fn_dashboard/index.html
       new HtmlWebpackPlugin({
         filename: path.resolve(__dirname, '../../public/microfrontends/fn_dashboard/index.html'),
         template: path.resolve(__dirname, '../../public/views/index-microfrontend-template.html'),
         inject: false,
         chunksSortMode: 'none',
-        excludeChunks: ['dark', 'light', 'app'],
+        excludeChunks: ['dark', 'light', 'app', 'swagger'],
       }),
       new HTMLWebpackCSSChunks(),
-      new DefinePlugin({
-        'process.env': {
-          NODE_ENV: JSON.stringify('development'),
-          SHOULD_LOG: JSON.stringify('false'),
-        },
+      new WebpackAssetsManifest({
+        entrypoints: true,
+        integrity: true,
+        publicPath: true,
       }),
       new WebpackManifestPlugin({
         fileName: path.join(process.cwd(), 'manifest.json'),
@@ -123,5 +115,11 @@ module.exports = (env = {}) =>
         });
       },
       new EnvironmentPlugin(envConfig),
+      new DefinePlugin({
+        'process.env': {
+          NODE_ENV: JSON.stringify('development'),
+          SHOULD_LOG: JSON.stringify('false'),
+        },
+      }),
     ],
   });
