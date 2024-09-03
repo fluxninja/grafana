@@ -1,7 +1,6 @@
 import { css, cx } from '@emotion/css';
 import { useLayoutEffect, useRef, useReducer, CSSProperties } from 'react';
 import * as React from 'react';
-import { createPortal } from 'react-dom';
 import uPlot from 'uplot';
 
 import { GrafanaTheme2 } from '@grafana/data';
@@ -9,7 +8,7 @@ import { DashboardCursorSync } from '@grafana/schema';
 
 import { useStyles2 } from '../../../themes';
 import { RangeSelection1D, RangeSelection2D, OnSelectRangeCallback } from '../../PanelChrome';
-import { getPortalContainer } from '../../Portal/Portal';
+import { getPortalContainer, Portal } from '../../Portal/Portal';
 import { UPlotConfigBuilder } from '../config/UPlotConfigBuilder';
 
 import { CloseButton } from './CloseButton';
@@ -651,18 +650,18 @@ export const TooltipPlugin2 = ({
   }, [isHovering]);
 
   if (plot && isHovering) {
-    return createPortal(
-      <div
-        className={cx(styles.tooltipWrapper, isPinned && styles.pinned)}
-        style={style}
-        aria-live="polite"
-        aria-atomic="true"
-        ref={domRef}
-      >
-        {isPinned && <CloseButton onClick={dismiss} />}
-        {contents}
-      </div>,
-      portalRoot.current
+    return (
+      <Portal>
+        <div
+          className={cx(styles.tooltipWrapper, isPinned && styles.pinned)}
+          aria-live="polite"
+          aria-atomic="true"
+          ref={domRef}
+        >
+          {isPinned && <CloseButton onClick={dismiss} />}
+          {contents}
+        </div>
+      </Portal>
     );
   }
 

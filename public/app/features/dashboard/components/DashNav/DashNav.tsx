@@ -1,5 +1,4 @@
 import { css } from '@emotion/css';
-import { noop } from 'lodash';
 import { memo, ReactNode } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
 import { useLocation } from 'react-router-dom-v5-compat';
@@ -15,7 +14,6 @@ import {
   ToolbarButtonRow,
   ConfirmModal,
   Badge,
-  PageToolbar,
 } from '@grafana/ui';
 import { updateNavIndex } from 'app/core/actions';
 import { AppChromeUpdate } from 'app/core/components/AppChrome/AppChromeUpdate';
@@ -54,9 +52,9 @@ const mapDispatchToProps = {
   updateNavIndex,
 };
 
-const mapStateToProps = (state: StoreState) => {
-  return { ...state.fnGlobalState, navIndex: state.navIndex };
-};
+const mapStateToProps = (state: StoreState) => ({
+  navIndex: state.navIndex,
+});
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 
@@ -277,26 +275,17 @@ export const DashNav = memo<Props>((props) => {
   };
 
   const renderRightActions = () => {
-    const { dashboard, isFullscreen, kioskMode, FNDashboard, hideTimePicker } = props;
+    const { dashboard, isFullscreen, kioskMode, hideTimePicker } = props;
     const { canSave, canEdit, showSettings, canShare } = dashboard.meta;
     const { snapshot } = dashboard;
     const snapshotUrl = snapshot && snapshot.originalUrl;
     const buttons: ReactNode[] = [];
-    // const tvButton = config.featureToggles.topnav ? null : (
-    //   <ToolbarButton
-    //     tooltip={t('dashboard.toolbar.tv-button', 'Cycle view mode')}
-    //     icon="monitor"
-    //     onClick={onToggleTVMode}
-    //     key="tv-button"
-    //     isHidden={!!FNDashboard}
-    //   />
-    // );
 
     if (isPlaylistRunning()) {
       return [renderPlaylistControls(), renderTimeControls()];
     }
 
-    if (kioskMode === KioskMode.TV || kioskMode === KioskMode.FN) {
+    if (kioskMode === KioskMode.TV) {
       return [renderTimeControls()];
     }
 
@@ -307,7 +296,6 @@ export const DashNav = memo<Props>((props) => {
           onClick={onOpenSnapshotOriginal}
           icon="link"
           key="button-snapshot"
-          isHidden={!!FNDashboard}
         />
       );
     }
@@ -325,12 +313,13 @@ export const DashNav = memo<Props>((props) => {
                   onDismiss: hideModal,
                 });
               }}
-              isHidden={!!FNDashboard}
             />
           )}
         </ModalsController>
       );
     }
+
+    addCustomContent(dynamicDashNavActions.right, buttons);
 
     if (showSettings) {
       buttons.push(
@@ -339,7 +328,6 @@ export const DashNav = memo<Props>((props) => {
           icon="cog"
           onClick={onOpenSettings}
           key="button-settings"
-          isHidden={!!FNDashboard}
         />
       );
     }
@@ -368,47 +356,16 @@ export const DashNav = memo<Props>((props) => {
     return buttons;
   };
 
-  const { isFullscreen, title, folderTitle } = props;
-
-  // let titleHref = '';
-  // let parentHref = '';
-
-  // if (kioskMode !== KioskMode.FN && location !== undefined) {
-  //   console.log( location, "inside location" )
-  // this ensures the component rerenders when the location changes
-  //   const location = useLocation()
-  //   titleHref = locationUtil.getUrlForPartial(location, { search: 'open' });
-  //   parentHref = locationUtil.getUrlForPartial(location, { search: 'open', folder: 'current' });
-  // }
-
-  const onGoBack = isFullscreen ? onclose : undefined;
-
-  if (config.featureToggles.topnav) {
-    return (
-      <AppChromeUpdate
-        actions={
-          <>
-            {renderLeftActions()}
-            <NavToolbarSeparator leftActionsSeparator />
-            <ToolbarButtonRow alignment="right">{renderRightActions()}</ToolbarButtonRow>
-          </>
-        }
-      />
-    );
-  }
-
   return (
-    <PageToolbar
-      //  pageIcon={isFullscreen ? undefined : 'apps'}
-      title={title}
-      parent={folderTitle}
-      // titleHref={titleHref}
-      // parentHref={parentHref}
-      onGoBack={onGoBack ?? noop}
-      leftItems={renderLeftActions()}
-    >
-      {renderRightActions()}
-    </PageToolbar>
+    <AppChromeUpdate
+      actions={
+        <>
+          {renderLeftActions()}
+          <NavToolbarSeparator leftActionsSeparator />
+          <ToolbarButtonRow alignment="right">{renderRightActions()}</ToolbarButtonRow>
+        </>
+      }
+    />
   );
 });
 

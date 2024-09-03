@@ -4,6 +4,7 @@ const browserslist = require('browserslist');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const { EsbuildPlugin } = require('esbuild-loader');
 const { resolveToEsbuildTarget } = require('esbuild-plugin-browserslist');
+const ESLintPlugin = require('eslint-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
@@ -11,6 +12,7 @@ const { DefinePlugin, EnvironmentPlugin } = require('webpack');
 const WebpackAssetsManifest = require('webpack-assets-manifest');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { merge } = require('webpack-merge');
+const WebpackBar = require('webpackbar');
 
 const getEnvConfig = require('./env-util.js');
 const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
@@ -75,6 +77,11 @@ module.exports = (env = {}) =>
       new MiniCssExtractPlugin({
         filename: 'grafana.[name].[contenthash].css',
       }),
+      new ESLintPlugin({
+        cache: true,
+        lintDirtyModulesOnly: true, // don't lint on start, only lint changed files
+        extensions: ['.ts', '.tsx'],
+      }),
       new HtmlWebpackPlugin({
         filename: path.resolve(__dirname, '../../public/views/error.html'),
         template: path.resolve(__dirname, '../../public/views/error-template.html'),
@@ -114,12 +121,13 @@ module.exports = (env = {}) =>
           }
         });
       },
-      new EnvironmentPlugin(envConfig),
-      new DefinePlugin({
-        'process.env': {
-          NODE_ENV: JSON.stringify('development'),
-          SHOULD_LOG: JSON.stringify('false'),
-        },
+      new EnvironmentPlugin({
+        ...envConfig,
+        SHOULD_LOG: 'false',
+      }),
+      new WebpackBar({
+        color: '#eb7b18',
+        name: 'Grafana',
       }),
     ],
   });

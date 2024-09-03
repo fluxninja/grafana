@@ -218,9 +218,9 @@ export const TimeRangeContent = (props: Props) => {
           type="button"
           onClick={onApply}
           style={{
-            width: '100%',
+            width: 193,
             textAlign: 'center',
-            paddingLeft: '55px',
+            paddingLeft: 45,
           }}
         >
           <Trans i18nKey="time-picker.range-content.apply-button">Apply time range</Trans>
