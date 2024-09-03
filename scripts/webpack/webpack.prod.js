@@ -4,14 +4,17 @@ const browserslist = require('browserslist');
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
 const { EsbuildPlugin } = require('esbuild-loader');
 const { resolveToEsbuildTarget } = require('esbuild-plugin-browserslist');
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 const { EnvironmentPlugin } = require('webpack');
 const WebpackAssetsManifest = require('webpack-assets-manifest');
 const { WebpackManifestPlugin } = require('webpack-manifest-plugin');
 const { merge } = require('webpack-merge');
+const WebpackBar = require('webpackbar');
 
 const getEnvConfig = require('./env-util.js');
+const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
 const common = require('./webpack.common.js');
 const esbuildTargets = resolveToEsbuildTarget(browserslist(), { printUnknownTargets: false });
 
@@ -20,19 +23,22 @@ const esbuildTargets = resolveToEsbuildTarget(browserslist(), { printUnknownTarg
 const esbuildOptions = {
   target: esbuildTargets,
   format: undefined,
-  jsx: 'automatic',
 };
 
 const envConfig = getEnvConfig();
 
+// using dev webpack for prod build to avoid css leak issues in microfrontends
 module.exports = (env = {}) =>
   merge(common, {
     mode: 'production',
     devtool: 'source-map',
 
     entry: {
+      app: './public/app/index.ts',
       dark: './public/sass/grafana.dark.scss',
       light: './public/sass/grafana.light.scss',
+      fn_dashboard: './public/app/fn_dashboard.ts',
+      swagger: './public/swagger/index.tsx',
     },
 
     module: {
@@ -40,6 +46,7 @@ module.exports = (env = {}) =>
       rules: [
         {
           test: /\.tsx?$/,
+          exclude: /node_modules/,
           use: {
             loader: 'esbuild-loader',
             options: esbuildOptions,
@@ -70,10 +77,14 @@ module.exports = (env = {}) =>
       new MiniCssExtractPlugin({
         filename: 'grafana.[name].[contenthash].css',
       }),
-      /**
-       * I know we have two manifest plugins here.
-       * WebpackManifestPlugin was only used in prod before and does not support integrity hashes
-       */
+      new HtmlWebpackPlugin({
+        filename: path.resolve(__dirname, '../../public/microfrontends/fn_dashboard/index.html'),
+        template: path.resolve(__dirname, '../../public/views/index-microfrontend-template.html'),
+        inject: false,
+        chunksSortMode: 'none',
+        excludeChunks: ['dark', 'light', 'app', 'swagger'],
+      }),
+      new HTMLWebpackCSSChunks(),
       new WebpackAssetsManifest({
         entrypoints: true,
         integrity: true,
@@ -92,5 +103,9 @@ module.exports = (env = {}) =>
         });
       },
       new EnvironmentPlugin(envConfig),
+      new WebpackBar({
+        color: '#eb7b18',
+        name: 'Grafana',
+      }),
     ],
   });

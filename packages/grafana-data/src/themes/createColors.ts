@@ -91,7 +91,7 @@ class DarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   mode: ThemeColorsMode = 'dark';
 
   // Used to get more white opacity colors
-  whiteBase = '204, 204, 220';
+  whiteBase = '219, 217, 215';
 
   border = {
     weak: `rgba(${this.whiteBase}, 0.12)`,
@@ -100,23 +100,22 @@ class DarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   text = {
-    primary: `rgb(${this.whiteBase})`,
-    secondary: `rgba(${this.whiteBase}, 0.65)`,
-    disabled: `rgba(${this.whiteBase}, 0.6)`,
-    link: palette.blueDarkText,
-    maxContrast: palette.white,
+    primary: '#DBD9D7',
+    secondary: '#F0E4B6',
+    disabled: '#9DA7B8',
+    link: '#F0E4B6',
+    maxContrast: '#F0E4B6',
   };
 
   primary = {
-    main: palette.blueDarkMain,
-    text: palette.blueDarkText,
-    border: palette.blueDarkText,
+    main: '#3F8367',
+    text: '#F0E4B6',
+    border: '#ffffff00',
   };
 
   secondary = {
-    main: `rgba(${this.whiteBase}, 0.10)`,
-    shade: `rgba(${this.whiteBase}, 0.14)`,
-    transparent: `rgba(${this.whiteBase}, 0.08)`,
+    main: '#F06929',
+    shade: '#F0692955',
     text: this.text.primary,
     contrastText: `rgb(${this.whiteBase})`,
     border: `rgba(${this.whiteBase}, 0.08)`,
@@ -130,19 +129,19 @@ class DarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   success = {
-    main: palette.greenDarkMain,
-    text: palette.greenDarkText,
+    main: '#4BBF73',
+    text: '#318B50',
   };
 
   warning = {
-    main: palette.orangeDarkMain,
-    text: palette.orangeDarkText,
+    main: '#CF8E07',
+    text: this.text.primary,
   };
 
   background = {
-    canvas: palette.gray05,
-    primary: palette.gray10,
-    secondary: palette.gray15,
+    canvas: '#312D2B', //palette.gray05,
+    primary: '#3B3835', //palette.gray10,
+    secondary: '#5E5855', //palette.gray15,
   };
 
   action = {
@@ -169,19 +168,19 @@ class DarkColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
 class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   mode: ThemeColorsMode = 'light';
 
-  blackBase = '36, 41, 46';
+  blackBase = '45, 51, 62';
 
   primary = {
-    main: palette.blueLightMain,
-    border: palette.blueLightText,
-    text: palette.blueLightText,
+    main: '#FF4702',
+    border: '#E33E00',
+    text: '#101828',
   };
 
   text = {
-    primary: `rgba(${this.blackBase}, 1)`,
-    secondary: `rgba(${this.blackBase}, 0.75)`,
-    disabled: `rgba(${this.blackBase}, 0.64)`,
-    link: this.primary.text,
+    primary: '#101828',
+    secondary: '#344054',
+    disabled: '#9DA7B8',
+    link: '#FF4702',
     maxContrast: palette.black,
   };
 
@@ -192,16 +191,15 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   secondary = {
-    main: `rgba(${this.blackBase}, 0.08)`,
-    shade: `rgba(${this.blackBase}, 0.15)`,
-    transparent: `rgba(${this.blackBase}, 0.08)`,
+    main: '#FF4702',
+    shade: '#FC9A6990',
     contrastText: `rgba(${this.blackBase},  1)`,
     text: this.text.primary,
     border: this.border.weak,
   };
 
   info = {
-    main: palette.blueLightMain,
+    main: '#64B6F7',
     text: palette.blueLightText,
   };
 
@@ -212,24 +210,24 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   success = {
-    main: palette.greenLightMain,
+    main: '#83D39E',
     text: palette.greenLightText,
   };
 
   warning = {
-    main: palette.orangeLightMain,
+    main: '#F3D086',
     text: palette.orangeLightText,
   };
 
   background = {
-    canvas: palette.gray90,
-    primary: palette.white,
-    secondary: palette.gray100,
+    primary: '#FFFFFF',
+    canvas: '#FFFFFF',
+    secondary: '#FAFAFA',
   };
 
   action = {
     hover: `rgba(${this.blackBase}, 0.12)`,
-    selected: `rgba(${this.blackBase}, 0.08)`,
+    selected: `#F27A40`,
     selectedBorder: palette.orangeLightMain,
     hoverOpacity: 0.08,
     focus: `rgba(${this.blackBase}, 0.12)`,
@@ -251,7 +249,9 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
 export function createColors(colors: ThemeColorsInput): ThemeColors {
   const dark = new DarkColors();
   const light = new LightColors();
+
   const base = (colors.mode ?? 'dark') === 'dark' ? dark : light;
+
   const {
     primary = base.primary,
     secondary = base.secondary,

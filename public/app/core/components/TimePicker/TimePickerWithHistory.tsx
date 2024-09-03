@@ -1,9 +1,12 @@
-import { uniqBy } from 'lodash';
+import { isEqual, uniqBy } from 'lodash';
+import { CSSProperties, FC, useEffect, useRef } from 'react';
+// eslint-disable-next-line no-restricted-imports
+import { useDispatch, useSelector } from 'react-redux';
 
-import { AppEvents, TimeRange, isDateTime, rangeUtil } from '@grafana/data';
-import { TimeRangePickerProps, TimeRangePicker } from '@grafana/ui';
-import { t } from '@grafana/ui/src/utils/i18n';
-import appEvents from 'app/core/app_events';
+import { TimeRange, isDateTime, rangeUtil } from '@grafana/data';
+import { TimeRangePickerProps, TimeRangePicker, useTheme2 } from '@grafana/ui';
+import { FnGlobalState, updatePartialFnStates } from 'app/core/reducers/fn-slice';
+import { StoreState } from 'app/types';
 
 import { LocalStorageValueProvider } from '../LocalStorageValueProvider';
 
@@ -20,31 +23,66 @@ interface TimePickerHistoryItem {
 // We should only be storing TimePickerHistoryItem, but in the past we also stored TimeRange
 type LSTimePickerHistoryItem = TimePickerHistoryItem | TimeRange;
 
-export const TimePickerWithHistory = (props: Props) => {
-  return (
-    <LocalStorageValueProvider<LSTimePickerHistoryItem[]> storageKey={LOCAL_STORAGE_KEY} defaultValue={[]}>
-      {(rawValues, onSaveToStore) => {
-        const values = migrateHistory(rawValues);
-        const history = deserializeHistory(values);
+const FnText: React.FC = () => {
+  const { FNDashboard } = useSelector<StoreState, FnGlobalState>(({ fnGlobalState }) => fnGlobalState);
+  const theme = useTheme2();
 
-        return (
-          <TimeRangePicker
-            {...props}
-            history={history}
-            onChange={(value) => {
-              onAppendToHistory(value, values, onSaveToStore);
-              props.onChange(value);
-            }}
-            onError={(error?: string) =>
-              appEvents.emit(AppEvents.alertError, [
-                t('time-picker.copy-paste.default-error-title', 'Invalid time range'),
-                t('time-picker.copy-paste.default-error-message', `{{error}} is not a valid time range`, { error }),
-              ])
-            }
-          />
+  const FN_TEXT_STYLE: CSSProperties = { fontWeight: 700, fontSize: 14, marginLeft: 8 };
+
+  return <>{FNDashboard ? <span style={{ ...FN_TEXT_STYLE, color: theme.colors.primary.main }}>UTC</span> : ''}</>;
+};
+
+export const TimePickerWithHistory: FC<Props> = (props) => (
+  <LocalStorageValueProvider<LSTimePickerHistoryItem[]> storageKey={LOCAL_STORAGE_KEY} defaultValue={[]}>
+    {(rawValues, onSaveToStore) => {
+      return <Picker rawValues={rawValues} onSaveToStore={onSaveToStore} pickerProps={props} />;
+    }}
+  </LocalStorageValueProvider>
+);
+
+export interface PickerProps {
+  rawValues: LSTimePickerHistoryItem[];
+  onSaveToStore: (value: LSTimePickerHistoryItem[]) => void;
+  pickerProps: Props;
+}
+
+export const Picker: FC<PickerProps> = ({ rawValues, onSaveToStore, pickerProps }) => {
+  const { fnGlobalTimeRange } = useSelector<StoreState, FnGlobalState>(({ fnGlobalState }) => fnGlobalState);
+  const dispatch = useDispatch();
+
+  const values = migrateHistory(rawValues);
+  const history = deserializeHistory(values);
+
+  const didMountRef = useRef(false);
+  useEffect(() => {
+    /* The condition below skips the first run of useeffect that happens when this component gets mounted */
+    if (didMountRef.current) {
+      /* If the current timerange value has changed, update fnGlobalTimeRange */
+      if (!isEqual(fnGlobalTimeRange?.raw, pickerProps.value.raw)) {
+        dispatch(
+          updatePartialFnStates({
+            fnGlobalTimeRange: pickerProps.value,
+          })
         );
+      }
+    } else if (fnGlobalTimeRange && !isEqual(fnGlobalTimeRange.raw, pickerProps.value.raw)) {
+      /* If fnGlobalTimeRange exists in the initial render, set the time as that */
+      pickerProps.onChange(fnGlobalTimeRange);
+    }
+
+    didMountRef.current = true;
+  }, [dispatch, fnGlobalTimeRange, pickerProps]);
+
+  return (
+    <TimeRangePicker
+      {...pickerProps}
+      history={history}
+      onChange={(value) => {
+        onAppendToHistory(value, values, onSaveToStore);
+        pickerProps.onChange(value);
       }}
-    </LocalStorageValueProvider>
+      fnText={<FnText />}
+    />
   );
 };
 

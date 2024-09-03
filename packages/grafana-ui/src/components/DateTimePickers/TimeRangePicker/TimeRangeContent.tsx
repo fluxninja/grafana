@@ -195,6 +195,7 @@ export const TimeRangeContent = (props: Props) => {
         </Field>
         {fyTooltip}
       </div>
+
       <div className={style.buttonsContainer}>
         <Button
           data-testid={selectors.components.TimePicker.copyTimeRange}
@@ -212,7 +213,16 @@ export const TimeRangeContent = (props: Props) => {
           type="button"
           onClick={onPaste}
         />
-        <Button data-testid={selectors.components.TimePicker.applyTimeRange} type="button" onClick={onApply}>
+        <Button
+          data-testid={selectors.components.TimePicker.applyTimeRange}
+          type="button"
+          onClick={onApply}
+          style={{
+            width: 193,
+            textAlign: 'center',
+            paddingLeft: 45,
+          }}
+        >
           <Trans i18nKey="time-picker.range-content.apply-button">Apply time range</Trans>
         </Button>
       </div>
