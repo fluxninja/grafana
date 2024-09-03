@@ -189,7 +189,7 @@ jobs:
           tag: <<parameters.tag>>
       - when:
           condition:
-            equal: [fluxninja_micro_frontends, << pipeline.git.branch >>]
+            equal: [coderabbit_micro_frontend, << pipeline.git.branch >>]
           steps:
             - gcp-gcr/tag-image:
                 image: <<parameters.image>>
@@ -256,7 +256,7 @@ workflows:
           filters:
             branches:
               only:
-                - fluxninja_micro_frontends
+                - coderabbit_micro_frontend
           requires:
             - image-build-grafana-alpine
           environment-path: environments/latest/

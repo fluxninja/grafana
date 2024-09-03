@@ -107,20 +107,6 @@ module.exports = (env = {}) => {
         filename: 'grafana.[name].[contenthash].css',
       }),
       new HtmlWebpackPlugin({
-        filename: path.resolve(__dirname, '../../public/views/error.html'),
-        template: path.resolve(__dirname, '../../public/views/error-template.html'),
-        inject: false,
-        chunksSortMode: 'none',
-        excludeChunks: ['dark', 'light', 'fn_dashboard'],
-      }),
-      new HtmlWebpackPlugin({
-        filename: path.resolve(__dirname, '../../public/views/index.html'),
-        template: path.resolve(__dirname, '../../public/views/index-template.html'),
-        inject: false,
-        chunksSortMode: 'none',
-        excludeChunks: ['dark', 'light', 'fn_dashboard'],
-      }),
-      new HtmlWebpackPlugin({
         filename: path.resolve(__dirname, '../../public/microfrontends/fn_dashboard/index.html'),
         template: path.resolve(__dirname, '../../public/views/index-microfrontend-template.html'),
         inject: false,
