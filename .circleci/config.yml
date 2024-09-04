@@ -1,59 +1,58 @@
 version: 2.1
 
 executors:
-  python-cimg-executor:
+  go-executor:
     docker:
-      - image: cimg/python:3.9
+      - image: circleci/golang:1.18
+    working_directory: ~/go/src/github.com/your_org/your_repo
+
+  node-executor:
+    docker:
+      - image: circleci/node:16
+    working_directory: ~/frontend
 
 jobs:
-  build:
-    docker:
-      - image: circleci/golang:1.17
+  build-backend:
+    executor: go-executor
     steps:
       - checkout
-      - setup_remote_docker:
-          version: 20.10.7
       - restore_cache:
           keys:
-            - go-mod-{{ checksum "go.sum" }}
-      - restore_cache:
-          keys:
-            - yarn-packages-{{ checksum "yarn.lock" }}
-      - run:
-          name: Install Yarn
-          command: curl -o- -L https://yarnpkg.com/install.sh | bash
+            - go-mod-cache-{{ checksum "go.sum" }}
+            - go-mod-cache-
       - run:
           name: Install Go dependencies
-          command: go mod tidy
+          command: go mod download
       - save_cache:
-          key: go-mod-{{ checksum "go.sum" }}
           paths:
             - ~/go/pkg/mod
+          key: go-mod-cache-{{ checksum "go.sum" }}
       - run:
-          name: Build Go backend
-          command: go build -o grafana-server ./cmd/grafana
+          name: Build backend
+          command: go build -o bin/backend ./...
+
+  build-frontend:
+    executor: node-executor
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - yarn-cache-{{ checksum "yarn.lock" }}
+            - yarn-cache-
       - run:
-          name: Install Yarn dependencies
-          command: yarn install --immutable
+          name: Install frontend dependencies
+          command: yarn install
       - save_cache:
-          key: yarn-packages-{{ checksum "yarn.lock" }}
           paths:
             - ~/.cache/yarn
+          key: yarn-cache-{{ checksum "yarn.lock" }}
       - run:
-          name: Build Yarn frontend
+          name: Build frontend
           command: yarn build
-      - run:
-          name: Build Docker image
-          command: docker build -t gcr.io/coderabbit/grafana:latest .
 
 workflows:
   version: 2
-  build-image:
+  build-and-test:
     jobs:
-      - build:
-          name: image-build-grafana
-          filters:
-            branches:
-              only:
-                - coderabbit_micro_frontend
-                - pull/requests
+      - build-backend
+      - build-frontend
