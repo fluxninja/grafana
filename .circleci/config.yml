@@ -29,7 +29,7 @@ jobs:
           key: go-mod-cache-{{ checksum "go.sum" }}
       - run:
           name: Build backend
-          command: go build -o bin/backend ./...
+          command: go run build.go build
 
   build-frontend:
     executor: node-executor
@@ -48,7 +48,7 @@ jobs:
           key: yarn-cache-{{ checksum "yarn.lock" }}
       - run:
           name: Build frontend
-          command: yarn build
+          command: yarn run build
 
 workflows:
   version: 2
