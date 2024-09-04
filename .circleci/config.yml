@@ -1,30 +1,51 @@
 version: 2.1
 
-orbs:
-  node: circleci/node@6.1.0
-  go: circleci/go@1.11.0
+executors:
+  go-executor:
+    docker:
+      - image: cimg/go:1.22.6
+    working_directory: ~/go/src/github.com/coderabbitai/grafana
+
+  node-executor:
+    docker:
+      - image: cimg/node:22.7.0
+    working_directory: ~/frontend
 
 jobs:
   build-backend:
-    executor: go/default
+    executor: go-executor
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - go-mod-cache-{{ checksum "go.sum" }}
+            - go-mod-cache-
       - run:
-          name: Tidy Go modules
-          command: go mod tidy
-      - go/install-deps:
-          cache-path: ~/go/pkg/mod
+          name: Install Go dependencies
+          command: go mod download
+      - save_cache:
+          paths:
+            - ~/go/pkg/mod
+          key: go-mod-cache-{{ checksum "go.sum" }}
       - run:
           name: Build backend
-          command: go run build.go build
+          command: go build -o bin/backend ./...
 
   build-frontend:
-    executor: node/default
+    executor: node-executor
     steps:
       - checkout
+      - restore_cache:
+          keys:
+            - yarn-cache-{{ checksum "yarn.lock" }}
+            - yarn-cache-
       - run:
-          name: Install frontend dependencies with Yarn
+          name: Install frontend dependencies
           command: yarn install --immutable
+      - save_cache:
+          paths:
+            - ~/.cache/yarn
+          key: yarn-cache-{{ checksum "yarn.lock" }}
       - run:
           name: Build frontend
           command: yarn build
