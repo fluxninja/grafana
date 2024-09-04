@@ -4,7 +4,7 @@ executors:
   go-executor:
     docker:
       - image: cimg/go:1.22.6
-    working_directory: ~/go/src/github.com/coderabbitai/grafana
+    working_directory: ~/github.com/grafana
 
   node-executor:
     docker:
@@ -12,7 +12,7 @@ executors:
     working_directory: ~/frontend
 
 jobs:
-  build-backend:
+  go-mod-install:
     executor: go-executor
     steps:
       - checkout
@@ -30,9 +30,6 @@ jobs:
           paths:
             - ~/go/pkg/mod
           key: go-mod-cache-{{ checksum "go.sum" }}
-      - run:
-          name: Run Grafana backend
-          command: go run ./pkg/cmd/grafana/main.go
 
   build-frontend:
     executor: node-executor
@@ -57,5 +54,5 @@ workflows:
   version: 2
   build-and-test:
     jobs:
-      - build-backend
+      - go-mod-install
       - build-frontend
