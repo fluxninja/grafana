@@ -23,13 +23,16 @@ jobs:
       - run:
           name: Install Go dependencies
           command: go mod download
+      - run:
+          name: Go mod tidy
+          command: go mod tidy
       - save_cache:
           paths:
             - ~/go/pkg/mod
           key: go-mod-cache-{{ checksum "go.sum" }}
       - run:
-          name: Build backend
-          command: go build -o bin/grafana ./...
+          name: Run Grafana backend
+          command: go run ./pkg/cmd/grafana/main.go
 
   build-frontend:
     executor: node-executor
