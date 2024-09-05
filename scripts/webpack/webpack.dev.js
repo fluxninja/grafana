@@ -26,7 +26,6 @@ const esbuildOptions = {
 };
 
 const envConfig = getEnvConfig();
-
 module.exports = (env = {}) => {
   return merge(common, {
     devtool: false,
@@ -143,7 +142,7 @@ module.exports = (env = {}) => {
       new DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify('development'),
-          SHOULD_LOG: JSON.stringify('true'),
+          SHOULD_LOG: JSON.stringify(process.env.SHOULD_LOG),
         },
       }),
     ],
