@@ -41,16 +41,6 @@ export const fnStateProps: FnStateProp[] = [
   'version',
 ];
 
-export const fnPropsMappedFromState: readonly FnPropMappedFromState[] = [
-  'FNDashboard',
-  'hiddenVariables',
-  'mode',
-  'uid',
-  'queryParams',
-  'slug',
-  'version',
-] as const;
-
 const INITIAL_MODE = GrafanaThemeType.Light;
 
 export const FN_STATE_KEY = 'fnGlobalState';

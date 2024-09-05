@@ -10,6 +10,7 @@ executors:
     docker:
       - image: cimg/node:22.7.0
     working_directory: ~/frontend
+    resource_class: large
 
 jobs:
   go-mod-install:

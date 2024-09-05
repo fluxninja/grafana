@@ -26,10 +26,9 @@ const esbuildOptions = {
 };
 
 const envConfig = getEnvConfig();
-
 module.exports = (env = {}) => {
   return merge(common, {
-    devtool: 'eval-source-map',
+    devtool: false,
     mode: 'development',
 
     entry: {
@@ -76,7 +75,6 @@ module.exports = (env = {}) => {
     //   removeEmptyChunks: false,
     //   splitChunks: false,
     // },
-
     optimization: {
       moduleIds: 'named',
       runtimeChunk: true,
@@ -95,6 +93,11 @@ module.exports = (env = {}) => {
         config: [__filename],
       },
     },
+
+    performance: {
+      hints: false,
+    },
+    parallelism: 2,
 
     plugins: [
       parseInt(env.noTsCheck, 10)
@@ -139,7 +142,7 @@ module.exports = (env = {}) => {
       new DefinePlugin({
         'process.env': {
           NODE_ENV: JSON.stringify('development'),
-          SHOULD_LOG: JSON.stringify('true'),
+          SHOULD_LOG: JSON.stringify(process.env.SHOULD_LOG),
         },
       }),
     ],
