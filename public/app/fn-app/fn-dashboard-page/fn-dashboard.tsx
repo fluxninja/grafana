@@ -1,8 +1,7 @@
-import { pick } from 'lodash';
 import { FC, useMemo } from 'react';
 
-import { FnPropMappedFromState, fnPropsMappedFromState } from 'app/core/reducers/fn-slice';
-import { StoreState, useSelector } from 'app/types';
+import { FnGlobalState, FnPropMappedFromState } from 'app/core/reducers/fn-slice';
+import { useSelector } from 'app/types';
 
 import { FnAppProvider } from '../fn-app-provider';
 import { FNDashboardProps } from '../types';
@@ -20,12 +19,8 @@ export const FNDashboard: FC<FNDashboardComponentProps> = (props) => {
   );
 };
 
-function mapStateToProps() {
-  return ({ fnGlobalState }: StoreState) => pick(fnGlobalState, ...fnPropsMappedFromState);
-}
-
 export const DashboardPortal: FC<FNDashboardComponentProps> = (p) => {
-  const globalFnProps = useSelector(mapStateToProps());
+  const globalFnProps = useSelector<FnGlobalState>(({ fnGlobalState }) => fnGlobalState);
 
   const props = useMemo(
     () => ({

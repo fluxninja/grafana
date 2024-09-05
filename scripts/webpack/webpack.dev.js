@@ -12,7 +12,7 @@ const path = require('path');
 const { DefinePlugin, EnvironmentPlugin } = require('webpack');
 const WebpackAssetsManifest = require('webpack-assets-manifest');
 const { merge } = require('webpack-merge');
-const WebpackBar = require('webpackbar');
+// const WebpackBar = require('webpackbar');
 
 const getEnvConfig = require('./env-util.js');
 const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
@@ -131,10 +131,10 @@ module.exports = (env = {}) => {
         integrity: true,
         publicPath: true,
       }),
-      new WebpackBar({
-        color: '#eb7b18',
-        name: 'Grafana',
-      }),
+      // new WebpackBar({
+      //   color: '#eb7b18',
+      //   name: 'Grafana',
+      // }),
       new EnvironmentPlugin(envConfig),
       new DefinePlugin({
         'process.env': {
