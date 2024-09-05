@@ -24,7 +24,7 @@ COPY conf/defaults.ini ./conf/defaults.ini
 
 RUN apk add --no-cache make build-base python3
 
-RUN yarn install --immutable
+RUN yarn install
 
 COPY tsconfig.json .eslintrc .editorconfig .browserslistrc .prettierrc.js ./
 COPY scripts scripts

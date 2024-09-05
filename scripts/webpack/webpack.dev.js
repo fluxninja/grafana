@@ -1,6 +1,8 @@
 'use strict';
 
 const browserslist = require('browserslist');
+const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
+const { EsbuildPlugin } = require('esbuild-loader');
 const { resolveToEsbuildTarget } = require('esbuild-plugin-browserslist');
 const ESLintPlugin = require('eslint-webpack-plugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
@@ -67,12 +69,22 @@ module.exports = (env = {}) => {
     },
 
     // https://webpack.js.org/guides/build-performance/#avoid-extra-optimization-steps
+    // optimization: {
+    //   moduleIds: 'named',
+    //   runtimeChunk: true,
+    //   removeAvailableModules: false,
+    //   removeEmptyChunks: false,
+    //   splitChunks: false,
+    // },
+
     optimization: {
       moduleIds: 'named',
       runtimeChunk: true,
       removeAvailableModules: false,
       removeEmptyChunks: false,
       splitChunks: false,
+      minimize: parseInt(env.noMinify, 10) !== 1,
+      minimizer: [new EsbuildPlugin(esbuildOptions), new CssMinimizerPlugin()],
     },
 
     // enable persistent cache for faster cold starts
