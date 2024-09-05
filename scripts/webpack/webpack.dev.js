@@ -12,7 +12,7 @@ const path = require('path');
 const { DefinePlugin, EnvironmentPlugin } = require('webpack');
 const WebpackAssetsManifest = require('webpack-assets-manifest');
 const { merge } = require('webpack-merge');
-// const WebpackBar = require('webpackbar');
+const WebpackBar = require('webpackbar');
 
 const getEnvConfig = require('./env-util.js');
 const HTMLWebpackCSSChunks = require('./plugins/HTMLWebpackCSSChunks');
@@ -29,7 +29,7 @@ const envConfig = getEnvConfig();
 
 module.exports = (env = {}) => {
   return merge(common, {
-    devtool: 'eval-source-map',
+    devtool: false,
     mode: 'development',
 
     entry: {
@@ -76,7 +76,6 @@ module.exports = (env = {}) => {
     //   removeEmptyChunks: false,
     //   splitChunks: false,
     // },
-
     optimization: {
       moduleIds: 'named',
       runtimeChunk: true,
@@ -95,6 +94,11 @@ module.exports = (env = {}) => {
         config: [__filename],
       },
     },
+
+    performance: {
+      hints: false,
+    },
+    parallelism: 2,
 
     plugins: [
       parseInt(env.noTsCheck, 10)
@@ -131,10 +135,10 @@ module.exports = (env = {}) => {
         integrity: true,
         publicPath: true,
       }),
-      // new WebpackBar({
-      //   color: '#eb7b18',
-      //   name: 'Grafana',
-      // }),
+      new WebpackBar({
+        color: '#eb7b18',
+        name: 'Grafana',
+      }),
       new EnvironmentPlugin(envConfig),
       new DefinePlugin({
         'process.env': {
