@@ -217,6 +217,7 @@ export class BackendSrv implements BackendService {
       if (codeRabbitOrg) {
         options.headers = options.headers ?? {};
         options.headers['x-coderabbit-organization'] = codeRabbitOrg.id;
+        options.headers['x-tenant-id'] = sessionStorage.getItem('firebaseTenantId');
       }
 
       if (options.url.startsWith('/')) {
