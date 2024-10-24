@@ -171,8 +171,8 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   blackBase = '45, 51, 62';
 
   primary = {
-    main: '#FF4702',
-    border: '#E33E00',
+    main: '#FF570AE5',
+    border: '#D9D9C8',
     text: '#101828',
   };
 
@@ -220,8 +220,8 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   background = {
-    primary: '#FFFFFF',
-    canvas: '#FFFFFF',
+    primary: '#F6F6F1',
+    canvas: '#F6F6F1',
     secondary: '#FAFAFA',
   };
 
