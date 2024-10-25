@@ -220,9 +220,9 @@ class LightColors implements ThemeColorsBase<Partial<ThemeRichColor>> {
   };
 
   background = {
-    primary: '#F6F6F1',
-    canvas: '#F6F6F1',
-    secondary: '#FAFAFA',
+    primary: '#F5F5F5',
+    canvas: '#F5F5F5',
+    secondary: '#F5f5f5',
   };
 
   action = {
