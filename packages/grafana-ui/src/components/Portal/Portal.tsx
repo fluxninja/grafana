@@ -13,7 +13,7 @@ interface Props {
   forwardedRef?: React.ForwardedRef<HTMLDivElement>;
 }
 
-export function Portal(props: PropsWithChildren<Props>) {
+export const Portal: React.FC<PropsWithChildren<Props>> = (props) => {
   const { children, className, root, forwardedRef } = props;
   const theme = useTheme2();
   const node = useRef<HTMLDivElement | null>(null);
