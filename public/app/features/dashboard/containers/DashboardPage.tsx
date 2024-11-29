@@ -1,22 +1,25 @@
 import { cx } from '@emotion/css';
 import { Portal } from '@mui/material';
-import React, { PureComponent } from 'react';
+import { PureComponent } from 'react';
 import { connect, ConnectedProps, MapDispatchToProps, MapStateToProps } from 'react-redux';
 
 import { NavModel, NavModelItem, TimeRange, PageLayoutType, locationUtil } from '@grafana/data';
 import { selectors } from '@grafana/e2e-selectors';
 import { config, locationService } from '@grafana/runtime';
-import { Themeable2, withTheme2, ToolbarButtonRow } from '@grafana/ui';
+import { Themeable2, withTheme2, ToolbarButtonRow, ToolbarButton, ModalsController } from '@grafana/ui';
 import { notifyApp } from 'app/core/actions';
+import { ScrollRefElement } from 'app/core/components/NativeScrollbar';
 import { Page } from 'app/core/components/Page/Page';
 import { EntityNotFound } from 'app/core/components/PageNotFound/EntityNotFound';
 import { GrafanaContext, GrafanaContextType } from 'app/core/context/GrafanaContext';
 import { createErrorNotification } from 'app/core/copy/appNotification';
+import { t } from 'app/core/internationalization';
 import { getKioskMode } from 'app/core/navigation/kiosk';
 import { GrafanaRouteComponentProps } from 'app/core/navigation/types';
 import { FnGlobalState } from 'app/core/reducers/fn-slice';
 import { getNavModel } from 'app/core/selectors/navModel';
 import { PanelModel } from 'app/features/dashboard/state';
+import { DashboardInteractions } from 'app/features/dashboard-scene/utils/interactions';
 import { dashboardWatcher } from 'app/features/live/dashboard/dashboardWatcher';
 import { updateTimeZoneForSession } from 'app/features/profile/state/reducers';
 import { getPageNavFromSlug, getRootContentNavModel } from 'app/features/storage/StorageFolderPage';
@@ -26,6 +29,7 @@ import { PanelEditEnteredEvent, PanelEditExitedEvent } from 'app/types/events';
 
 import { cancelVariables, templateVarsChangedInUrl } from '../../variables/state/actions';
 import { findTemplateVarChanges } from '../../variables/utils';
+import AddPanelButton from '../components/AddPanelButton/AddPanelButton';
 import { AddWidgetModal } from '../components/AddWidgetModal/AddWidgetModal';
 import { DashNav } from '../components/DashNav';
 import { DashNavTimeControls } from '../components/DashNav/DashNavTimeControls';
@@ -36,6 +40,7 @@ import { DashboardPrompt } from '../components/DashboardPrompt/DashboardPrompt';
 import { DashboardSettings } from '../components/DashboardSettings';
 import { PanelInspector } from '../components/Inspector/PanelInspector';
 import { PanelEditor } from '../components/PanelEditor/PanelEditor';
+import { SaveDashboardDrawer } from '../components/SaveDashboard/SaveDashboardDrawer';
 import { SubMenu } from '../components/SubMenu/SubMenu';
 import { DashboardGrid } from '../dashgrid/DashboardGrid';
 import { liveTimer } from '../dashgrid/liveTimer';
@@ -72,7 +77,7 @@ export type MapStateToDashboardPageProps = MapStateToProps<
   Pick<DashboardState, 'initPhase' | 'initError'> & {
     dashboard: ReturnType<DashboardState['getModel']>;
     navIndex: StoreState['navIndex'];
-  } & Pick<FnGlobalState, 'FNDashboard' | 'controlsContainer'>,
+  } & Pick<FnGlobalState, 'FNDashboard' | 'controlsContainer' | 'isCustomDashboard'>,
   OwnProps,
   StoreState
 >;
@@ -93,6 +98,7 @@ export const mapStateToProps: MapStateToDashboardPageProps = (state) => ({
   dashboard: state.dashboard.getModel(),
   navIndex: state.navIndex,
   FNDashboard: state.fnGlobalState.FNDashboard,
+  isCustomDashboard: state.fnGlobalState.isCustomDashboard,
   controlsContainer: state.fnGlobalState.controlsContainer,
 });
 
@@ -128,7 +134,7 @@ export interface State {
   showLoadingState: boolean;
   panelNotFound: boolean;
   editPanelAccessDenied: boolean;
-  scrollElement?: HTMLDivElement;
+  scrollElement?: ScrollRefElement;
   pageNav?: NavModelItem;
   sectionNav?: NavModel;
 }
@@ -152,9 +158,9 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
   componentDidMount() {
     this.initDashboard();
-    const { FNDashboard } = this.props;
+    const { FNDashboard, isCustomDashboard } = this.props;
 
-    if (!FNDashboard) {
+    if (!FNDashboard || isCustomDashboard) {
       this.forceRouteReloadCounter = (this.props.history.location?.state as any)?.routeReloadCounter || 0;
     }
   }
@@ -192,13 +198,13 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    const { dashboard, match, templateVarsChangedInUrl, FNDashboard } = this.props;
+    const { dashboard, match, templateVarsChangedInUrl, FNDashboard, isCustomDashboard } = this.props;
 
     if (!dashboard) {
       return;
     }
 
-    if (!FNDashboard) {
+    if (!FNDashboard || isCustomDashboard) {
       const routeReloadCounter = (this.props.history.location?.state as any)?.routeReloadCounter;
 
       if (
@@ -354,7 +360,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
     this.setState({ updateScrollTop: 0 });
   };
 
-  setScrollRef = (scrollElement: HTMLDivElement): void => {
+  setScrollRef = (scrollElement: ScrollRefElement): void => {
     this.setState({ scrollElement });
   };
 
@@ -378,7 +384,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   render() {
-    const { dashboard, initError, queryParams, FNDashboard, controlsContainer } = this.props;
+    const { dashboard, initError, queryParams, FNDashboard, controlsContainer, isCustomDashboard } = this.props;
     const { editPanel, viewPanel, pageNav, sectionNav } = this.state;
     const kioskMode = getKioskMode(this.props.queryParams);
 
@@ -391,12 +397,22 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
     const showToolbar = FNDashboard || (kioskMode !== KioskMode.Full && !queryParams.editview);
 
+    const isFNDashboardEditable = (isCustomDashboard && FNDashboard) || !FNDashboard;
+
+    console.log('Edit Panel: ', { editPanel, sectionNav, pageNav, isFNDashboardEditable });
+    console.log('Dashboard settings: ', { editView: queryParams.editview, pageNav, sectionNav, isFNDashboardEditable });
+    console.log('Add Widget: ', {
+      isFNDashboardEditable,
+      addWidget: queryParams.addWidget,
+      configToggle: config.featureToggles.vizAndWidgetSplit,
+    });
+
     const pageClassName = cx({
       'panel-in-fullscreen': Boolean(viewPanel),
       'page-hidden': Boolean(queryParams.editview || editPanel),
     });
 
-    if (dashboard.meta.dashboardNotFound) {
+    if (dashboard.meta.dashboardNotFound && !FNDashboard) {
       return (
         <Page navId="dashboards/browse" layout={PageLayoutType.Canvas} pageNav={{ text: 'Not found' }}>
           <EntityNotFound entity="Dashboard" />
@@ -417,27 +433,56 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
     );
 
     return (
-      <React.Fragment>
+      <>
         <Page
           navModel={sectionNav}
           pageNav={pageNav}
           layout={PageLayoutType.Canvas}
           className={pageClassName}
-          // scrollRef={this.setScrollRef}
-          // scrollTop={updateScrollTop}
-          style={{ minHeight: '550px' }}
+          onSetScrollRef={this.setScrollRef}
         >
           {showToolbar && (
             <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
               {FNDashboard ? (
-                FNTimeRange
+                <div
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'flex-end',
+                    gap: 4,
+                  }}
+                >
+                  {isCustomDashboard && (
+                    <>
+                      <ModalsController key="button-save">
+                        {({ showModal, hideModal }) => (
+                          <ToolbarButton
+                            tooltip={t('dashboard.toolbar.save', 'Save dashboard')}
+                            icon="save"
+                            onClick={() => {
+                              showModal(SaveDashboardDrawer, {
+                                dashboard,
+                                onDismiss: hideModal,
+                              });
+                            }}
+                          />
+                        )}
+                      </ModalsController>
+                      <AddPanelButton
+                        onToolbarAddMenuOpen={DashboardInteractions.toolbarAddClick}
+                        dashboard={dashboard}
+                        key="panel-add-dropdown"
+                        isFNDashboard
+                      />
+                    </>
+                  )}
+                  {FNTimeRange}
+                </div>
               ) : (
                 <DashNav
                   dashboard={dashboard}
                   title={dashboard.title}
                   folderTitle={dashboard.meta.folderTitle}
                   isFullscreen={!!viewPanel}
-                  // onAddPanel={this.onAddPanel}
                   kioskMode={kioskMode}
                   hideTimePicker={dashboard.timepicker.hidden}
                 />
@@ -453,14 +498,14 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           )}
           <DashboardGrid
             dashboard={dashboard}
-            isEditable={!!dashboard.meta.canEdit && !FNDashboard}
+            isEditable={isFNDashboardEditable && !!dashboard.meta.canEdit}
             viewPanel={viewPanel}
             editPanel={editPanel}
           />
 
           {inspectPanel && !FNDashboard && <PanelInspector dashboard={dashboard} panel={inspectPanel} />}
         </Page>
-        {editPanel && !FNDashboard && sectionNav && pageNav && (
+        {editPanel && sectionNav && pageNav && isFNDashboardEditable && (
           <PanelEditor
             dashboard={dashboard}
             sourcePanel={editPanel}
@@ -469,7 +514,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
             pageNav={pageNav}
           />
         )}
-        {queryParams.editview && !FNDashboard && pageNav && sectionNav && (
+        {queryParams.editview && pageNav && sectionNav && isFNDashboardEditable && (
           <DashboardSettings
             dashboard={dashboard}
             editview={queryParams.editview}
@@ -477,16 +522,18 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
             sectionNav={sectionNav}
           />
         )}
-        {!FNDashboard && queryParams.addWidget && config.featureToggles.vizAndWidgetSplit && <AddWidgetModal />}
-      </React.Fragment>
+        {isFNDashboardEditable && queryParams.addWidget && config.featureToggles.vizAndWidgetSplit && (
+          <AddWidgetModal />
+        )}
+      </>
     );
   }
 }
 
 function updateStatePageNavFromProps(props: Props, state: State): State {
-  const { dashboard, FNDashboard } = props;
+  const { dashboard, FNDashboard, isCustomDashboard } = props;
 
-  if (!dashboard || FNDashboard) {
+  if (!dashboard || (FNDashboard && !isCustomDashboard)) {
     return state;
   }
 

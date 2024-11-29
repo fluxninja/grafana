@@ -10,9 +10,10 @@ import AddPanelMenu from './AddPanelMenu';
 export interface Props {
   dashboard: DashboardModel;
   onToolbarAddMenuOpen?: () => void;
+  isFNDashboard?: boolean;
 }
 
-const AddPanelButton = ({ dashboard, onToolbarAddMenuOpen }: Props) => {
+const AddPanelButton = ({ dashboard, onToolbarAddMenuOpen, isFNDashboard }: Props) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   useEffect(() => {
@@ -29,8 +30,8 @@ const AddPanelButton = ({ dashboard, onToolbarAddMenuOpen }: Props) => {
       onVisibleChange={setIsMenuOpen}
     >
       <Button
-        variant="secondary"
-        size="sm"
+        variant="primary"
+        size={isFNDashboard ? 'md' : 'sm'}
         fill="outline"
         data-testid={selectors.components.PageToolbar.itemButton('Add button')}
       >

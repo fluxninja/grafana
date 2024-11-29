@@ -280,6 +280,7 @@ class createMfe {
             version: other.version,
             queryParams: other.queryParams,
             controlsContainer: other.controlsContainer,
+            isCustomDashboard: other.isCustomDashboard,
           })
         );
       }

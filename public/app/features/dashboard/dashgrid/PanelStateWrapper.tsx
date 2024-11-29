@@ -618,7 +618,7 @@ export class PanelStateWrapperDisConnected extends PureComponent<Props, State> {
 
 function mapStateToProps() {
   return (state: StoreState) => ({
-    isFnDashboard: state.fnGlobalState.FNDashboard,
+    isFnDashboard: state.fnGlobalState.FNDashboard && !state.fnGlobalState.isCustomDashboard,
   });
 }
 

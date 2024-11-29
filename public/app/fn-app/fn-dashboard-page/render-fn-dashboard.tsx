@@ -17,7 +17,7 @@ const DEFAULT_DASHBOARD_PAGE_PROPS: Pick<DashboardPageProps, 'history' | 'route'
     path: '/d/:uid/:slug?',
     url: '',
   },
-  history: {} as DashboardPageProps['history'],
+  history: locationService.getHistory(),
   route: {
     routeName: DashboardRoutes.Normal,
     path: '/d/:uid/:slug?',
