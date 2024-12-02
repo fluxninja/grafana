@@ -158,9 +158,9 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
   componentDidMount() {
     this.initDashboard();
-    const { FNDashboard, isCustomDashboard } = this.props;
+    const { FNDashboard } = this.props;
 
-    if (!FNDashboard || isCustomDashboard) {
+    if (!FNDashboard) {
       this.forceRouteReloadCounter = (this.props.history.location?.state as any)?.routeReloadCounter || 0;
     }
   }
@@ -198,13 +198,13 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   }
 
   componentDidUpdate(prevProps: Props, prevState: State) {
-    const { dashboard, match, templateVarsChangedInUrl, FNDashboard, isCustomDashboard } = this.props;
+    const { dashboard, match, templateVarsChangedInUrl, FNDashboard } = this.props;
 
     if (!dashboard) {
       return;
     }
 
-    if (!FNDashboard || isCustomDashboard) {
+    if (!FNDashboard) {
       const routeReloadCounter = (this.props.history.location?.state as any)?.routeReloadCounter;
 
       if (
@@ -407,6 +407,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       configToggle: config.featureToggles.vizAndWidgetSplit,
     });
 
+
     const pageClassName = cx({
       'panel-in-fullscreen': Boolean(viewPanel),
       'page-hidden': Boolean(queryParams.editview || editPanel),
@@ -440,6 +441,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           layout={PageLayoutType.Canvas}
           className={pageClassName}
           onSetScrollRef={this.setScrollRef}
+          style={{ minHeight: 600 }}
         >
           {showToolbar && (
             <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
@@ -489,7 +491,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
               )}
             </header>
           )}
-          {!FNDashboard && <DashboardPrompt dashboard={dashboard} />}
+          {!isFNDashboardEditable && <DashboardPrompt dashboard={dashboard} />}
           {initError && <DashboardFailed />}
           {showSubMenu && (
             <section aria-label={selectors.pages.Dashboard.SubMenu.submenu}>
@@ -503,7 +505,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
             editPanel={editPanel}
           />
 
-          {inspectPanel && !FNDashboard && <PanelInspector dashboard={dashboard} panel={inspectPanel} />}
+          {inspectPanel && isFNDashboardEditable && <PanelInspector dashboard={dashboard} panel={inspectPanel} />}
         </Page>
         {editPanel && sectionNav && pageNav && isFNDashboardEditable && (
           <PanelEditor
