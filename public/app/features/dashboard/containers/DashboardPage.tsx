@@ -274,17 +274,16 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
   };
 
   static getDerivedStateFromProps(props: Props, state: State) {
-    const { dashboard, queryParams } = props;
+    const { dashboard, queryParams, isCustomDashboard, FNDashboard } = props;
 
     const urlEditPanelId = queryParams.editPanel;
     const urlViewPanelId = queryParams.viewPanel;
 
-    if (!dashboard) {
+    if (!dashboard || (FNDashboard && !isCustomDashboard)) {
       return state;
     }
 
     const updatedState = { ...state };
-
     // Entering edit mode
     if (!state.editPanel && urlEditPanelId) {
       const panel = dashboard.getPanelByUrlId(urlEditPanelId);
@@ -398,15 +397,6 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
     const showToolbar = FNDashboard || (kioskMode !== KioskMode.Full && !queryParams.editview);
 
     const isFNDashboardEditable = (isCustomDashboard && FNDashboard) || !FNDashboard;
-
-    console.log('Edit Panel: ', { editPanel, sectionNav, pageNav, isFNDashboardEditable });
-    console.log('Dashboard settings: ', { editView: queryParams.editview, pageNav, sectionNav, isFNDashboardEditable });
-    console.log('Add Widget: ', {
-      isFNDashboardEditable,
-      addWidget: queryParams.addWidget,
-      configToggle: config.featureToggles.vizAndWidgetSplit,
-    });
-
 
     const pageClassName = cx({
       'panel-in-fullscreen': Boolean(viewPanel),

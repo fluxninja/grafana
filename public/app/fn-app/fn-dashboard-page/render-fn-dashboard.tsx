@@ -1,4 +1,4 @@
-import { merge, isFunction } from 'lodash';
+import { merge, isFunction, isEqual } from 'lodash';
 import { useEffect, FC, useMemo } from 'react';
 
 import { locationService as locationSrv, HistoryWrapper } from '@grafana/runtime';
@@ -50,26 +50,39 @@ export const RenderFNDashboard: FC<FNDashboardProps> = (props) => {
   }, [firstError, setErrors]);
 
   useEffect(() => {
-    locationService.fnPathnameChange(window.location.pathname, queryParams);
+    const searchParams = getSearchParamsObject();
+    if (isEqual(searchParams, queryParams)) {
+      return;
+    }
+    locationService.fnPathnameChange(window.location.pathname, {
+      ...searchParams,
+      ...queryParams,
+    });
   }, [queryParams]);
 
-  const dashboardPageProps: DashboardPageProps = useMemo(
-    () =>
-      merge({}, DEFAULT_DASHBOARD_PAGE_PROPS, {
-        ...DEFAULT_DASHBOARD_PAGE_PROPS,
-        match: {
-          params: {
-            ...props,
-          },
+  const dashboardPageProps: DashboardPageProps = useMemo(() => {
+    return merge({}, DEFAULT_DASHBOARD_PAGE_PROPS, {
+      ...DEFAULT_DASHBOARD_PAGE_PROPS,
+      match: {
+        params: {
+          ...props,
         },
-        location: locationService.getLocation(),
-        queryParams,
-        hiddenVariables,
-        controlsContainer,
-        isLoading,
-      }),
-    [controlsContainer, hiddenVariables, isLoading, props, queryParams]
-  );
+      },
+      location: locationService.getLocation(),
+      queryParams: {
+        ...getSearchParamsObject(),
+        ...queryParams,
+      },
+      hiddenVariables,
+      controlsContainer,
+      isLoading,
+    });
+  }, [controlsContainer, hiddenVariables, isLoading, props, queryParams]);
 
   return <DashboardPage {...dashboardPageProps} />;
 };
+
+function getSearchParamsObject() {
+  const searchParams = new URLSearchParams(window.location.search);
+  return Object.fromEntries(searchParams.entries());
+}

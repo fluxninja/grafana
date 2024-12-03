@@ -12,7 +12,9 @@ import {
   reportInteraction,
 } from '@grafana/runtime';
 import { ErrorBoundaryAlert, GlobalStyles } from '@grafana/ui';
+import { AngularRoot } from 'app/angular/AngularRoot';
 import { loadAndInitAngularIfEnabled } from 'app/angular/loadAndInitAngularIfEnabled';
+import { AppChrome } from 'app/core/components/AppChrome/AppChrome';
 import { ModalsContextProvider } from 'app/core/context/ModalsContextProvider';
 import { ThemeProvider } from 'app/core/utils/ConfigProvider';
 import { FnLoader } from 'app/features/dashboard/components/DashboardLoading/FnLoader';
@@ -66,7 +68,12 @@ export const FnAppProvider: FC<PropsWithChildren<FnAppProviderProps>> = (props) 
                     <CompatRouter>
                       <ModalsContextProvider>
                         <GlobalStyles />
-                        {children}
+                        <div className="grafana-app">
+                          <AppChrome>
+                            <AngularRoot />
+                            {children}
+                          </AppChrome>
+                        </div>
                       </ModalsContextProvider>
                     </CompatRouter>
                   </LocationServiceProvider>
