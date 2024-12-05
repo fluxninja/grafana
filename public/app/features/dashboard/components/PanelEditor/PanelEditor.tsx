@@ -72,6 +72,8 @@ const mapStateToProps = (state: StoreState, ownProps: OwnProps) => {
     uiState: state.panelEditor.ui,
     tableViewEnabled: state.panelEditor.tableViewEnabled,
     variables: getVariablesByKey(ownProps.dashboard.uid, state),
+    isMFEDashboard: state.fnGlobalState.FNDashboard,
+    isMFECustomDashboard: state.fnGlobalState.isCustomDashboard,
   };
 };
 
@@ -431,27 +433,33 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
   };
 
   render() {
-    const { initDone, uiState, theme, sectionNav, pageNav, className, updatePanelEditorUIState } = this.props;
+    const { initDone, uiState, theme, sectionNav, pageNav, className, updatePanelEditorUIState, isMFECustomDashboard } = this.props;
     const styles = getStyles(theme, this.props);
 
     if (!initDone) {
       return null;
     }
 
-    return (
-      <Page
-        navModel={sectionNav}
-        pageNav={pageNav}
-        data-testid={selectors.components.PanelEditor.General.content}
-        layout={PageLayoutType.Custom}
-        className={className}
-      >
-        <AppChromeUpdate
+    console.log('PanelEditor.tsx this.props', {
+      isPanelOptionVisible: uiState.isPanelOptionsVisible,
+      isMFECustomDashboard,
+      modelState: this.state.showSaveLibraryPanelModal,
+    });
+
+    const editPanelContent = (
+      <>
+      {
+        !isMFECustomDashboard ? (
+          <AppChromeUpdate
           actions={<ToolbarButtonRow alignment="right">{this.renderEditorActions()}</ToolbarButtonRow>}
-        />
+          />
+        ): (
+          <ToolbarButtonRow alignment="right">{this.renderEditorActions()}</ToolbarButtonRow>
+        )
+      }
         <div className={styles.wrapper}>
           <div className={styles.verticalSplitPanesWrapper}>
-            {!uiState.isPanelOptionsVisible ? (
+            {!uiState.isPanelOptionsVisible || isMFECustomDashboard ? (
               this.renderPanelAndEditor(uiState, styles)
             ) : (
               <SplitPaneWrapper
@@ -480,7 +488,25 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
             />
           )}
         </div>
-      </Page>
+      </>
+    )
+
+    return (
+      <>
+      {
+        !isMFECustomDashboard ? (
+          <Page
+          navModel={sectionNav}
+          pageNav={pageNav}
+          data-testid={selectors.components.PanelEditor.General.content}
+          layout={PageLayoutType.Custom}
+          className={className}
+        >
+        {editPanelContent}
+        </Page>
+        ): <div>{editPanelContent}</div>
+      }
+      </>
     );
   }
 }

@@ -54,7 +54,7 @@ export const DashboardPortal: FC<FNDashboardComponentProps> = (p) => {
 
   return (
     <RenderPortal ID="grafana-portal">
-      <div className="page-dashboard">{content}</div>
+      {content}
     </RenderPortal>
   );
 };

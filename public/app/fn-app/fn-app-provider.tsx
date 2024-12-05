@@ -11,7 +11,7 @@ import {
   navigationLogger,
   reportInteraction,
 } from '@grafana/runtime';
-import { ErrorBoundaryAlert, GlobalStyles } from '@grafana/ui';
+import { ErrorBoundaryAlert, GlobalStyles, ModalRoot } from '@grafana/ui';
 import { AngularRoot } from 'app/angular/AngularRoot';
 import { loadAndInitAngularIfEnabled } from 'app/angular/loadAndInitAngularIfEnabled';
 import { AppChrome } from 'app/core/components/AppChrome/AppChrome';
@@ -74,6 +74,7 @@ export const FnAppProvider: FC<PropsWithChildren<FnAppProviderProps>> = (props) 
                             {children}
                           </AppChrome>
                         </div>
+                        <ModalRoot />
                       </ModalsContextProvider>
                     </CompatRouter>
                   </LocationServiceProvider>

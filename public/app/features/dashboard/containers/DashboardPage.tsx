@@ -423,6 +423,8 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
       </Portal>
     );
 
+    const isPanelEditorVisible = editPanel && sectionNav && pageNav && isFNDashboardEditable
+
     return (
       <>
         <Page
@@ -431,7 +433,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
           layout={PageLayoutType.Canvas}
           className={pageClassName}
           onSetScrollRef={this.setScrollRef}
-          style={{ minHeight: 600 }}
+          style={{ minHeight: 600, position: 'relative' }}
         >
           {showToolbar && (
             <header data-testid={selectors.pages.Dashboard.DashNav.navV2}>
@@ -497,7 +499,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
 
           {inspectPanel && isFNDashboardEditable && <PanelInspector dashboard={dashboard} panel={inspectPanel} />}
         </Page>
-        {editPanel && sectionNav && pageNav && isFNDashboardEditable && (
+        {isPanelEditorVisible && (
           <PanelEditor
             dashboard={dashboard}
             sourcePanel={editPanel}
