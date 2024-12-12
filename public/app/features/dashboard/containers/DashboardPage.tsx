@@ -483,7 +483,7 @@ export class UnthemedDashboardPage extends PureComponent<Props, State> {
               )}
             </header>
           )}
-          {!isFNDashboardEditable && <DashboardPrompt dashboard={dashboard} />}
+          <DashboardPrompt dashboard={dashboard} />
           {initError && <DashboardFailed />}
           {showSubMenu && (
             <section aria-label={selectors.pages.Dashboard.SubMenu.submenu}>

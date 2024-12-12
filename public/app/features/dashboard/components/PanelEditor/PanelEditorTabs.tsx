@@ -20,9 +20,10 @@ interface PanelEditorTabsProps {
   dashboard: DashboardModel;
   tabs: PanelEditorTab[];
   onChangeTab: (tab: PanelEditorTab) => void;
+  isMfeEditPanel?: boolean;
 }
 
-export const PanelEditorTabs = memo(({ panel, dashboard, tabs, onChangeTab }: PanelEditorTabsProps) => {
+export const PanelEditorTabs = memo(({ panel, dashboard, tabs, onChangeTab, isMfeEditPanel }: PanelEditorTabsProps) => {
   const forceUpdate = useForceUpdate();
   const styles = useStyles2(getStyles);
 
@@ -49,7 +50,7 @@ export const PanelEditorTabs = memo(({ panel, dashboard, tabs, onChangeTab }: Pa
     return () => eventSubs.unsubscribe();
   }, [panel, dashboard, forceUpdate]);
 
-  const activeTab = tabs.find((item) => item.active)!;
+  const activeTab = !isMfeEditPanel? tabs.find((item) => item.active)!: tabs.find((item) => item.id === PanelEditorTabId.Query)!;
 
   if (tabs.length === 0) {
     return null;
@@ -60,7 +61,7 @@ export const PanelEditorTabs = memo(({ panel, dashboard, tabs, onChangeTab }: Pa
   return (
     <div className={styles.wrapper}>
       <TabsBar className={styles.tabBar} hideBorder>
-        {tabs.map((tab) => {
+        {!isMfeEditPanel ? tabs.map((tab) => {
           if (tab.id === PanelEditorTabId.Alert && alertingEnabled) {
             return (
               <PanelAlertTab
@@ -84,7 +85,7 @@ export const PanelEditorTabs = memo(({ panel, dashboard, tabs, onChangeTab }: Pa
               counter={getCounter(panel, tab)}
             />
           );
-        })}
+        }): null}
       </TabsBar>
       <TabContent className={styles.tabContent}>
         {activeTab.id === PanelEditorTabId.Query && <PanelEditorQueries panel={panel} queries={panel.targets} />}

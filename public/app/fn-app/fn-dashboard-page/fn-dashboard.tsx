@@ -1,9 +1,11 @@
 import { FC, useMemo } from 'react';
 
+import { ModalRoot, PortalContainer } from '@grafana/ui';
+import { AppWrapper } from 'app/AppWrapper';
+import app from 'app/app';
 import { FnGlobalState, FnPropMappedFromState } from 'app/core/reducers/fn-slice';
 import { useSelector } from 'app/types';
 
-import { FnAppProvider } from '../fn-app-provider';
 import { FNDashboardProps } from '../types';
 import { RenderPortal } from '../utils';
 
@@ -13,9 +15,9 @@ type FNDashboardComponentProps = Omit<FNDashboardProps, FnPropMappedFromState>;
 
 export const FNDashboard: FC<FNDashboardComponentProps> = (props) => {
   return (
-    <FnAppProvider fnError={props.fnError}>
+    <AppWrapper app={app} isMFE>
       <DashboardPortal {...props} />
-    </FnAppProvider>
+    </AppWrapper>
   );
 };
 
@@ -54,6 +56,8 @@ export const DashboardPortal: FC<FNDashboardComponentProps> = (p) => {
 
   return (
     <RenderPortal ID="grafana-portal">
+      <ModalRoot />
+      <PortalContainer />
       {content}
     </RenderPortal>
   );

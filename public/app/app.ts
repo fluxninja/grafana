@@ -44,7 +44,7 @@ import {
 import { setPanelDataErrorView } from '@grafana/runtime/src/components/PanelDataErrorView';
 import { setPanelRenderer } from '@grafana/runtime/src/components/PanelRenderer';
 import { setPluginPage } from '@grafana/runtime/src/components/PluginPage';
-import config, { updateConfig } from 'app/core/config';
+import config, { Settings, updateConfig } from 'app/core/config';
 import { arrayMove } from 'app/core/utils/arrayMove';
 import { getStandardTransformers } from 'app/features/transformers/standardTransformers';
 
@@ -125,7 +125,7 @@ if (process.env.NODE_ENV === 'development') {
 export class GrafanaApp {
   context!: GrafanaContextType;
 
-  async init() {
+  async init(isMFE = false) {
     try {
       // Let iframe container know grafana has started loading
       parent.postMessage('GrafanaAppInit', '*');
@@ -133,7 +133,19 @@ export class GrafanaApp {
       const initI18nPromise = initializeI18n(config.bootData.user.language);
       initI18nPromise.then(({ language }) => updateConfig({ language }));
 
-      setBackendSrv(backendSrv);
+      if(isMFE){
+        backendSrv.setGrafanaPrefix(true);
+        setBackendSrv(backendSrv);
+        const settings: Settings = await backendSrv.get('/api/frontend/settings');
+
+        config.panels = settings.panels;
+        config.datasources = settings.datasources;
+        config.defaultDatasource = settings.defaultDatasource;
+      } else {
+        setBackendSrv(backendSrv);
+      }
+
+
       initEchoSrv();
       initIconCache();
       // This needs to be done after the `initEchoSrv` since it is being used under the hood.
@@ -270,12 +282,14 @@ export class GrafanaApp {
 
       initializeScopes();
 
-      const root = createRoot(document.getElementById('reactRoot')!);
-      root.render(
-        createElement(AppWrapper, {
-          app: this,
-        })
-      );
+      if(!isMFE){
+        const root = createRoot(document.getElementById('reactRoot')!);
+        root.render(
+          createElement(AppWrapper, {
+            app: this,
+          })
+        );
+      }
     } catch (error) {
       console.error('Failed to start Grafana', error);
       window.__grafana_load_failed();

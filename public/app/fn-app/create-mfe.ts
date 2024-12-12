@@ -14,6 +14,7 @@ import { GrafanaTheme2 } from '@grafana/data/src/themes/types';
 import { ThemeChangedEvent } from '@grafana/runtime';
 import { GrafanaBootConfig } from '@grafana/runtime/src/config';
 import { getTheme } from '@grafana/ui';
+import app from 'app/app';
 import appEvents from 'app/core/app_events';
 import config from 'app/core/config';
 import {
@@ -25,7 +26,6 @@ import {
   fnStateProps,
 } from 'app/core/reducers/fn-slice';
 import { backendSrv } from 'app/core/services/backend_srv';
-import fn_app from 'app/fn_app';
 import { FnLoggerService } from 'app/fn_logger';
 import { dispatch } from 'app/store/store';
 
@@ -89,7 +89,7 @@ class createMfe {
   }
 
   static boot() {
-    return () => fn_app.init();
+    return () => app.init(true);
   }
 
   private static toggleTheme = (mode: FNDashboardProps['mode']): GrafanaThemeType.Light | GrafanaThemeType.Dark =>

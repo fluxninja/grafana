@@ -277,6 +277,7 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
             dashboard={dashboard}
             tabs={tabs}
             onChangeTab={this.onChangeTab}
+            isMfeEditPanel={this.props.isMFEDashboard}
           />
         </div>
       </SplitPaneWrapper>
@@ -433,33 +434,32 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
   };
 
   render() {
-    const { initDone, uiState, theme, sectionNav, pageNav, className, updatePanelEditorUIState, isMFECustomDashboard } = this.props;
+    const { initDone, uiState, theme, sectionNav, pageNav, className, updatePanelEditorUIState, isMFECustomDashboard } =
+      this.props;
     const styles = getStyles(theme, this.props);
 
     if (!initDone) {
       return null;
     }
 
-    console.log('PanelEditor.tsx this.props', {
-      isPanelOptionVisible: uiState.isPanelOptionsVisible,
-      isMFECustomDashboard,
-      modelState: this.state.showSaveLibraryPanelModal,
-    });
-
-    const editPanelContent = (
-      <>
-      {
-        !isMFECustomDashboard ? (
+    return (
+      <Page
+        navModel={sectionNav}
+        pageNav={pageNav}
+        data-testid={selectors.components.PanelEditor.General.content}
+        layout={PageLayoutType.Custom}
+        className={!isMFECustomDashboard ? className : styles.mfeWrapper}
+      >
+        {!isMFECustomDashboard ? (
           <AppChromeUpdate
-          actions={<ToolbarButtonRow alignment="right">{this.renderEditorActions()}</ToolbarButtonRow>}
+            actions={<ToolbarButtonRow alignment="right">{this.renderEditorActions()}</ToolbarButtonRow>}
           />
-        ): (
+        ) : (
           <ToolbarButtonRow alignment="right">{this.renderEditorActions()}</ToolbarButtonRow>
-        )
-      }
+        )}
         <div className={styles.wrapper}>
           <div className={styles.verticalSplitPanesWrapper}>
-            {!uiState.isPanelOptionsVisible || isMFECustomDashboard ? (
+            {!uiState.isPanelOptionsVisible ? (
               this.renderPanelAndEditor(uiState, styles)
             ) : (
               <SplitPaneWrapper
@@ -488,25 +488,7 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
             />
           )}
         </div>
-      </>
-    )
-
-    return (
-      <>
-      {
-        !isMFECustomDashboard ? (
-          <Page
-          navModel={sectionNav}
-          pageNav={pageNav}
-          data-testid={selectors.components.PanelEditor.General.content}
-          layout={PageLayoutType.Custom}
-          className={className}
-        >
-        {editPanelContent}
-        </Page>
-        ): <div>{editPanelContent}</div>
-      }
-      </>
+      </Page>
     );
   }
 }
@@ -521,12 +503,16 @@ export const getStyles = stylesFactory((theme: GrafanaTheme2, props: Props) => {
   const paneSpacing = theme.spacing(2);
 
   return {
+    mfeWrapper: css({
+      height: '100vh',
+    }),
     wrapper: css({
       width: '100%',
       flexGrow: 1,
       minHeight: 0,
       display: 'flex',
       paddingTop: theme.spacing(2),
+      height: '100%',
     }),
     verticalSplitPanesWrapper: css({
       display: 'flex',
