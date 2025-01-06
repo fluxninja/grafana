@@ -36,7 +36,7 @@ const (
 	HeaderPanelPluginId  = "X-Panel-Plugin-Id"
 	HeaderQueryGroupID   = "X-Query-Group-Id"    // mainly useful for finding related queries with query chunking
 	HeaderFromExpression = "X-Grafana-From-Expr" // used by datasources to identify expression queries
-	headerCodeRabbitOrg  = "X-CodeRabbit-Org-Id"    // used by CodeRabbit Org Id use to set Row Level Security to scope queries to org
+	headerCodeRabbitOrg  = "X-CodeRabbit-Org-Id" // used by CodeRabbit Org Id use to set Row Level Security to scope queries to org
 )
 
 func ProvideService(
@@ -264,11 +264,11 @@ func (s *ServiceImpl) handleQuerySingleDatasource(ctx context.Context, user iden
 	codeRabbitOrgId := ""
 	reqCtx := contexthandler.FromContext(ctx)
 	if reqCtx != nil && reqCtx.Req != nil {
-		s.log.Info("CodeRabbitOrgID found in header")
 		codeRabbitOrgId = reqCtx.Req.Header.Get(headerCodeRabbitOrg)
 	}
 
 	if codeRabbitOrgId != "" {
+		s.log.Info("CodeRabbitOrgID found in header")
 		setQuery := s.createScopeToOrgQuery(codeRabbitOrgId, ds, true)
 		resetQuery := s.createScopeToOrgQuery(codeRabbitOrgId, ds, false)
 
