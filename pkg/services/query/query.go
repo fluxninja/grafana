@@ -36,6 +36,7 @@ const (
 	HeaderPanelPluginId  = "X-Panel-Plugin-Id"
 	HeaderQueryGroupID   = "X-Query-Group-Id"    // mainly useful for finding related queries with query chunking
 	HeaderFromExpression = "X-Grafana-From-Expr" // used by datasources to identify expression queries
+	headerCodeRabbitOrg  = "X-CodeRabbit-Org-Id"    // used by CodeRabbit Org Id use to set Row Level Security to scope queries to org
 )
 
 func ProvideService(
@@ -259,6 +260,46 @@ func (s *ServiceImpl) handleQuerySingleDatasource(ctx context.Context, user iden
 	if err != nil {
 		return nil, err
 	}
+
+	codeRabbitOrgId := ""
+	reqCtx := contexthandler.FromContext(ctx)
+	if reqCtx != nil && reqCtx.Req != nil {
+		s.log.Info("CodeRabbitOrgID found in header")
+		codeRabbitOrgId = reqCtx.Req.Header.Get(headerCodeRabbitOrg)
+	}
+
+	if codeRabbitOrgId != "" {
+		setQuery := s.createScopeToOrgQuery(codeRabbitOrgId, ds, true)
+		resetQuery := s.createScopeToOrgQuery(codeRabbitOrgId, ds, false)
+
+		setQueryReq := &backend.QueryDataRequest{
+			PluginContext: pCtx,
+			Headers:       map[string]string{},
+			Queries:       []backend.DataQuery{},
+		}
+		setQueryReq.Queries = append(setQueryReq.Queries, setQuery)
+		_, err := s.pluginClient.QueryData(ctx, setQueryReq)
+		if err != nil {
+			s.log.Error("Error querying data", "error", err)
+			return nil, err
+		} else {
+			s.log.Info("Applied RLS Query: ")
+		}
+
+		defer func() {
+			resetQueryReq := &backend.QueryDataRequest{
+				PluginContext: pCtx,
+				Headers:       map[string]string{},
+				Queries:       []backend.DataQuery{},
+			}
+			resetQueryReq.Queries = append(resetQueryReq.Queries, resetQuery)
+			_, err := s.pluginClient.QueryData(ctx, resetQueryReq)
+			if err != nil {
+				s.log.Error("Error querying data", "error", err)
+			}
+		}()
+	}
+
 	req := &backend.QueryDataRequest{
 		PluginContext: pCtx,
 		Headers:       map[string]string{},
@@ -339,6 +380,36 @@ func (s *ServiceImpl) parseMetricRequest(ctx context.Context, user identity.Requ
 	}
 
 	return req, req.validateRequest(ctx)
+}
+
+func (s *ServiceImpl) createScopeToOrgQuery(codeRabbitOrgId string, ds *datasources.DataSource, setOrg bool) backend.DataQuery {
+	setOrgID := fmt.Sprintf("SET app.current_org_id = '%s'", codeRabbitOrgId)
+	resetOrgID := "RESET app.current_org_id"
+
+	rawSql := ""
+	if setOrg {
+		rawSql = setOrgID
+	} else {
+		rawSql = resetOrgID
+	}
+
+	return backend.DataQuery{
+		TimeRange: backend.TimeRange{
+			From: time.Now().Add(-time.Hour),
+			To:   time.Now(),
+		},
+		RefID:         "rls_setup",
+		MaxDataPoints: 100,
+		Interval:      1000 * time.Millisecond,
+		QueryType:     rawSql,
+		JSON: []byte(`{
+		"datasource": {"uid": "` + ds.UID + `"},
+		"intervalMs": 1000,
+		"maxDataPoints": 100,
+		"rawSql": "` + rawSql + `",
+		"format": "table",
+		"refId": "rls_setup"}`),
+	}
 }
 
 func (s *ServiceImpl) getDataSourceFromQuery(ctx context.Context, user identity.Requester, skipDSCache bool, query *simplejson.Json, history map[string]*datasources.DataSource) (*datasources.DataSource, error) {
