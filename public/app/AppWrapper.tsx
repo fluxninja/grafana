@@ -30,6 +30,8 @@ import { LiveConnectionWarning } from './features/live/LiveConnectionWarning';
 
 interface AppWrapperProps {
   app: GrafanaApp;
+  isMFE?: boolean;
+  children?: React.ReactNode | null;
 }
 
 interface AppWrapperState {
@@ -88,7 +90,7 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
   }
 
   render() {
-    const { app } = this.props;
+    const { app, isMFE, children } = this.props;
     const { ready } = this.state;
 
     navigationLogger('AppWrapper', false, 'rendering');
@@ -116,22 +118,29 @@ export class AppWrapper extends Component<AppWrapperProps, AppWrapperState> {
                         <GlobalStyles />
                         <div className="grafana-app">
                           <AppChrome>
-                            <AngularRoot />
-                            <AppNotificationList />
-                            <Stack gap={0} grow={1} direction="column">
-                              {pageBanners.map((Banner, index) => (
-                                <Banner key={index.toString()} />
+                            <>
+                              <AngularRoot />
+                              <AppNotificationList />
+                              <Stack gap={0} grow={1} direction="column">
+                                {pageBanners.map((Banner, index) => (
+                                  <Banner key={index.toString()} />
+                                ))}
+                                {ready && !isMFE && this.renderRoutes()}
+                              </Stack>
+                              {bodyRenderHooks.map((Hook, index) => (
+                                <Hook key={index.toString()} />
                               ))}
-                              {ready && this.renderRoutes()}
-                            </Stack>
-                            {bodyRenderHooks.map((Hook, index) => (
-                              <Hook key={index.toString()} />
-                            ))}
+                            </>
+                            {children}
                           </AppChrome>
                         </div>
                         <LiveConnectionWarning />
-                        <ModalRoot />
-                        <PortalContainer />
+                        {!isMFE && (
+                          <>
+                            <ModalRoot />
+                            <PortalContainer />
+                          </>
+                        )}
                       </ModalsContextProvider>
                     </CompatRouter>
                   </LocationServiceProvider>

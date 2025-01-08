@@ -6,6 +6,7 @@ import { AnyObject } from '../../fn-app/types';
 
 export interface FnGlobalState {
   FNDashboard: boolean;
+  isCustomDashboard: boolean;
   uid: string;
   slug: string;
   version: number;
@@ -48,6 +49,7 @@ export const FN_STATE_KEY = 'fnGlobalState';
 export const INITIAL_FN_STATE: FnGlobalState = {
   // NOTE: initial value is false
   FNDashboard: false,
+  isCustomDashboard: false,
   uid: '',
   slug: '',
   version: 1,

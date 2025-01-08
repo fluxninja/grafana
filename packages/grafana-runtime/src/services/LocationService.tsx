@@ -21,6 +21,7 @@ export interface LocationService {
   getHistory: () => H.History;
   getSearch: () => URLSearchParams;
   getSearchObject: () => UrlQueryMap;
+  fnPathnameChange: (path: string, queryParams: any) => void;
 
   /**
    * This is from the old LocationSrv interface

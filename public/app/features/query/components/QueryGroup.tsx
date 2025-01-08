@@ -27,7 +27,7 @@ import { dataSource as expressionDatasource } from 'app/features/expressions/Exp
 import { AngularDeprecationPluginNotice } from 'app/features/plugins/angularDeprecation/AngularDeprecationPluginNotice';
 import { isSharedDashboardQuery } from 'app/plugins/datasource/dashboard';
 import { GrafanaQuery } from 'app/plugins/datasource/grafana/types';
-import { QueryGroupOptions } from 'app/types';
+import { QueryGroupOptions, StoreState, useSelector } from 'app/types';
 
 import { isAngularDatasourcePluginAndNotHidden } from '../../plugins/angularDeprecation/utils';
 import { PanelQueryRunner } from '../state/PanelQueryRunner';
@@ -36,6 +36,7 @@ import { updateQueries } from '../state/updateQueries';
 import { GroupActionComponents } from './QueryActionComponent';
 import { QueryEditorRows } from './QueryEditorRows';
 import { QueryGroupOptionsEditor } from './QueryGroupOptions';
+
 
 export interface Props {
   queryRunner: PanelQueryRunner;
@@ -404,6 +405,13 @@ export function QueryGroupTopSection({
 }: QueryGroupTopSectionProps) {
   const styles = getStyles();
   const [isHelpOpen, setIsHelpOpen] = useState(false);
+  const { FNDashboard, isCustomDashboard } = useSelector((state: StoreState) => state.fnGlobalState);
+
+  // do not render data source selection options in micro frontend dashboard
+  if(isCustomDashboard && FNDashboard){
+    return null;
+  }
+
   return (
     <>
       <div data-testid={selectors.components.QueryTab.queryGroupTopSection}>

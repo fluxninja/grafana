@@ -72,6 +72,8 @@ const mapStateToProps = (state: StoreState, ownProps: OwnProps) => {
     uiState: state.panelEditor.ui,
     tableViewEnabled: state.panelEditor.tableViewEnabled,
     variables: getVariablesByKey(ownProps.dashboard.uid, state),
+    isMFEDashboard: state.fnGlobalState.FNDashboard,
+    isMFECustomDashboard: state.fnGlobalState.isCustomDashboard,
   };
 };
 
@@ -275,6 +277,7 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
             dashboard={dashboard}
             tabs={tabs}
             onChangeTab={this.onChangeTab}
+            isMfeEditPanel={this.props.isMFEDashboard}
           />
         </div>
       </SplitPaneWrapper>
@@ -431,7 +434,8 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
   };
 
   render() {
-    const { initDone, uiState, theme, sectionNav, pageNav, className, updatePanelEditorUIState } = this.props;
+    const { initDone, uiState, theme, sectionNav, pageNav, className, updatePanelEditorUIState, isMFECustomDashboard } =
+      this.props;
     const styles = getStyles(theme, this.props);
 
     if (!initDone) {
@@ -444,11 +448,15 @@ export class PanelEditorUnconnected extends PureComponent<Props> {
         pageNav={pageNav}
         data-testid={selectors.components.PanelEditor.General.content}
         layout={PageLayoutType.Custom}
-        className={className}
+        className={!isMFECustomDashboard ? className : styles.mfeWrapper}
       >
-        <AppChromeUpdate
-          actions={<ToolbarButtonRow alignment="right">{this.renderEditorActions()}</ToolbarButtonRow>}
-        />
+        {!isMFECustomDashboard ? (
+          <AppChromeUpdate
+            actions={<ToolbarButtonRow alignment="right">{this.renderEditorActions()}</ToolbarButtonRow>}
+          />
+        ) : (
+          <ToolbarButtonRow alignment="right">{this.renderEditorActions()}</ToolbarButtonRow>
+        )}
         <div className={styles.wrapper}>
           <div className={styles.verticalSplitPanesWrapper}>
             {!uiState.isPanelOptionsVisible ? (
@@ -495,12 +503,16 @@ export const getStyles = stylesFactory((theme: GrafanaTheme2, props: Props) => {
   const paneSpacing = theme.spacing(2);
 
   return {
+    mfeWrapper: css({
+      height: '100vh',
+    }),
     wrapper: css({
       width: '100%',
       flexGrow: 1,
       minHeight: 0,
       display: 'flex',
       paddingTop: theme.spacing(2),
+      height: '100%',
     }),
     verticalSplitPanesWrapper: css({
       display: 'flex',

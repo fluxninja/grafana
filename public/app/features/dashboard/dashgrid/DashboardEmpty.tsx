@@ -26,7 +26,10 @@ export interface Props {
 const DashboardEmpty = ({ dashboard, canCreate }: Props) => {
   const styles = useStyles2(getStyles);
   const dispatch = useDispatch();
-  const initialDatasource = useSelector((state) => state.dashboard.initialDatasource);
+  const { initialDatasource, isFNDashboard } = useSelector((state) => ({
+    initialDatasource: state.dashboard.initialDatasource,
+    isFNDashboard: state.fnGlobalState.FNDashboard
+  }));
 
   const onAddVisualization = () => {
     let id;
@@ -63,14 +66,18 @@ const DashboardEmpty = ({ dashboard, canCreate }: Props) => {
                   Start your new dashboard by adding a visualization
                 </Trans>
               </Text>
-              <Box marginBottom={2} paddingX={4}>
-                <Text element="p" textAlignment="center" color="secondary">
-                  <Trans i18nKey="dashboard.empty.add-visualization-body">
-                    Select a data source and then query and visualize your data with charts, stats and tables or create
-                    lists, markdowns and other widgets.
-                  </Trans>
-                </Text>
-              </Box>
+
+                  <Box marginBottom={2} paddingX={4}>
+                  <Text element="p" textAlignment="center" color="secondary">
+                    {
+                      !isFNDashboard ? <Trans i18nKey="dashboard.empty.add-visualization-body">
+                        Select a data source and then query and visualize your data with charts, stats and tables or create
+                        lists, markdowns and other widgets.
+                      </Trans>: `Visualize CodeRabbit Review metrics using charts, tables and other widgets.`
+                    }
+                  </Text>
+                </Box>
+
               <Button
                 size="lg"
                 icon="plus"
@@ -82,83 +89,87 @@ const DashboardEmpty = ({ dashboard, canCreate }: Props) => {
               </Button>
             </Stack>
           </Box>
-          <Stack direction={{ xs: 'column', md: 'row' }} wrap="wrap" gap={4}>
-            {config.featureToggles.vizAndWidgetSplit && (
+          {
+            !isFNDashboard && (
+              <Stack direction={{ xs: 'column', md: 'row' }} wrap="wrap" gap={4}>
+              {config.featureToggles.vizAndWidgetSplit && (
+                <Box borderColor="strong" borderStyle="dashed" padding={3} flex={1}>
+                  <Stack direction="column" alignItems="center" gap={1}>
+                    <Text element="h3" textAlignment="center" weight="medium">
+                      <Trans i18nKey="dashboard.empty.add-widget-header">Add a widget</Trans>
+                    </Text>
+                    <Box marginBottom={2}>
+                      <Text element="p" textAlignment="center" color="secondary">
+                        <Trans i18nKey="dashboard.empty.add-widget-body">Create lists, markdowns and other widgets</Trans>
+                      </Text>
+                    </Box>
+                    <Button
+                      icon="plus"
+                      fill="outline"
+                      data-testid={selectors.pages.AddDashboard.itemButton('Create new widget button')}
+                      onClick={() => {
+                        DashboardInteractions.emptyDashboardButtonClicked({ item: 'add_widget' });
+                        locationService.partial({ addWidget: true });
+                      }}
+                      disabled={!canCreate}
+                    >
+                      <Trans i18nKey="dashboard.empty.add-widget-button">Add widget</Trans>
+                    </Button>
+                  </Stack>
+                </Box>
+              )}
               <Box borderColor="strong" borderStyle="dashed" padding={3} flex={1}>
                 <Stack direction="column" alignItems="center" gap={1}>
                   <Text element="h3" textAlignment="center" weight="medium">
-                    <Trans i18nKey="dashboard.empty.add-widget-header">Add a widget</Trans>
+                    <Trans i18nKey="dashboard.empty.add-library-panel-header">Import panel</Trans>
                   </Text>
                   <Box marginBottom={2}>
                     <Text element="p" textAlignment="center" color="secondary">
-                      <Trans i18nKey="dashboard.empty.add-widget-body">Create lists, markdowns and other widgets</Trans>
+                      <Trans i18nKey="dashboard.empty.add-library-panel-body">
+                        Add visualizations that are shared with other dashboards.
+                      </Trans>
                     </Text>
                   </Box>
                   <Button
                     icon="plus"
                     fill="outline"
-                    data-testid={selectors.pages.AddDashboard.itemButton('Create new widget button')}
-                    onClick={() => {
-                      DashboardInteractions.emptyDashboardButtonClicked({ item: 'add_widget' });
-                      locationService.partial({ addWidget: true });
-                    }}
+                    data-testid={selectors.pages.AddDashboard.itemButton('Add a panel from the panel library button')}
+                    onClick={onAddLibraryPanel}
                     disabled={!canCreate}
                   >
-                    <Trans i18nKey="dashboard.empty.add-widget-button">Add widget</Trans>
+                    <Trans i18nKey="dashboard.empty.add-library-panel-button">Add library panel</Trans>
                   </Button>
                 </Stack>
               </Box>
-            )}
-            <Box borderColor="strong" borderStyle="dashed" padding={3} flex={1}>
-              <Stack direction="column" alignItems="center" gap={1}>
-                <Text element="h3" textAlignment="center" weight="medium">
-                  <Trans i18nKey="dashboard.empty.add-library-panel-header">Import panel</Trans>
-                </Text>
-                <Box marginBottom={2}>
-                  <Text element="p" textAlignment="center" color="secondary">
-                    <Trans i18nKey="dashboard.empty.add-library-panel-body">
-                      Add visualizations that are shared with other dashboards.
-                    </Trans>
+              <Box borderColor="strong" borderStyle="dashed" padding={3} flex={1}>
+                <Stack direction="column" alignItems="center" gap={1}>
+                  <Text element="h3" textAlignment="center" weight="medium">
+                    <Trans i18nKey="dashboard.empty.import-a-dashboard-header">Import a dashboard</Trans>
                   </Text>
-                </Box>
-                <Button
-                  icon="plus"
-                  fill="outline"
-                  data-testid={selectors.pages.AddDashboard.itemButton('Add a panel from the panel library button')}
-                  onClick={onAddLibraryPanel}
-                  disabled={!canCreate}
-                >
-                  <Trans i18nKey="dashboard.empty.add-library-panel-button">Add library panel</Trans>
-                </Button>
-              </Stack>
-            </Box>
-            <Box borderColor="strong" borderStyle="dashed" padding={3} flex={1}>
-              <Stack direction="column" alignItems="center" gap={1}>
-                <Text element="h3" textAlignment="center" weight="medium">
-                  <Trans i18nKey="dashboard.empty.import-a-dashboard-header">Import a dashboard</Trans>
-                </Text>
-                <Box marginBottom={2}>
-                  <Text element="p" textAlignment="center" color="secondary">
-                    <Trans i18nKey="dashboard.empty.import-a-dashboard-body">
-                      Import dashboards from files or <a href="https://grafana.com/grafana/dashboards/">grafana.com</a>.
-                    </Trans>
-                  </Text>
-                </Box>
-                <Button
-                  icon="upload"
-                  fill="outline"
-                  data-testid={selectors.pages.AddDashboard.itemButton('Import dashboard button')}
-                  onClick={() => {
-                    DashboardInteractions.emptyDashboardButtonClicked({ item: 'import_dashboard' });
-                    onImportDashboard();
-                  }}
-                  disabled={!canCreate}
-                >
-                  <Trans i18nKey="dashboard.empty.import-dashboard-button">Import dashboard</Trans>
-                </Button>
-              </Stack>
-            </Box>
-          </Stack>
+                  <Box marginBottom={2}>
+                    <Text element="p" textAlignment="center" color="secondary">
+                      <Trans i18nKey="dashboard.empty.import-a-dashboard-body">
+                        Import dashboards from files or <a href="https://grafana.com/grafana/dashboards/">grafana.com</a>.
+                      </Trans>
+                    </Text>
+                  </Box>
+                  <Button
+                    icon="upload"
+                    fill="outline"
+                    data-testid={selectors.pages.AddDashboard.itemButton('Import dashboard button')}
+                    onClick={() => {
+                      DashboardInteractions.emptyDashboardButtonClicked({ item: 'import_dashboard' });
+                      onImportDashboard();
+                    }}
+                    disabled={!canCreate}
+                  >
+                    <Trans i18nKey="dashboard.empty.import-dashboard-button">Import dashboard</Trans>
+                  </Button>
+                </Stack>
+              </Box>
+            </Stack>
+            )
+          }
         </Stack>
       </div>
     </Stack>

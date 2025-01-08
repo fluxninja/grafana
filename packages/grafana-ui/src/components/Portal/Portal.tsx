@@ -60,6 +60,7 @@ export function PortalContainer() {
   return (
     <div
       id="grafana-portal-container"
+      data-qiankun="grafana-full-app"
       className={cx({
         [styles.grafanaPortalContainer]: isBodyScrolling,
       })}
